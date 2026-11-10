@@ -60,7 +60,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           <a
-            href="https://github.com/dhaneshwar/chunklens"
+            href="https://github.com/Dhanesh10war/chunklens"
             target="_blank"
             rel="noreferrer"
             className="flex items-center space-x-1 px-2.5 py-1.5 rounded-md text-xs font-medium text-slate-300 bg-surface border border-slate-800 hover:border-slate-700 transition-colors"

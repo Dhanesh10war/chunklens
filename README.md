@@ -44,7 +44,7 @@ Retrieval-Augmented Generation (RAG) applications live and die by document chunk
 ### Run Locally
 ```bash
 # 1. Clone repository
-git clone https://github.com/dhaneshwar/chunklens.git
+git clone https://github.com/Dhanesh10war/chunklens.git
 cd chunklens
 
 # 2. Install dependencies
@@ -111,4 +111,4 @@ ChunkLens is designed to run indefinitely on permanent $0 free-tier infrastructu
 
 ## 📄 License
 
-Licensed under the [MIT License](./LICENSE). Created by [Dhaneshwar](https://github.com/dhaneshwar).
+Licensed under the [MIT License](./LICENSE). Created by [Dhaneshwar](https://github.com/Dhanesh10war).
