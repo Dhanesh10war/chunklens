@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useDeferredValue } from 'react';
 import { ChunkingConfig } from './engine/types';
 import { SAMPLE_DOCUMENTS } from './data/samples';
 import { executeChunking } from './engine/chunkers';
@@ -8,33 +8,44 @@ import { MetricsBar } from './components/MetricsBar';
 import { VisualCanvas } from './components/VisualCanvas';
 import { ComparisonView } from './components/ComparisonView';
 import { ExportModal } from './components/ExportModal';
-import { Edit3, Eye, FileText } from 'lucide-react';
+import { Edit3, Eye, FileText, RotateCcw } from 'lucide-react';
 import { cn } from './utils/cn';
+import { loadStoredSession, saveStoredSession, clearStoredSession, DEFAULT_SESSION } from './utils/storage';
 
 export const App: React.FC = () => {
-  // Active sample or custom document text
-  const [selectedSampleId, setSelectedSampleId] = useState<string | null>('api-reference');
-  const [documentTitle, setDocumentTitle] = useState<string>(SAMPLE_DOCUMENTS[0].title);
-  const [rawText, setRawText] = useState<string>(SAMPLE_DOCUMENTS[0].content);
+  // Load restored session or default sample
+  const initialSession = useMemo(() => loadStoredSession(), []);
+
+  const [selectedSampleId, setSelectedSampleId] = useState<string | null>(initialSession.selectedSampleId);
+  const [documentTitle, setDocumentTitle] = useState<string>(initialSession.documentTitle);
+  const [rawText, setRawText] = useState<string>(initialSession.rawText);
 
   // Chunking parameters
-  const [config, setConfig] = useState<ChunkingConfig>({
-    strategy: 'recursive',
-    chunkSize: 400,
-    chunkOverlap: 40,
-    unit: 'tokens',
-    encoding: 'o200k_base',
-  });
+  const [config, setConfig] = useState<ChunkingConfig>(initialSession.config);
 
   // UI state
   const [isCompareMode, setIsCompareMode] = useState<boolean>(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'visualizer' | 'editor'>('visualizer');
 
-  // Reactive chunking execution (debounced automatically via React rendering)
+  // Persist session changes to localStorage
+  useEffect(() => {
+    saveStoredSession({
+      selectedSampleId,
+      documentTitle,
+      rawText,
+      config,
+    });
+  }, [selectedSampleId, documentTitle, rawText, config]);
+
+  // Decouple high-frequency slider dragging from CPU tokenization for smooth 60fps UI
+  const deferredText = useDeferredValue(rawText);
+  const deferredConfig = useDeferredValue(config);
+
+  // Reactive chunking execution using deferred inputs
   const chunkingResult = useMemo(() => {
-    return executeChunking(rawText, config);
-  }, [rawText, config]);
+    return executeChunking(deferredText, deferredConfig);
+  }, [deferredText, deferredConfig]);
 
   const handleSelectSample = (sampleId: string) => {
     const sample = SAMPLE_DOCUMENTS.find((s) => s.id === sampleId);
@@ -49,6 +60,14 @@ export const App: React.FC = () => {
     setSelectedSampleId(null);
     setDocumentTitle(filename);
     setRawText(content);
+  };
+
+  const handleResetToDefaults = () => {
+    clearStoredSession();
+    setSelectedSampleId(DEFAULT_SESSION.selectedSampleId);
+    setDocumentTitle(DEFAULT_SESSION.documentTitle);
+    setRawText(DEFAULT_SESSION.rawText);
+    setConfig(DEFAULT_SESSION.config);
   };
 
   return (
@@ -75,11 +94,19 @@ export const App: React.FC = () => {
       {/* Main Workspace Area */}
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Document Header & Tab Navigation */}
-        <div className="px-6 py-2 border-b border-slate-800 bg-[#0b101d] flex items-center justify-between text-xs">
+        <div className="px-6 py-2 border-b border-slate-800 bg-[#0b101d] flex flex-wrap items-center justify-between gap-2 text-xs">
           <div className="flex items-center space-x-2">
             <FileText className="h-4 w-4 text-primary-400" />
             <span className="font-medium text-slate-300">Document:</span>
             <span className="text-white font-semibold font-mono">{documentTitle}</span>
+            <button
+              onClick={handleResetToDefaults}
+              className="ml-2 flex items-center space-x-1 text-[11px] text-slate-400 hover:text-slate-200 px-2 py-0.5 rounded bg-surface-elevated border border-slate-700 transition-colors"
+              title="Reset document and chunking settings to defaults"
+            >
+              <RotateCcw className="h-3 w-3" />
+              <span>Reset</span>
+            </button>
           </div>
 
           <div className="flex items-center space-x-1 bg-surface-elevated p-0.5 rounded border border-slate-700">
