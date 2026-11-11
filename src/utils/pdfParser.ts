@@ -3,6 +3,8 @@
  * Extracts text from PDF documents entirely within the browser runtime with zero server transmission.
  */
 
+import pdfWorkerUrl from 'pdfjs-dist/legacy/build/pdf.worker.min.mjs?url';
+
 export interface PdfParseResult {
   text: string;
   pageCount: number;
@@ -15,6 +17,10 @@ export interface PdfParseResult {
 export async function extractTextFromPdf(data: ArrayBuffer | Uint8Array): Promise<PdfParseResult> {
   // Dynamically import legacy build for universal browser & Node test compatibility
   const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+
+  if (pdfjs.GlobalWorkerOptions && !pdfjs.GlobalWorkerOptions.workerSrc) {
+    pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+  }
 
   const uint8 = data instanceof Uint8Array ? data : new Uint8Array(data);
 
