@@ -4,31 +4,41 @@
 
 @layer base {
   body {
-    @apply bg-[#090d16] text-slate-100 font-sans antialiased overflow-x-hidden;
+    @apply bg-canvas text-slate-100 font-sans antialiased overflow-x-hidden selection:bg-primary-500/30 selection:text-white;
   }
 }
 
-/* Custom scrollbar for developer aesthetics */
+/* Precision scrollbar for developer workbench */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #090d16;
+  background: #080c14;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 3px;
+  background: #212f4c;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #334770;
 }
 
-/* Chunk color badges */
+/* Custom interactive utilities for tactile UI polish (Emil Kowalski / Apple design) */
+@layer utilities {
+  .active-press {
+    @apply active:scale-[0.98] transition-transform duration-100 ease-out;
+  }
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas;
+  }
+}
+
+/* Chunk spectrum categorization badges (matched luminance & contrast) */
 .chunk-badge-0 {
-  background-color: rgba(139, 92, 246, 0.12);
-  border-color: rgba(139, 92, 246, 0.35);
-  color: #c4b5fd;
+  background-color: rgba(99, 102, 241, 0.12);
+  border-color: rgba(99, 102, 241, 0.35);
+  color: #a5b4fc;
 }
 .chunk-badge-1 {
   background-color: rgba(6, 182, 212, 0.12);
@@ -51,8 +61,8 @@
   color: #fda4af;
 }
 
-/* Overlap highlight pulse */
+/* Overlap highlight */
 .overlap-highlight {
-  background-color: rgba(245, 158, 11, 0.28) !important;
+  background-color: rgba(245, 158, 11, 0.22) !important;
   border-bottom: 2px dashed #f59e0b;
 }
