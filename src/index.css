@@ -2,67 +2,162 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* LIGHT THEME */
+  --bg-base: #FAFAFA;
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #F4F4F5;
+  --border-subtle: rgba(0, 0, 0, 0.05);
+  --border-default: rgba(0, 0, 0, 0.08);
+  --border-hover: rgba(0, 0, 0, 0.16);
+
+  --text-primary: #18181B;
+  --text-secondary: #71717A;
+  --text-tertiary: #64646D; /* 5.2:1 contrast against #FAFAFA */
+
+  --accent: oklch(0.55 0.18 275);
+  --accent-hover: oklch(0.50 0.18 275);
+  --accent-subtle: rgba(79, 70, 229, 0.08);
+  --accent-ring: oklch(0.55 0.18 275);
+
+  --status-error: oklch(0.55 0.18 25);
+  --status-warn: oklch(0.65 0.15 75);
+  --status-success: oklch(0.58 0.14 150);
+
+  /* Light Chunk Palette (L=0.60, C=0.13) */
+  --chunk-0: oklch(0.60 0.13 250);
+  --chunk-0-bg: oklch(0.60 0.13 250 / 0.10);
+  --chunk-1: oklch(0.60 0.13 200);
+  --chunk-1-bg: oklch(0.60 0.13 200 / 0.10);
+  --chunk-2: oklch(0.60 0.13 150);
+  --chunk-2-bg: oklch(0.60 0.13 150 / 0.10);
+  --chunk-3: oklch(0.60 0.13 85);
+  --chunk-3-bg: oklch(0.60 0.13 85 / 0.10);
+  --chunk-4: oklch(0.60 0.13 40);
+  --chunk-4-bg: oklch(0.60 0.13 40 / 0.10);
+  --chunk-5: oklch(0.60 0.13 340);
+  --chunk-5-bg: oklch(0.60 0.13 340 / 0.10);
+  --chunk-6: oklch(0.60 0.13 290);
+  --chunk-6-bg: oklch(0.60 0.13 290 / 0.10);
+  --chunk-7: oklch(0.60 0.13 120);
+  --chunk-7-bg: oklch(0.60 0.13 120 / 0.10);
+}
+
+.dark {
+  /* DARK THEME (DEFAULT) */
+  --bg-base: #0A0A0B;      /* near-black neutral, NOT navy */
+  --bg-surface: #111113;   /* panels */
+  --bg-elevated: #17171A;  /* popovers, menus, hovered rows */
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.10);
+  --border-hover: rgba(255, 255, 255, 0.18);
+
+  --text-primary: #EDEDEF;
+  --text-secondary: #A1A1AA;
+  --text-tertiary: #8A8A93; /* 5.9:1 contrast against #0A0A0B */
+
+  --accent: oklch(0.68 0.14 275);
+  --accent-hover: oklch(0.72 0.14 275);
+  --accent-subtle: rgba(99, 102, 241, 0.12);
+  --accent-ring: oklch(0.68 0.14 275);
+
+  --status-error: oklch(0.65 0.15 25);
+  --status-warn: oklch(0.75 0.13 75);
+  --status-success: oklch(0.70 0.12 150);
+
+  /* Dark Chunk Palette (L=0.72, C=0.11) */
+  --chunk-0: oklch(0.72 0.11 250);
+  --chunk-0-bg: oklch(0.72 0.11 250 / 0.13);
+  --chunk-1: oklch(0.72 0.11 200);
+  --chunk-1-bg: oklch(0.72 0.11 200 / 0.13);
+  --chunk-2: oklch(0.72 0.11 150);
+  --chunk-2-bg: oklch(0.72 0.11 150 / 0.13);
+  --chunk-3: oklch(0.72 0.11 90);
+  --chunk-3-bg: oklch(0.72 0.11 90 / 0.13);
+  --chunk-4: oklch(0.72 0.11 40);
+  --chunk-4-bg: oklch(0.72 0.11 40 / 0.13);
+  --chunk-5: oklch(0.72 0.11 340);
+  --chunk-5-bg: oklch(0.72 0.11 340 / 0.13);
+  --chunk-6: oklch(0.72 0.11 290);
+  --chunk-6-bg: oklch(0.72 0.11 290 / 0.13);
+  --chunk-7: oklch(0.72 0.11 120);
+  --chunk-7-bg: oklch(0.72 0.11 120 / 0.13);
+}
+
 @layer base {
+  * {
+    border-color: var(--border-default);
+  }
+  html {
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+  }
   body {
-    @apply bg-canvas text-slate-100 font-sans antialiased overflow-x-hidden selection:bg-primary-500/30 selection:text-white;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, 'Geist Sans', 'Inter', 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
   }
 }
 
-/* Precision scrollbar for developer workbench */
+/* Precision Hairline Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #080c14;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #212f4c;
-  border-radius: 4px;
+  background: var(--border-default);
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334770;
+  background: var(--border-hover);
 }
 
-/* Custom interactive utilities for tactile UI polish (Emil Kowalski / Apple design) */
+/* Interaction and Craft Utilities (Emil Kowalski / Linear quality) */
 @layer utilities {
   .active-press {
-    @apply active:scale-[0.98] transition-transform duration-100 ease-out;
+    transition: transform 120ms ease-out;
+  }
+  .active-press:active {
+    transform: scale(0.98);
   }
   .focus-ring {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas;
+    outline: none;
+  }
+  .focus-ring:focus-visible {
+    outline: 2px solid var(--accent-ring);
+    outline-offset: 2px;
+  }
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
   }
 }
 
-/* Chunk spectrum categorization badges (matched luminance & contrast) */
-.chunk-badge-0 {
-  background-color: rgba(99, 102, 241, 0.12);
-  border-color: rgba(99, 102, 241, 0.35);
-  color: #a5b4fc;
-}
-.chunk-badge-1 {
-  background-color: rgba(6, 182, 212, 0.12);
-  border-color: rgba(6, 182, 212, 0.35);
-  color: #67e8f9;
-}
-.chunk-badge-2 {
-  background-color: rgba(16, 185, 129, 0.12);
-  border-color: rgba(16, 185, 129, 0.35);
-  color: #6ee7b7;
-}
-.chunk-badge-3 {
-  background-color: rgba(245, 158, 11, 0.12);
-  border-color: rgba(245, 158, 11, 0.35);
-  color: #fcd34d;
-}
-.chunk-badge-4 {
-  background-color: rgba(244, 63, 94, 0.12);
-  border-color: rgba(244, 63, 94, 0.35);
-  color: #fda4af;
+/* Diagonal Overlap Pattern */
+.overlap-hatch {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--overlap-c1, rgba(255, 255, 255, 0.05)),
+    var(--overlap-c1, rgba(255, 255, 255, 0.05)) 4px,
+    var(--overlap-c2, rgba(255, 255, 255, 0.12)) 4px,
+    var(--overlap-c2, rgba(255, 255, 255, 0.12)) 8px
+  );
+  border-bottom: 1.5px dashed var(--border-default);
 }
 
-/* Overlap highlight */
-.overlap-highlight {
-  background-color: rgba(245, 158, 11, 0.22) !important;
-  border-bottom: 2px dashed #f59e0b;
+/* Accessibility: Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

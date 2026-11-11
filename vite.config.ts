@@ -13,6 +13,16 @@ export default defineConfig({
   optimizeDeps: {
     include: ['js-tiktoken'],
   },
+  server: {
+    host: '127.0.0.1',
+    port: 5173,
+    allowedHosts: true,
+  },
+  preview: {
+    host: '127.0.0.1',
+    port: 4173,
+    allowedHosts: true,
+  },
   build: {
     chunkSizeWarningLimit: 6000,
     rollupOptions: {

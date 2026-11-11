@@ -8,42 +8,65 @@ export default {
   theme: {
     extend: {
       colors: {
-        canvas: '#080c14',
-        panel: '#0d1422',
-        surface: '#131c30',
-        subtle: '#1a2640',
-        'surface-elevated': '#18243e',
+        // Semantic Enterprise Tokens (Linear / Vercel grade)
+        'bg-base': 'var(--bg-base)',
+        'bg-surface': 'var(--bg-surface)',
+        'bg-elevated': 'var(--bg-elevated)',
+
+        // Backwards-compatible aliases mapping to semantic tokens
+        canvas: 'var(--bg-base)',
+        panel: 'var(--bg-surface)',
+        surface: 'var(--bg-surface)',
+        subtle: 'var(--bg-elevated)',
+        'surface-elevated': 'var(--bg-elevated)',
+
         border: {
-          subtle: '#162034',
-          DEFAULT: '#212f4c',
-          hover: '#334770',
+          subtle: 'var(--border-subtle)',
+          DEFAULT: 'var(--border-default)',
+          hover: 'var(--border-hover)',
         },
-        primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6', // Precision Cobalt
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
-          DEFAULT: '#3b82f6',
+
+        text: {
+          primary: 'var(--text-primary)',
+          secondary: 'var(--text-secondary)',
+          tertiary: 'var(--text-tertiary)',
         },
+
         accent: {
-          cyan: '#06b6d4',
-          emerald: '#10b981',
-          amber: '#f59e0b',
-          crimson: '#ef4444',
-          rose: '#f43f5e',
-          violet: '#8b5cf6',
-          cobalt: '#3b82f6',
-        }
+          DEFAULT: 'var(--accent)',
+          hover: 'var(--accent-hover)',
+          subtle: 'var(--accent-subtle)',
+          ring: 'var(--accent-ring)',
+        },
+
+        // Single primary accent mapping
+        primary: {
+          DEFAULT: 'var(--accent)',
+          50: 'var(--accent-subtle)',
+          400: 'var(--accent)',
+          500: 'var(--accent)',
+          600: 'var(--accent)',
+          700: 'var(--accent-hover)',
+        },
+
+        status: {
+          error: 'var(--status-error)',
+          warn: 'var(--status-warn)',
+          success: 'var(--status-success)',
+        },
+      },
+      fontSize: {
+        '2xs': ['11px', { lineHeight: '14px', letterSpacing: '0.01em' }],
+        'xs': ['12px', { lineHeight: '16px', letterSpacing: '0' }],
+        'sm': ['13px', { lineHeight: '18px', letterSpacing: '-0.005em' }],
+        'base': ['14px', { lineHeight: '20px', letterSpacing: '-0.01em' }],
+        'md': ['16px', { lineHeight: '24px', letterSpacing: '-0.015em' }],
+        'lg': ['20px', { lineHeight: '28px', letterSpacing: '-0.02em' }],
+        'xl': ['28px', { lineHeight: '34px', letterSpacing: '-0.025em' }],
       },
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
-        mono: ['"JetBrains Mono"', '"SF Mono"', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+        sans: ['Geist Sans', 'Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        mono: ['Geist Mono', '"JetBrains Mono"', '"SF Mono"', 'Menlo', 'Monaco', 'monospace'],
       },
       borderRadius: {
         sm: '4px',
@@ -53,9 +76,10 @@ export default {
         xl: '12px',
       },
       boxShadow: {
-        subtle: '0 1px 2px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.05)',
-        inset: 'inset 0 1px 1px 0 rgba(0, 0, 0, 0.3)',
-      }
+        subtle: '0 1px 2px 0 rgba(0, 0, 0, 0.25)',
+        elevated: '0 4px 12px 0 rgba(0, 0, 0, 0.35)',
+        modal: '0 12px 32px 0 rgba(0, 0, 0, 0.50)',
+      },
     },
   },
   plugins: [],
