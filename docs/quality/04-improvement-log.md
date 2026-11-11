@@ -43,4 +43,22 @@
   - Ran `npm run test` (24 passed across 2 test files).
   - Ran `npm run typecheck` (passed with 0 errors).
   - Ran `npm run build` (passed).
+- **Git Commit:** `1d01a2a`
+
+---
+
+## Batch 3: Strategy-Aware Production Code Exporters
+- **Issue IDs:** ISS-03
+- **Goal:** Update `src/exporters/codeExporters.ts` to generate code specifically tailored to the active strategy (Markdown, Sentence, Fixed, Recursive) across all 4 frameworks.
+- **Files Modified:**
+  - `src/exporters/codeExporters.ts`: Implemented strategy-tailored templates:
+    - LangChain Python: `MarkdownHeaderTextSplitter` + `RecursiveCharacterTextSplitter` for markdown, sentence-delimiter splitter for sentence, `CharacterTextSplitter` for fixed, `RecursiveCharacterTextSplitter` for recursive.
+    - LlamaIndex Python: `MarkdownNodeParser` for markdown, `TokenTextSplitter` for fixed, `SentenceSplitter` for sentence/recursive.
+    - LangChain.js: `MarkdownHeaderTextSplitter` for markdown, sentence/recursive splitters.
+    - Native Python: Standalone header-aware markdown chunker, grammatical sentence chunker, and sliding window chunker.
+  - `src/exporters/__tests__/codeExporters.test.ts`: Added unit tests verifying generated code templates across all 4 frameworks and 4 strategies (12 tests total).
+- **Verification:**
+  - Ran `npm run test` (31 passed across 2 test files).
+  - Ran `npm run typecheck` (passed with 0 errors).
+  - Ran `npm run build` (passed).
 - **Git Commit:** Pending.
