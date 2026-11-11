@@ -3,7 +3,7 @@ import { ChunkMetadata, ChunkingConfig, CodeExportFramework } from '../engine/ty
 import { generateExportCode } from '../exporters/codeExporters';
 import { exportChunksToJson, exportChunksToCsv, downloadFile } from '../exporters/dataExporters';
 import { copyToClipboard } from '../utils/clipboard';
-import { X, Copy, Check, Terminal, FileJson, FileSpreadsheet } from 'lucide-react';
+import { X, Copy, Check, Terminal, FileJson, FileSpreadsheet, Code2, Cpu, Boxes, FileCode } from 'lucide-react';
 import { cn } from '../utils/cn';
 
 interface ExportModalProps {
@@ -48,112 +48,121 @@ export const ExportModal: React.FC<ExportModalProps> = ({
     downloadFile(csvStr, `${safeTitle}_chunks_${config.strategy}.csv`, 'text/csv');
   };
 
-  const tabs: { id: CodeExportFramework; label: string; icon: string }[] = [
-    { id: 'langchain-python', label: 'LangChain (Python)', icon: '🐍' },
-    { id: 'llamaindex-python', label: 'LlamaIndex (Python)', icon: '🦙' },
-    { id: 'langchain-js', label: 'LangChain.js (TS)', icon: '⚡' },
-    { id: 'native-python', label: 'Native Python (0 Deps)', icon: '📦' },
+  const tabs: { id: CodeExportFramework; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+    { id: 'langchain-python', label: 'LangChain (Python)', icon: Code2 },
+    { id: 'llamaindex-python', label: 'LlamaIndex (Python)', icon: Cpu },
+    { id: 'langchain-js', label: 'LangChain.js (TS)', icon: FileCode },
+    { id: 'native-python', label: 'Native Python (0 Deps)', icon: Boxes },
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="bg-[#0f172a] border border-slate-700 rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 animate-in fade-in duration-150">
+      <div className="bg-panel border border-border rounded-lg w-full max-w-3xl overflow-hidden shadow-2xl">
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-[#090d16]/80">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-border bg-surface">
           <div className="flex items-center space-x-2.5">
-            <div className="p-1.5 rounded-lg bg-primary-500/10 text-primary-400">
-              <Terminal className="h-5 w-5" />
+            <div className="p-1.5 rounded-md bg-primary/10 border border-primary/20 text-primary">
+              <Terminal className="h-4 w-4" />
             </div>
             <div>
-              <h3 className="font-semibold text-white text-sm">Export Code & Chunk Dataset</h3>
+              <h3 className="font-semibold text-slate-100 text-sm tracking-tight">Export Pipeline Code & Datasets</h3>
               <p className="text-xs text-slate-400">
-                Copy ingestion pipeline code or download the generated chunks ({chunks.length} chunks ready for vector DB).
+                Production-ready code snippets or export <span className="font-mono text-slate-300 tabular-nums">{chunks.length}</span> structured chunks for vector stores.
               </p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-md text-slate-400 hover:text-slate-200 hover:bg-panel active-press focus-ring transition-colors"
+            aria-label="Close export modal"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
         {/* Top Controls: Framework Tabs & Direct Dataset Download */}
-        <div className="flex flex-wrap items-center justify-between border-b border-slate-800 bg-[#0b101d] px-4 pt-2 gap-2">
-          <div className="flex gap-2 overflow-x-auto">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={cn(
-                  'flex items-center space-x-2 px-3 py-2 text-xs font-medium border-b-2 transition-all whitespace-nowrap',
-                  activeTab === tab.id
-                    ? 'border-primary-500 text-primary-300 bg-primary-500/10 rounded-t'
-                    : 'border-transparent text-slate-400 hover:text-slate-200'
-                )}
-              >
-                <span>{tab.icon}</span>
-                <span>{tab.label}</span>
-              </button>
-            ))}
+        <div className="flex flex-wrap items-center justify-between border-b border-border bg-panel px-4 pt-1.5 gap-2">
+          <div className="flex gap-1 overflow-x-auto">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={cn(
+                    'flex items-center space-x-2 px-3 py-2 text-xs font-medium border-b-2 transition-all whitespace-nowrap active-press focus-ring',
+                    isActive
+                      ? 'border-primary text-primary-light bg-surface rounded-t-sm'
+                      : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-surface/50'
+                  )}
+                >
+                  <Icon className={cn('h-3.5 w-3.5', isActive ? 'text-primary' : 'text-slate-500')} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Dataset Download Action Group */}
           {chunks.length > 0 && (
-            <div className="flex items-center gap-1.5 pb-2">
+            <div className="flex items-center gap-1.5 pb-1.5">
               <button
                 onClick={handleDownloadJson}
-                className="flex items-center space-x-1 px-2.5 py-1.5 rounded text-xs bg-surface-elevated hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors"
+                className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-md text-xs bg-surface hover:bg-subtle text-slate-200 border border-border active-press focus-ring transition-colors shadow-subtle"
                 title="Download chunked data as JSON with full metadata"
               >
-                <FileJson className="h-3.5 w-3.5 text-accent-cyan" />
-                <span>JSON</span>
+                <FileJson className="h-3.5 w-3.5 text-cyan-400" />
+                <span className="font-mono">JSON</span>
               </button>
               <button
                 onClick={handleDownloadCsv}
-                className="flex items-center space-x-1 px-2.5 py-1.5 rounded text-xs bg-surface-elevated hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors"
+                className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-md text-xs bg-surface hover:bg-subtle text-slate-200 border border-border active-press focus-ring transition-colors shadow-subtle"
                 title="Download chunked data as CSV spreadsheet"
               >
-                <FileSpreadsheet className="h-3.5 w-3.5 text-accent-emerald" />
-                <span>CSV</span>
+                <FileSpreadsheet className="h-3.5 w-3.5 text-emerald-400" />
+                <span className="font-mono">CSV</span>
               </button>
             </div>
           )}
         </div>
 
         {/* Code Preview Box */}
-        <div className="relative p-6 bg-[#090d16] font-mono text-xs">
+        <div className="relative p-5 bg-canvas font-mono text-xs">
           <button
             onClick={handleCopy}
-            className="absolute top-8 right-8 flex items-center space-x-1.5 px-3 py-1.5 rounded-md bg-primary-500/20 border border-primary-500/40 text-primary-300 hover:bg-primary-500/30 transition-colors"
+            className="absolute top-7 right-7 flex items-center space-x-1.5 px-3 py-1.5 rounded-md bg-primary/15 border border-primary/30 text-primary hover:bg-primary/25 active-press focus-ring transition-colors shadow-subtle"
           >
             {copied ? (
               <>
                 <Check className="h-3.5 w-3.5 text-emerald-400" />
-                <span className="text-emerald-400">Copied to Clipboard!</span>
+                <span className="text-emerald-400 font-medium">Copied!</span>
               </>
             ) : (
               <>
                 <Copy className="h-3.5 w-3.5" />
-                <span>Copy Code</span>
+                <span className="font-medium">Copy Code</span>
               </>
             )}
           </button>
 
-          <pre className="text-slate-300 overflow-x-auto max-h-[380px] p-4 rounded-lg bg-[#0b101d] border border-slate-800/80 leading-relaxed">
+          <pre className="text-slate-300 overflow-x-auto max-h-[380px] p-4 rounded-md bg-panel border border-border leading-relaxed selection:bg-primary/20">
             {code}
           </pre>
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-3 border-t border-slate-800 bg-[#090d16] flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
-          <span>Configured for: {config.strategy} • {config.chunkSize} {config.unit} • {config.chunkOverlap} overlap</span>
+        <div className="px-5 py-3 border-t border-border bg-surface flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
+          <span className="font-mono text-slate-400">
+            Target: <span className="text-slate-200">{config.strategy}</span> •{' '}
+            <span className="tabular-nums text-slate-200">{config.chunkSize}</span> {config.unit} •{' '}
+            <span className="tabular-nums text-slate-200">{config.chunkOverlap}</span> overlap
+          </span>
           <div className="flex items-center space-x-2">
             <button
               onClick={onClose}
-              className="px-4 py-1.5 rounded-md bg-surface-elevated text-slate-300 hover:text-white border border-slate-700"
+              className="px-4 py-1.5 rounded-md bg-panel hover:bg-subtle text-slate-300 hover:text-white border border-border active-press focus-ring transition-colors text-xs font-medium"
             >
               Close
             </button>

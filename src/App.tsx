@@ -71,7 +71,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#090d16] text-slate-100 font-sans">
+    <div className="min-h-screen flex flex-col bg-canvas text-slate-100 font-sans">
       {/* Top Header */}
       <Header
         onExportClick={() => setIsExportModalOpen(true)}
@@ -94,14 +94,14 @@ export const App: React.FC = () => {
       {/* Main Workspace Area */}
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Document Header & Tab Navigation */}
-        <div className="px-6 py-2 border-b border-slate-800 bg-[#0b101d] flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div className="px-6 py-2 border-b border-border bg-panel flex flex-wrap items-center justify-between gap-2 text-xs">
           <div className="flex items-center space-x-2">
             <FileText className="h-4 w-4 text-primary-400" />
-            <span className="font-medium text-slate-300">Document:</span>
+            <span className="font-medium text-slate-400">Document:</span>
             <span className="text-white font-semibold font-mono">{documentTitle}</span>
             <button
               onClick={handleResetToDefaults}
-              className="ml-2 flex items-center space-x-1 text-[11px] text-slate-400 hover:text-slate-200 px-2 py-0.5 rounded bg-surface-elevated border border-slate-700 transition-colors"
+              className="ml-2 h-6 flex items-center space-x-1.5 text-[11px] text-slate-400 hover:text-slate-200 px-2 rounded bg-surface border border-border hover:border-border-hover active-press focus-ring transition-colors"
               title="Reset document and chunking settings to defaults"
             >
               <RotateCcw className="h-3 w-3" />
@@ -109,13 +109,13 @@ export const App: React.FC = () => {
             </button>
           </div>
 
-          <div className="flex items-center space-x-1 bg-surface-elevated p-0.5 rounded border border-slate-700">
+          <div className="flex items-center space-x-1 bg-canvas p-0.5 rounded border border-border">
             <button
               onClick={() => setActiveTab('visualizer')}
               className={cn(
-                'flex items-center space-x-1 px-2.5 py-1 rounded text-xs transition-colors',
+                'h-7 flex items-center space-x-1.5 px-3 rounded text-xs active-press focus-ring transition-colors',
                 activeTab === 'visualizer'
-                  ? 'bg-primary-500 text-white font-medium'
+                  ? 'bg-primary-600 text-white font-medium shadow-subtle'
                   : 'text-slate-400 hover:text-slate-200'
               )}
             >
@@ -125,9 +125,9 @@ export const App: React.FC = () => {
             <button
               onClick={() => setActiveTab('editor')}
               className={cn(
-                'flex items-center space-x-1 px-2.5 py-1 rounded text-xs transition-colors',
+                'h-7 flex items-center space-x-1.5 px-3 rounded text-xs active-press focus-ring transition-colors',
                 activeTab === 'editor'
-                  ? 'bg-primary-500 text-white font-medium'
+                  ? 'bg-primary-600 text-white font-medium shadow-subtle'
                   : 'text-slate-400 hover:text-slate-200'
               )}
             >
@@ -139,7 +139,7 @@ export const App: React.FC = () => {
 
         {/* Content View: Editor or Visualizer / Comparison */}
         {activeTab === 'editor' ? (
-          <div className="flex-1 p-6 bg-[#090d16] flex flex-col">
+          <div className="flex-1 p-6 bg-canvas flex flex-col">
             <textarea
               value={rawText}
               onChange={(e) => {
@@ -147,7 +147,7 @@ export const App: React.FC = () => {
                 setSelectedSampleId(null);
               }}
               placeholder="Paste or type raw document text here to test chunking in real time..."
-              className="flex-1 w-full bg-surface border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-200 focus:outline-none focus:border-primary-500 resize-none leading-relaxed"
+              className="flex-1 w-full bg-surface border border-border rounded-lg p-4 font-mono text-xs text-slate-200 focus-ring hover:border-border-hover resize-none leading-relaxed shadow-subtle"
             />
           </div>
         ) : isCompareMode ? (
