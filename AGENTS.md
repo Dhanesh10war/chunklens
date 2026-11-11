@@ -1,9 +1,10 @@
 # ChunkLens Agent Map
 
 ## Golden Commands
-- **Install:** `npm ci`
-- **Type-Check:** `npm run typecheck` (`tsc -b`)
+- **Install:** `npm ci` (or `npm install`)
+- **Lint / Type-Check:** `npm run lint` / `npm run typecheck` (`tsc -b`)
 - **Unit Tests:** `npm run test` (`vitest run`)
+- **Verbose Tests:** `npm run test:verbose` (`vitest run --reporter=verbose`)
 - **Production Build:** `npm run build` (`tsc -b && vite build`)
 - **Local Dev Server:** `npm run dev` (`vite`)
 
