@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChunkMetadata } from '../engine/types';
 import { Copy, Check, Eye, AlertTriangle, Bookmark, Hash, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '../utils/cn';
@@ -22,6 +22,37 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({ chunks }) => {
   };
 
   const selectedChunk = chunks.find((c) => c.id === selectedChunkId);
+
+  // Enable ArrowLeft / ArrowRight / Escape keyboard shortcuts when inspecting a chunk
+  useEffect(() => {
+    if (!selectedChunkId) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      if (e.key === 'ArrowLeft') {
+        const currentIdx = chunks.findIndex((c) => c.id === selectedChunkId);
+        if (currentIdx > 0) {
+          e.preventDefault();
+          setSelectedChunkId(chunks[currentIdx - 1].id);
+        }
+      } else if (e.key === 'ArrowRight') {
+        const currentIdx = chunks.findIndex((c) => c.id === selectedChunkId);
+        if (currentIdx >= 0 && currentIdx < chunks.length - 1) {
+          e.preventDefault();
+          setSelectedChunkId(chunks[currentIdx + 1].id);
+        }
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        setSelectedChunkId(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedChunkId, chunks]);
 
   const handlePrevChunk = (e: React.MouseEvent) => {
     e.stopPropagation();
