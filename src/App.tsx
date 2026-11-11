@@ -130,11 +130,13 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      {/* Export Code Modal */}
+      {/* Export Code & Dataset Modal */}
       <ExportModal
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
         config={config}
+        chunks={chunkingResult.chunks}
+        docTitle={documentTitle}
       />
     </div>
   );
