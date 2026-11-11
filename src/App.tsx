@@ -1,11 +1,13 @@
 import React, { useState, useMemo, useEffect, useDeferredValue } from 'react';
-import { ChunkingConfig } from './engine/types';
+import { ChunkingConfig, ChunkingStrategy } from './engine/types';
 import { SAMPLE_DOCUMENTS } from './data/samples';
 import { useChunkingWorker } from './engine/worker/useChunkingWorker';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { MetricsBar } from './components/MetricsBar';
 import { VisualCanvas } from './components/VisualCanvas';
+import { ChunkInspector } from './components/ChunkInspector';
+import { CommandPalette } from './components/CommandPalette';
 import { ComparisonView } from './components/ComparisonView';
 import { ExportModal } from './components/ExportModal';
 import { SimilarityHeatmap } from './components/SimilarityHeatmap';
@@ -28,6 +30,9 @@ export const AppContent: React.FC = () => {
 
   // UI state
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
+  const [isInspectorOpen, setIsInspectorOpen] = useState<boolean>(true);
+  const [selectedChunkId, setSelectedChunkId] = useState<string | null>(null);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
   const [isCompareMode, setIsCompareMode] = useState<boolean>(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState<boolean>(false);
   const [isTokenizerModalOpen, setIsTokenizerModalOpen] = useState<boolean>(false);
@@ -43,15 +48,21 @@ export const AppContent: React.FC = () => {
     });
   }, [selectedSampleId, documentTitle, rawText, config]);
 
-  // Global keyboard shortcuts: '[' toggles sidebar
+  // Global keyboard shortcuts: '[' toggles sidebar, ']' toggles inspector, Cmd+K opens palette
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
         return;
       }
-      if (e.key === '[') {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen((prev) => !prev);
+      } else if (e.key === '[') {
         e.preventDefault();
         setIsSidebarOpen((prev) => !prev);
+      } else if (e.key === ']') {
+        e.preventDefault();
+        setIsInspectorOpen((prev) => !prev);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -71,6 +82,7 @@ export const AppContent: React.FC = () => {
       setSelectedSampleId(sample.id);
       setDocumentTitle(sample.title);
       setRawText(sample.content);
+      setSelectedChunkId(null);
     }
   };
 
@@ -78,6 +90,7 @@ export const AppContent: React.FC = () => {
     setSelectedSampleId(null);
     setDocumentTitle(filename);
     setRawText(content);
+    setSelectedChunkId(null);
   };
 
   const handleResetToDefaults = () => {
@@ -86,7 +99,17 @@ export const AppContent: React.FC = () => {
     setDocumentTitle(DEFAULT_SESSION.documentTitle);
     setRawText(DEFAULT_SESSION.rawText);
     setConfig(DEFAULT_SESSION.config);
+    setSelectedChunkId(null);
   };
+
+  // Find inspected chunk and immediate neighbors
+  const selectedChunk = chunkingResult.chunks.find((c) => c.id === selectedChunkId) || null;
+  const selectedChunkIdx = selectedChunk ? selectedChunk.index : -1;
+  const prevChunk = selectedChunkIdx > 0 ? chunkingResult.chunks[selectedChunkIdx - 1] : null;
+  const nextChunk =
+    selectedChunkIdx >= 0 && selectedChunkIdx < chunkingResult.chunks.length - 1
+      ? chunkingResult.chunks[selectedChunkIdx + 1]
+      : null;
 
   return (
     <div className="min-h-screen flex flex-col bg-bg-base text-text-primary font-sans antialiased">
@@ -100,9 +123,10 @@ export const AppContent: React.FC = () => {
         onToggleCompare={() => setIsCompareMode(!isCompareMode)}
         isSidebarOpen={isSidebarOpen}
         onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
       />
 
-      {/* App Shell Layout: Collapsible Sidebar + Hero Main Canvas */}
+      {/* App Shell Layout: Collapsible Sidebar + Hero Main Canvas + Pro Inspector */}
       <div className="flex-1 flex overflow-hidden h-[calc(100vh-48px)]">
         {/* Left Sidebar */}
         <Sidebar
@@ -139,7 +163,7 @@ export const AppContent: React.FC = () => {
           </div>
 
           {/* Main View Area */}
-          <div className="flex-1 overflow-hidden flex flex-col">
+          <div className="flex-1 overflow-hidden flex">
             {activeTab === 'editor' ? (
               <div className="flex-1 p-6 flex flex-col bg-bg-base">
                 <div className="flex items-center justify-between pb-2 text-xs">
@@ -169,11 +193,62 @@ export const AppContent: React.FC = () => {
                 }}
               />
             ) : (
-              <VisualCanvas chunks={chunkingResult.chunks} />
+              <VisualCanvas
+                chunks={chunkingResult.chunks}
+                selectedChunkId={selectedChunkId}
+                onSelectChunk={(chunkId) => {
+                  setSelectedChunkId(chunkId);
+                  if (chunkId) setIsInspectorOpen(true);
+                }}
+                onLoadDefaultSample={() => handleSelectSample('attention-paper')}
+                onUploadClick={() => setIsSidebarOpen(true)}
+              />
+            )}
+
+            {/* Right Inspector Drawer (Collapsible, appears on chunk selection) */}
+            {activeTab === 'visualizer' && !isCompareMode && selectedChunk && isInspectorOpen && (
+              <ChunkInspector
+                chunk={selectedChunk}
+                totalChunks={chunkingResult.chunks.length}
+                prevChunk={prevChunk}
+                nextChunk={nextChunk}
+                onSelectPrev={() => {
+                  if (selectedChunkIdx > 0) {
+                    setSelectedChunkId(chunkingResult.chunks[selectedChunkIdx - 1].id);
+                  }
+                }}
+                onSelectNext={() => {
+                  if (selectedChunkIdx < chunkingResult.chunks.length - 1) {
+                    setSelectedChunkId(chunkingResult.chunks[selectedChunkIdx + 1].id);
+                  }
+                }}
+                onClose={() => setIsInspectorOpen(false)}
+              />
             )}
           </div>
         </main>
       </div>
+
+      {/* Command Palette Modal (Cmd+K) */}
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        onSelectStrategy={(strategy: ChunkingStrategy) => setConfig({ ...config, strategy })}
+        currentStrategy={config.strategy}
+        onSelectSample={handleSelectSample}
+        onResetDocument={handleResetToDefaults}
+        onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
+        onToggleInspector={() => {
+          if (!isInspectorOpen && !selectedChunkId && chunkingResult.chunks.length > 0) {
+            setSelectedChunkId(chunkingResult.chunks[0].id);
+          }
+          setIsInspectorOpen((prev) => !prev);
+        }}
+        onOpenExport={() => setIsExportModalOpen(true)}
+        onOpenTokenizer={() => setIsTokenizerModalOpen(true)}
+        onSelectTab={(tab) => setActiveTab(tab)}
+        onToggleCompare={() => setIsCompareMode((prev) => !prev)}
+      />
 
       {/* Export Code & Dataset Modal */}
       <ExportModal
