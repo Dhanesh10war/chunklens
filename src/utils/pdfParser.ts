@@ -18,8 +18,8 @@ export async function extractTextFromPdf(data: ArrayBuffer | Uint8Array): Promis
   // Dynamically import legacy build for universal browser & Node test compatibility
   const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
 
-  if (pdfjs.GlobalWorkerOptions && !pdfjs.GlobalWorkerOptions.workerSrc) {
-    pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+  if (typeof window !== 'undefined' && pdfjs.GlobalWorkerOptions) {
+    pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerUrl || `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`;
   }
 
   const uint8 = data instanceof Uint8Array ? data : new Uint8Array(data);

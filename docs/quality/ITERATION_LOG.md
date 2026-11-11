@@ -123,3 +123,17 @@
   - Unit Tests: 51 passed (8 test files) -> **56 passed (9 test files)**.
   - TypeScript: 0 diagnostic errors (`tsc -b`).
   - Production Bundle: 116.67 kB main JS bundle, 25.06 kB CSS (vite build in 6.79s).
+
+
+---
+
+## Enhancement ENH-05: Multi-Model Tokenizer & Ingestion Matrix (Completed)
+- **Date:** November 11, 2026
+- **Summary:** Designed and implemented the Multi-Model Tokenizer & Ingestion Matrix engine (`src/engine/tokenizers/multiModel.ts`) and interactive workbench modal (`src/components/TokenizerComparisonModal.tsx`). Compares real-time token counts, variance ratios (+%), and characters/token compression efficiency across 6 model families (OpenAI GPT-4o `o200k_base`, OpenAI GPT-4 `cl100k_base`, Anthropic Claude 3.5 Sonnet, Meta Llama 3/3.1, Google Gemini 1.5, and Cohere Command R+). Features multi-provider vector embedding cost projections (OpenAI, Google Vertex AI, Voyage AI, Cohere) with an interactive scale calculator (1k to 1M documents), and includes a Context Truncation Risk Guard that flags chunks breaching standard embedding boundaries (512, 2048, 8192 tokens) to protect RAG pipelines against silent downstream text loss. Accessible via dedicated header action and real-time metrics bar trigger.
+- **Metrics Before / After:**
+  - App Version: v0.1.4 -> **v0.2.0**.
+  - Tokenizer Intelligence: Single baseline count -> **6 model families cross-compared in real-time**.
+  - Truncation Diagnostics: None -> **Automated 512, 2048, and 8192 token boundary inspection**.
+  - Unit Tests: 56 passed (9 test files) -> **66 passed (10 test files)**.
+  - TypeScript: 0 diagnostic errors (`tsc -b`).
+  - Production Bundle: 136.20 kB main JS bundle, 26.97 kB CSS (vite build in 6.83s).

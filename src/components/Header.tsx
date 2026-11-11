@@ -1,15 +1,17 @@
 import React from 'react';
-import { Layers, ShieldCheck, Github, Code2, SplitSquareVertical } from 'lucide-react';
+import { Layers, ShieldCheck, Github, Code2, SplitSquareVertical, Cpu } from 'lucide-react';
 import { cn } from '../utils/cn';
 
 interface HeaderProps {
   onExportClick: () => void;
+  onTokenizerClick?: () => void;
   isCompareMode: boolean;
   onToggleCompare: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onExportClick,
+  onTokenizerClick,
   isCompareMode,
   onToggleCompare,
 }) => {
@@ -25,7 +27,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="flex items-center space-x-2">
               <span className="font-semibold text-sm tracking-tight text-white font-sans">ChunkLens</span>
               <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-sm bg-subtle text-slate-300 border border-border-subtle">
-                v0.1.4
+                v0.2.0
               </span>
             </div>
             <p className="text-[11px] text-slate-400 hidden sm:block">Visual RAG Chunking & Token Optimizer</p>
@@ -40,6 +42,17 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Actions */}
         <div className="flex items-center space-x-2">
+          {onTokenizerClick && (
+            <button
+              onClick={onTokenizerClick}
+              className="h-8 flex items-center space-x-1.5 px-3 rounded-md text-xs font-medium bg-surface border border-border text-slate-300 hover:bg-subtle hover:border-border-hover active-press focus-ring transition-colors"
+              title="Multi-Model Tokenizer Comparison Matrix"
+            >
+              <Cpu className="h-3.5 w-3.5 text-primary-400" />
+              <span className="hidden sm:inline">Tokenizers</span>
+            </button>
+          )}
+
           <button
             onClick={onToggleCompare}
             className={cn(

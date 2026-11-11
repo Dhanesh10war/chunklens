@@ -9,6 +9,7 @@ import { VisualCanvas } from './components/VisualCanvas';
 import { ComparisonView } from './components/ComparisonView';
 import { ExportModal } from './components/ExportModal';
 import { SimilarityHeatmap } from './components/SimilarityHeatmap';
+import { TokenizerComparisonModal } from './components/TokenizerComparisonModal';
 import { Edit3, Eye, FileText, RotateCcw, Grid3X3 } from 'lucide-react';
 import { cn } from './utils/cn';
 import { loadStoredSession, saveStoredSession, clearStoredSession, DEFAULT_SESSION } from './utils/storage';
@@ -27,6 +28,7 @@ export const App: React.FC = () => {
   // UI state
   const [isCompareMode, setIsCompareMode] = useState<boolean>(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState<boolean>(false);
+  const [isTokenizerModalOpen, setIsTokenizerModalOpen] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'visualizer' | 'heatmap' | 'editor'>('visualizer');
 
   // Persist session changes to localStorage
@@ -74,6 +76,7 @@ export const App: React.FC = () => {
       {/* Top Header */}
       <Header
         onExportClick={() => setIsExportModalOpen(true)}
+        onTokenizerClick={() => setIsTokenizerModalOpen(true)}
         isCompareMode={isCompareMode}
         onToggleCompare={() => setIsCompareMode(!isCompareMode)}
       />
@@ -88,7 +91,11 @@ export const App: React.FC = () => {
       />
 
       {/* Real-Time Metrics Bar */}
-      <MetricsBar result={chunkingResult} isProcessing={isProcessing} />
+      <MetricsBar
+        result={chunkingResult}
+        isProcessing={isProcessing}
+        onOpenTokenizerModal={() => setIsTokenizerModalOpen(true)}
+      />
 
       {/* Main Workspace Area */}
       <main className="flex-1 flex flex-col overflow-hidden">
@@ -184,6 +191,15 @@ export const App: React.FC = () => {
         config={config}
         chunks={chunkingResult.chunks}
         docTitle={documentTitle}
+      />
+
+      {/* Multi-Model Tokenizer Comparison Matrix Modal */}
+      <TokenizerComparisonModal
+        isOpen={isTokenizerModalOpen}
+        onClose={() => setIsTokenizerModalOpen(false)}
+        rawText={deferredText}
+        chunks={chunkingResult.chunks}
+        baselineEncoding={config.encoding}
       />
     </div>
   );

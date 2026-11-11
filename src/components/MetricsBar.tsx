@@ -1,14 +1,19 @@
 import React from 'react';
 import { ChunkingResult } from '../engine/types';
-import { Layers, Hash, Activity, Clock, DollarSign, AlertCircle } from 'lucide-react';
+import { Layers, Hash, Activity, Clock, DollarSign, AlertCircle, Cpu } from 'lucide-react';
 import { cn } from '../utils/cn';
 
 interface MetricsBarProps {
   result: ChunkingResult;
   isProcessing?: boolean;
+  onOpenTokenizerModal?: () => void;
 }
 
-export const MetricsBar: React.FC<MetricsBarProps> = ({ result, isProcessing = false }) => {
+export const MetricsBar: React.FC<MetricsBarProps> = ({
+  result,
+  isProcessing = false,
+  onOpenTokenizerModal,
+}) => {
   const {
     chunks,
     totalTokens,
@@ -99,6 +104,18 @@ export const MetricsBar: React.FC<MetricsBarProps> = ({ result, isProcessing = f
             <AlertCircle className="h-3.5 w-3.5" />
             <span>Chunk &gt; 1,024 tokens</span>
           </div>
+        )}
+
+        {/* Action: Open Multi-Model Tokenizer Matrix */}
+        {onOpenTokenizerModal && (
+          <button
+            onClick={onOpenTokenizerModal}
+            className="flex items-center space-x-1.5 px-2.5 py-1 rounded bg-surface hover:bg-subtle text-slate-300 hover:text-white border border-border hover:border-border-hover active-press focus-ring transition-colors ml-auto sm:ml-0"
+            title="Inspect token variance and embedding costs across OpenAI, Claude, Llama 3 & Voyage"
+          >
+            <Cpu className="h-3.5 w-3.5 text-primary-400" />
+            <span className="font-sans font-medium text-[11px]">Compare Tokenizers</span>
+          </button>
         )}
       </div>
     </div>
