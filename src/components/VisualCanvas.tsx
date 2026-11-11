@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { ChunkMetadata } from '../engine/types';
-import { Copy, Check, Eye, AlertTriangle, Bookmark, Hash } from 'lucide-react';
+import { Copy, Check, Eye, AlertTriangle, Bookmark, Hash, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '../utils/cn';
+import { copyToClipboard } from '../utils/clipboard';
 
 interface VisualCanvasProps {
   chunks: ChunkMetadata[];
@@ -12,13 +13,33 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({ chunks }) => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'cards' | 'stream'>('cards');
 
-  const handleCopyChunk = (id: string, text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 1800);
+  const handleCopyChunk = async (id: string, text: string) => {
+    const ok = await copyToClipboard(text);
+    if (ok) {
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 1800);
+    }
   };
 
   const selectedChunk = chunks.find((c) => c.id === selectedChunkId);
+
+  const handlePrevChunk = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!selectedChunk) return;
+    const prevIdx = selectedChunk.index - 1;
+    if (prevIdx >= 0) {
+      setSelectedChunkId(chunks[prevIdx].id);
+    }
+  };
+
+  const handleNextChunk = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!selectedChunk) return;
+    const nextIdx = selectedChunk.index + 1;
+    if (nextIdx < chunks.length) {
+      setSelectedChunkId(chunks[nextIdx].id);
+    }
+  };
 
   return (
     <div className="flex-1 flex flex-col h-full bg-[#090d16] overflow-hidden">
@@ -27,9 +48,27 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({ chunks }) => {
         <div className="flex items-center space-x-2">
           <span className="text-slate-400 font-medium">Viewing {chunks.length} Chunks</span>
           {selectedChunk && (
-            <span className="text-primary-400 font-mono bg-primary-500/10 px-2 py-0.5 rounded border border-primary-500/20">
-              Inspecting #{selectedChunk.index + 1} ({selectedChunk.tokenCount} tokens)
-            </span>
+            <div className="flex items-center space-x-1 font-mono">
+              <button
+                disabled={selectedChunk.index === 0}
+                onClick={handlePrevChunk}
+                className="p-1 rounded bg-surface-elevated text-slate-300 disabled:opacity-30 hover:bg-slate-700 transition-colors"
+                title="Inspect previous chunk"
+              >
+                <ChevronLeft className="h-3 w-3" />
+              </button>
+              <span className="text-primary-400 bg-primary-500/10 px-2 py-0.5 rounded border border-primary-500/20 text-[11px]">
+                #{selectedChunk.index + 1} of {chunks.length} ({selectedChunk.tokenCount} tok)
+              </span>
+              <button
+                disabled={selectedChunk.index === chunks.length - 1}
+                onClick={handleNextChunk}
+                className="p-1 rounded bg-surface-elevated text-slate-300 disabled:opacity-30 hover:bg-slate-700 transition-colors"
+                title="Inspect next chunk"
+              >
+                <ChevronRight className="h-3 w-3" />
+              </button>
+            </div>
           )}
         </div>
 

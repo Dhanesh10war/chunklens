@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ChunkMetadata, ChunkingConfig, CodeExportFramework } from '../engine/types';
 import { generateExportCode } from '../exporters/codeExporters';
 import { exportChunksToJson, exportChunksToCsv, downloadFile } from '../exporters/dataExporters';
+import { copyToClipboard } from '../utils/clipboard';
 import { X, Copy, Check, Terminal, FileJson, FileSpreadsheet } from 'lucide-react';
 import { cn } from '../utils/cn';
 
@@ -27,10 +28,12 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
   const code = generateExportCode(config, activeTab);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopy = async () => {
+    const ok = await copyToClipboard(code);
+    if (ok) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const handleDownloadJson = () => {

@@ -151,7 +151,14 @@ export const App: React.FC = () => {
             />
           </div>
         ) : isCompareMode ? (
-          <ComparisonView primaryConfig={config} rawText={rawText} />
+          <ComparisonView
+            primaryConfig={config}
+            rawText={rawText}
+            onApplyVariantB={(newConfig) => {
+              setConfig(newConfig);
+              setIsCompareMode(false);
+            }}
+          />
         ) : (
           <VisualCanvas chunks={chunkingResult.chunks} />
         )}

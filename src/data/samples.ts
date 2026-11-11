@@ -129,4 +129,116 @@ We formulate chunk boundary optimization as a dual-objective trade-off:
 
 Experimental results across seven open-domain question answering datasets confirm that recursive delimiter-based splitting outperforms static sliding-window chunking by 18.4 points in Normalized Discounted Cumulative Gain (NDCG@10).`,
   },
+  {
+    id: 'backend-service',
+    title: 'Python Backend Service (FastAPI & SQLAlchemy)',
+    category: 'Source Code & Architecture',
+    description: 'Production Python service with FastAPI routes, Pydantic schemas, and SQLAlchemy ORM models.',
+    content: `"""FastAPI Document Ingestion & Chunking Service."""
+
+from typing import List, Optional
+from datetime import datetime
+from pydantic import BaseModel, Field
+from fastapi import FastAPI, Depends, HTTPException, status
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, create_engine
+from sqlalchemy.orm import declarative_base, sessionmaker, Session
+
+# ---------------------------------------------------------
+# Database Models & ORM Schema
+# ---------------------------------------------------------
+Base = declarative_base()
+
+class DocumentRecord(Base):
+    """Database model for indexed knowledge documents."""
+    __tablename__ = "documents"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(255), nullable=False)
+    source_uri = Column(String(512), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class ChunkRecord(Base):
+    """Database model for vectorized document chunks."""
+    __tablename__ = "document_chunks"
+
+    id = Column(Integer, primary_key=True, index=True)
+    document_id = Column(Integer, ForeignKey("documents.id", ondelete="CASCADE"), nullable=False)
+    chunk_index = Column(Integer, nullable=False)
+    content = Column(Text, nullable=False)
+    token_count = Column(Integer, nullable=False)
+    embedding_id = Column(String(64), nullable=True, index=True)
+
+# ---------------------------------------------------------
+# Pydantic Request & Response Schemas
+# ---------------------------------------------------------
+class ChunkResponse(BaseModel):
+    chunk_index: int
+    content: str
+    token_count: int
+
+    class Config:
+        from_attributes = True
+
+class IngestRequest(BaseModel):
+    title: str = Field(..., max_length=255, description="Document title")
+    text: str = Field(..., min_length=1, description="Raw document text")
+    chunk_size: int = Field(default=500, ge=50, le=4000)
+    chunk_overlap: int = Field(default=50, ge=0, le=1000)
+
+class IngestResponse(BaseModel):
+    document_id: int
+    total_chunks: int
+    total_tokens: int
+    chunks: List[ChunkResponse]
+
+# ---------------------------------------------------------
+# FastAPI Application & Endpoints
+# ---------------------------------------------------------
+app = FastAPI(
+    title="ChunkLens Ingestion Engine",
+    version="1.0.0",
+    description="High-performance API for document chunking and vector storage."
+)
+
+@app.get("/health", status_code=status.HTTP_200_OK)
+def health_check():
+    """Service liveness probe for container orchestrators."""
+    return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
+
+@app.post("/api/v1/ingest", response_model=IngestResponse, status_code=status.HTTP_201_CREATED)
+def ingest_document(payload: IngestRequest, db: Session = Depends(get_db)):
+    """Split document into coherent chunks and persist records."""
+    if payload.chunk_overlap >= payload.chunk_size:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="chunk_overlap must be strictly less than chunk_size"
+        )
+    
+    doc = DocumentRecord(title=payload.title)
+    db.add(doc)
+    db.flush()
+
+    chunks = split_text(payload.text, payload.chunk_size, payload.chunk_overlap)
+    total_tokens = sum(c["tokens"] for c in chunks)
+    
+    records = [
+        ChunkRecord(
+            document_id=doc.id,
+            chunk_index=i,
+            content=c["text"],
+            token_count=c["tokens"],
+        )
+        for i, c in enumerate(chunks)
+    ]
+    db.add_all(records)
+    db.commit()
+    
+    return IngestResponse(
+        document_id=doc.id,
+        total_chunks=len(records),
+        total_tokens=total_tokens,
+        chunks=[ChunkResponse(chunk_index=r.chunk_index, content=r.content, token_count=r.token_count) for r in records]
+    )
+`,
+  },
 ];

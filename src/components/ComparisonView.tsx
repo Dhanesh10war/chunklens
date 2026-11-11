@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { ChunkingConfig, ChunkingStrategy, ChunkUnit, TokenizerEncoding } from '../engine/types';
 import { executeChunking } from '../engine/chunkers';
-import { SplitSquareVertical } from 'lucide-react';
+import { SplitSquareVertical, Check } from 'lucide-react';
 import { cn } from '../utils/cn';
 
 interface ComparisonViewProps {
   primaryConfig: ChunkingConfig;
   rawText: string;
+  onApplyVariantB?: (config: ChunkingConfig) => void;
 }
 
-export const ComparisonView: React.FC<ComparisonViewProps> = ({ primaryConfig, rawText }) => {
+export const ComparisonView: React.FC<ComparisonViewProps> = ({ primaryConfig, rawText, onApplyVariantB }) => {
   // Strategy B secondary configuration
   const [secondaryConfig, setSecondaryConfig] = useState<ChunkingConfig>({
     strategy: 'markdown',
@@ -170,6 +171,16 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ primaryConfig, r
               <span>{resultB.chunks.length} chunks</span>
               <span>avg {resultB.avgTokensPerChunk} tok</span>
               <span className="text-emerald-400">{resultB.executionTimeMs} ms</span>
+              {onApplyVariantB && (
+                <button
+                  onClick={() => onApplyVariantB(secondaryConfig)}
+                  className="flex items-center space-x-1 px-2.5 py-1 rounded bg-accent-cyan/20 border border-accent-cyan/40 text-cyan-300 hover:bg-accent-cyan/30 text-xs font-sans font-medium transition-colors ml-2"
+                  title="Apply Variant B parameters as the active primary configuration"
+                >
+                  <Check className="h-3.5 w-3.5" />
+                  <span>Apply as Active</span>
+                </button>
+              )}
             </div>
           </div>
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
