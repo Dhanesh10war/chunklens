@@ -33,3 +33,23 @@
 - **Strict TypeScript:** `"noUnusedLocals": true` and `"noUnusedParameters": true` cause compile failures on unused imports or args.
 - **Large Tokenizer Bundle:** `js-tiktoken` vocab is 5.6 MB. `vite.config.ts` uses `manualChunks` to keep application code under 100 kB. Never remove chunk splitting.
 - **Execution Directory:** The repository is located at `/home/drago/projects/Venture/chunklens`. Always run commands inside `chunklens/`.
+
+
+## UI Conventions & Design System Tokens ("Precision RAG Instrument")
+- **Palette Tokens:**
+  - Backgrounds: `bg-canvas` (`#080c14`), `bg-panel` (`#0d1422`), `bg-surface` (`#131c30`), `bg-subtle` (`#1a2640`).
+  - Borders: `border-border` (`#1e293b`), hairline subtle separators (`#212f4c`).
+  - Primary Accent: Precision Cobalt (`#3b82f6` / `primary-500`), `primary-light: #60a5fa`, `primary-dark: #1d4ed8`.
+  - Chunk Spectrum: 5 luminance-matched badge tokens (`chunk-badge-0` through `chunk-badge-4`).
+- **Border Radii:** Strictly 3 scales (`rounded-sm: 4px`, `rounded-md: 6px`, `rounded-lg: 8px`). Never use arbitrary `rounded-xl` or `rounded-2xl`.
+- **Interaction & Feedback:**
+  - Compression on Click: Use `.active-press` (`active:scale-[0.98] transition-transform`) on interactive buttons and cards.
+  - Focus Indicator: Use `.focus-ring` (`focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:ring-offset-canvas`) on all clickable elements.
+- **Typography & Numerals:**
+  - All token counts, chunk metrics, and numerical displays must use `tabular-nums font-mono` to prevent layout reflow during parameter tuning.
+- **Forbidden Patterns (Zero Tolerance):**
+  - No purple-indigo gradients (`bg-gradient-to-r from-purple-500 to-indigo-600`).
+  - No neon glow drop shadows (`shadow-[0_0_...]`).
+  - No meaningless sparkle icons (`Sparkles` from lucide-react).
+  - No glassmorphic backdrop blurs (`backdrop-blur-sm`).
+  - No raw emojis in UI tab or action buttons.

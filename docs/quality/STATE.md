@@ -28,7 +28,7 @@
 | **Reliability** | 10 / 10 | **10 / 10** | = | `localStorage` persistence, error-guarded file readers, empty/whitespace file rejection guard. |
 | **Performance & Scalability** | 10 / 10 | **10 / 10** | = | React `useDeferredValue` for chunking parameters guarantees 60fps during rapid slider drag. |
 | **Data Integrity** | 10 / 10 | **10 / 10** | = | Accurate chunk token summation, vector cost calculation on total ingestion volume, true overlap tracking. |
-| **UX / DX** | 10 / 10 | **10 / 10** | = | Arrow key (`ArrowLeft`/`ArrowRight`/`Escape`) chunk stepping, Variant B promotion, custom delimiters editor. |
+| **UX / DX** | 10 / 10 | **10 / 10** | = | Arrow key steppers, variant promotion, Obsidian Slate palette, zero generic AI tells, tabular numerals, 100% focus rings. |
 | **Operability** | 10 / 10 | **10 / 10** | = | GitHub Actions CI workflow, clean dev/test/test:verbose/lint/build scripts, zero build warnings. |
 | **Comprehensibility** | 10 / 10 | **10 / 10** | = | Maintained `AGENTS.md` map with golden commands, architecture pointers, traps, and constraints. |
 | **OVERALL** | **9.8 / 10** | **10.0 / 10** | ↑ | **Zero surviving mutants, production-grade quality, zero technical debt.** |
