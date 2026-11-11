@@ -85,3 +85,15 @@
   - Unit Tests: 40 passed (5 test files) -> **43 passed (6 test files)**.
   - TypeScript: 0 diagnostic errors (`tsc -b`).
   - Core App Bundle: 94.46 kB JS (pdf-engine code-split into 512.51 kB lazy chunk).
+
+
+---
+
+## Enhancement ENH-01: In-Browser Semantic Similarity & Cosine Heatmap Matrix (Completed)
+- **Date:** November 11, 2026
+- **Summary:** Built the in-browser vectorizer engine (`src/engine/embeddings/vectorizer.ts`) and interactive visual heatmap workbench (`src/components/SimilarityHeatmap.tsx`). Uses normalized TF-IDF subword vector representations with stopword filtering to compute full $N \times N$ cosine similarity matrices in milliseconds without server calls. Computes sequential chunk transition continuity scores to identify boundary fragmentation, flags redundant chunk pairs (>70% overlap) with shared keyword extraction, and provides an interactive side-by-side pair comparison inspector. Added `Similarity Heatmap` tab to the main application interface.
+- **Metrics Before / After:**
+  - Capabilities: Text chunking visualization -> added full $N \times N$ pairwise semantic similarity matrix and boundary continuity tracking.
+  - Unit Tests: 43 passed (6 test files) -> **49 passed (7 test files)**.
+  - TypeScript: 0 diagnostic errors (`tsc -b`).
+  - Production Bundle: 106.83 kB main JS bundle, 24.96 kB CSS (vite build in 7.01s).

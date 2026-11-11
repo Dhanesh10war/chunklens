@@ -8,7 +8,8 @@ import { MetricsBar } from './components/MetricsBar';
 import { VisualCanvas } from './components/VisualCanvas';
 import { ComparisonView } from './components/ComparisonView';
 import { ExportModal } from './components/ExportModal';
-import { Edit3, Eye, FileText, RotateCcw } from 'lucide-react';
+import { SimilarityHeatmap } from './components/SimilarityHeatmap';
+import { Edit3, Eye, FileText, RotateCcw, Grid3X3 } from 'lucide-react';
 import { cn } from './utils/cn';
 import { loadStoredSession, saveStoredSession, clearStoredSession, DEFAULT_SESSION } from './utils/storage';
 
@@ -26,7 +27,7 @@ export const App: React.FC = () => {
   // UI state
   const [isCompareMode, setIsCompareMode] = useState<boolean>(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'visualizer' | 'editor'>('visualizer');
+  const [activeTab, setActiveTab] = useState<'visualizer' | 'heatmap' | 'editor'>('visualizer');
 
   // Persist session changes to localStorage
   useEffect(() => {
@@ -123,6 +124,18 @@ export const App: React.FC = () => {
               <span>Chunks</span>
             </button>
             <button
+              onClick={() => setActiveTab('heatmap')}
+              className={cn(
+                'h-7 flex items-center space-x-1.5 px-3 rounded text-xs active-press focus-ring transition-colors',
+                activeTab === 'heatmap'
+                  ? 'bg-primary-600 text-white font-medium shadow-subtle'
+                  : 'text-slate-400 hover:text-slate-200'
+              )}
+            >
+              <Grid3X3 className="h-3.5 w-3.5" />
+              <span>Similarity Heatmap</span>
+            </button>
+            <button
               onClick={() => setActiveTab('editor')}
               className={cn(
                 'h-7 flex items-center space-x-1.5 px-3 rounded text-xs active-press focus-ring transition-colors',
@@ -137,7 +150,7 @@ export const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Content View: Editor or Visualizer / Comparison */}
+        {/* Content View: Editor, Heatmap, or Visualizer / Comparison */}
         {activeTab === 'editor' ? (
           <div className="flex-1 p-6 bg-canvas flex flex-col">
             <textarea
@@ -150,6 +163,8 @@ export const App: React.FC = () => {
               className="flex-1 w-full bg-surface border border-border rounded-lg p-4 font-mono text-xs text-slate-200 focus-ring hover:border-border-hover resize-none leading-relaxed shadow-subtle"
             />
           </div>
+        ) : activeTab === 'heatmap' ? (
+          <SimilarityHeatmap chunks={chunkingResult.chunks} />
         ) : isCompareMode ? (
           <ComparisonView
             primaryConfig={config}

@@ -25,6 +25,9 @@ Retrieval-Augmented Generation (RAG) applications live and die by document chunk
   - Powered by `js-tiktoken` running OpenAI's tokenizers (`o200k_base` for GPT-4o, `cl100k_base` for GPT-4).
 - **📄 Client-Side PDF Ingestion:**
   - Directly upload `.pdf` documents with automated page boundary detection (`--- Page X ---`) running 100% in-browser with zero server transmission.
+- **🔥 Semantic Similarity Heatmap & Continuity Matrix:**
+  - Computes an interactive $N \times N$ pairwise cosine similarity matrix directly in-browser using L2-normalized TF-IDF vectorization.
+  - Automatically assesses sequential boundary continuity, detects redundant chunk pairs (>70% overlap), and extracts key shared terms.
 - **🎨 Interactive Visual Canvas:**
   - Distinctive color-coded chunk cards with token badges, character offsets, and mid-word truncation warning alerts.
   - Continuous highlighted document stream view for spotting chunk boundary cuts.
@@ -118,9 +121,9 @@ Every commit is validated via GitHub Actions CI:
 ## 🗺️ Roadmap
 
 - [x] v0.1: 4 core chunking algorithms, interactive visual canvas, tiktoken integration, and code export.
-- [ ] v0.2: Local embedding generation & cosine similarity heatmaps using Transformers.js (`all-MiniLM-L6-v2`).
+- [x] v0.2: In-browser pairwise semantic similarity heatmap, boundary continuity scoring, and client-side PDF ingestion.
 - [ ] v0.3: Direct CSV/JSON tabular dataset chunking with schema preservation.
-- [ ] v0.4: CLI tool (`npx chunklens test ./docs`) for CI/CD RAG regression testing on GitHub Actions.
+- [ ] v0.4: Web Worker engine offload for massive documents (>100k words) & CLI CI/CD linter.
 
 ---
 
