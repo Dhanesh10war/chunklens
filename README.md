@@ -23,6 +23,8 @@ Retrieval-Augmented Generation (RAG) applications live and die by document chunk
   - 🪟 **Fixed Window:** Exact character or token sliding windows with custom overlap.
 - **⚡ Exact BPE Token Calculation:**
   - Powered by `js-tiktoken` running OpenAI's tokenizers (`o200k_base` for GPT-4o, `cl100k_base` for GPT-4).
+- **📄 Client-Side PDF Ingestion:**
+  - Directly upload `.pdf` documents with automated page boundary detection (`--- Page X ---`) running 100% in-browser with zero server transmission.
 - **🎨 Interactive Visual Canvas:**
   - Distinctive color-coded chunk cards with token badges, character offsets, and mid-word truncation warning alerts.
   - Continuous highlighted document stream view for spotting chunk boundary cuts.

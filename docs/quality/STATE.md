@@ -58,7 +58,7 @@
 
 | ID | Title | Lens | Impact | Effort | Confidence | Smallest Shippable Slice (MVP) | Status |
 | :---: | :--- | :--- | :---: | :---: | :---: | :--- | :--- |
-| **ENH-02** | Client-Side PDF Ingestion (`pdfjs-dist`) | User Value | High | S (1d) | High | Parse text from non-scanned PDFs via in-browser worker | **Recommended Next Candidate** |
+| **ENH-02** | Client-Side PDF Ingestion (`pdfjs-dist`) | User Value | High | S (1d) | High | Parse text from non-scanned PDFs via in-browser worker | ✅ COMPLETED |
 | **ENH-01** | In-Browser Local Embeddings & Cosine Heatmaps | Differentiation | High | M (3d) | Med | Web Worker with ONNX `all-MiniLM-L6-v2` embedding generation | Proposed for v0.2 |
 | **ENH-03** | Web Worker Engine Offload | Scale | Med | S (1d) | High | Run `executeChunking` in dedicated worker if document > 25k chars | Proposed for large docs |
 | **ENH-04** | Tabular CSV/JSON Chunker with Schema Retention | User Value | High | M (2d) | High | Chunk rows while prepending column schema to every chunk | Proposed for v0.3 |
@@ -80,6 +80,6 @@
 ---
 
 ## 6. "Start Here Next Time" (Top 3 Recommendations)
-1. **ENH-02 (Client-Side PDF Ingestion):** Integrate `pdfjs-dist` to parse `.pdf` documents directly in the browser.
-2. **ENH-01 (Transformers.js Embeddings):** Prototype ONNX Web browser embeddings (`all-MiniLM-L6-v2`) and visual cosine similarity heatmaps.
-3. **ENH-03 (Web Worker Offload):** Move `executeChunking` into a Web Worker for documents > 25,000 characters.
+1. **ENH-01 (Transformers.js Embeddings):** Prototype ONNX Web browser embeddings (`all-MiniLM-L6-v2`) and visual cosine similarity heatmaps.
+2. **ENH-03 (Web Worker Offload):** Move `executeChunking` into a Web Worker for documents > 25,000 characters.
+3. **ENH-04 (Tabular CSV/JSON Chunker):** Implement structured row chunker with header schema preservation.

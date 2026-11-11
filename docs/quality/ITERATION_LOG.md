@@ -73,3 +73,15 @@
   - Unit Tests: 40 passed across 5 test suites (100% pass, 0 flaky).
   - TypeScript & Lint: 0 diagnostic errors (`npm run lint`).
   - Production Bundle: 91.85 kB main JS bundle, 22.46 kB CSS.
+
+
+---
+
+## Enhancement ENH-02: Client-Side PDF Ingestion (Completed)
+- **Date:** November 11, 2026
+- **Summary:** Implemented 100% in-browser client-side PDF document parsing and text extraction using `pdfjs-dist/legacy`. Extracted text includes page boundary metadata (`--- Page X ---`) to assist downstream chunkers in respecting structural page divisions. Added dynamic import and Vite Rollup `manualChunks` code-splitting (`pdf-engine`) so that `pdfjs-dist` (512 kB) is isolated and loaded on-demand only when a PDF is selected, maintaining the core app bundle size at 94.46 kB. Added reactive loading spinner state (`Extracting PDF...`) to prevent double-uploads.
+- **Metrics Before / After:**
+  - Supported Formats: `.txt`, `.md`, `.json`, `.csv`, `.py`, `.js`, `.ts` -> added `.pdf`.
+  - Unit Tests: 40 passed (5 test files) -> **43 passed (6 test files)**.
+  - TypeScript: 0 diagnostic errors (`tsc -b`).
+  - Core App Bundle: 94.46 kB JS (pdf-engine code-split into 512.51 kB lazy chunk).

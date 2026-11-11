@@ -21,6 +21,7 @@ export default defineConfig({
           'vendor-react': ['react', 'react-dom'],
           'vendor-icons': ['lucide-react'],
           'tokenizer-tiktoken': ['js-tiktoken'],
+          'pdf-engine': ['pdfjs-dist/legacy/build/pdf.mjs'],
         },
       },
     },

@@ -1,8 +1,9 @@
 import React, { useRef, useState } from 'react';
 import { ChunkingConfig, ChunkingStrategy, TokenizerEncoding, ChunkUnit } from '../engine/types';
 import { SAMPLE_DOCUMENTS } from '../data/samples';
-import { Sliders, BookOpen, Upload, Cpu, ListFilter } from 'lucide-react';
+import { Sliders, BookOpen, Upload, Cpu, ListFilter, Loader2 } from 'lucide-react';
 import { cn } from '../utils/cn';
+import { extractTextFromPdf } from '../utils/pdfParser';
 
 interface ControlsPanelProps {
   config: ChunkingConfig;
@@ -20,6 +21,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
   onFileUpload,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isExtractingPdf, setIsExtractingPdf] = useState(false);
   const [separatorsText, setSeparatorsText] = useState<string>(
     config.separators ? config.separators.map((s) => JSON.stringify(s)).join(', ') : ''
   );
@@ -70,7 +72,36 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
 
     // Enforce 10MB limit to protect browser memory and responsiveness
     if (file.size > 10 * 1024 * 1024) {
-      alert('Selected file exceeds 10 MB limit. Please upload a smaller text document to maintain real-time performance.');
+      alert('Selected file exceeds 10 MB limit. Please upload a smaller document to maintain real-time performance.');
+      e.target.value = '';
+      return;
+    }
+
+    if (file.name.toLowerCase().endsWith('.pdf')) {
+      setIsExtractingPdf(true);
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const buffer = event.target?.result as ArrayBuffer;
+          const result = await extractTextFromPdf(buffer);
+          if (!result.text.trim()) {
+            alert(`No readable text could be extracted from "${file.name}". The document might be a scanned image or protected.`);
+            return;
+          }
+          onFileUpload(result.text, file.name);
+        } catch (err) {
+          console.error('PDF extraction failed:', err);
+          alert(`Failed to extract text from PDF "${file.name}": ${err instanceof Error ? err.message : 'Unknown error'}`);
+        } finally {
+          setIsExtractingPdf(false);
+        }
+      };
+      reader.onerror = () => {
+        setIsExtractingPdf(false);
+        console.error('Failed to read PDF file:', file.name);
+        alert(`Error reading file: ${file.name}`);
+      };
+      reader.readAsArrayBuffer(file);
       e.target.value = '';
       return;
     }
@@ -128,15 +159,31 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
             type="file"
             ref={fileInputRef}
             onChange={handleFileChange}
-            accept=".txt,.md,.json,.csv,.py,.js,.ts"
+            accept=".txt,.md,.json,.csv,.py,.js,.ts,.pdf"
             className="hidden"
           />
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="h-7 flex items-center space-x-1.5 text-xs px-2.5 rounded bg-surface text-slate-300 border border-border hover:bg-subtle hover:border-border-hover active-press focus-ring transition-colors"
+            disabled={isExtractingPdf}
+            title="Upload text, markdown, code, or PDF documents"
+            className={cn(
+              'h-7 flex items-center space-x-1.5 text-xs px-2.5 rounded bg-surface border border-border transition-colors active-press focus-ring',
+              isExtractingPdf
+                ? 'opacity-70 cursor-wait text-primary-300'
+                : 'text-slate-300 hover:bg-subtle hover:border-border-hover'
+            )}
           >
-            <Upload className="h-3.5 w-3.5 text-slate-400" />
-            <span>Upload File</span>
+            {isExtractingPdf ? (
+              <>
+                <Loader2 className="h-3.5 w-3.5 text-primary animate-spin" />
+                <span className="font-medium">Extracting PDF...</span>
+              </>
+            ) : (
+              <>
+                <Upload className="h-3.5 w-3.5 text-slate-400" />
+                <span>Upload File</span>
+              </>
+            )}
           </button>
         </div>
       </div>
