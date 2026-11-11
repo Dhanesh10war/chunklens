@@ -25,4 +25,22 @@
   - Ran `npm run test` (19 passed across 2 test files).
   - Ran `npm run typecheck` (passed with 0 errors).
   - Ran `npm run build` (passed).
+- **Git Commit:** `3ba7d58`
+
+---
+
+## Batch 2: Chunker Algorithm Bug Fixes & Code Fence Protection
+- **Issue IDs:** ISS-04, ISS-05
+- **Goal:** Protect Markdown code fences from being broken in half; implement true paragraph overlap in Markdown chunker; enforce `chunkSize` limits on oversized sentences in Sentence chunker; honor token units during recursive chunker hard slicing; centralize text and token slicing in `utils.ts`.
+- **Files Modified:**
+  - `src/engine/chunkers/utils.ts`: Created shared helper module providing `createLengthFn`, `findChunkIndices` (with cursor tracking to prevent repeat-text index conflicts), `detectOrphan`, and `splitOversizedText` (supporting both token and character modes).
+  - `src/engine/chunkers/recursiveChunker.ts`: Rewrote to use `utils.ts`, honor token units during hard slicing, calculate true character overlap, and track search cursors.
+  - `src/engine/chunkers/markdownChunker.ts`: Rewrote parser to preserve fenced code blocks atomically through blank lines; dynamically close and reopen code fences if an individual code block strictly exceeds `chunkSize`; implement genuine paragraph overlap; track search cursors.
+  - `src/engine/chunkers/sentenceChunker.ts`: Subdivide sentences exceeding `chunkSize` using `splitOversizedText`; treat newline blocks as sentence boundaries; track search cursors.
+  - `src/engine/chunkers/fixedChunker.ts`: Added token-mode character offset mapping via `findChunkIndices`, `detectOrphan`, and true overlap measurement.
+  - `src/engine/chunkers/__tests__/chunkers.test.ts`: Added tests for Markdown code fence protection with blank lines, oversized code block fence enclosure, sentence chunker oversized sentence enforcement, and recursive chunker token-unit constraints.
+- **Verification:**
+  - Ran `npm run test` (24 passed across 2 test files).
+  - Ran `npm run typecheck` (passed with 0 errors).
+  - Ran `npm run build` (passed).
 - **Git Commit:** Pending.

@@ -1,5 +1,6 @@
 import { ChunkMetadata, ChunkingConfig } from '../types';
 import { countTokens, getTokenizer } from '../tokenizers/tokenizer';
+import { findChunkIndices, detectOrphan } from './utils';
 
 export function chunkFixed(text: string, config: ChunkingConfig): ChunkMetadata[] {
   if (!text || text.trim().length === 0) return [];
@@ -20,9 +21,7 @@ export function chunkFixed(text: string, config: ChunkingConfig): ChunkMetadata[
 
       const overlapPrev = index > 0 ? safeOverlap : 0;
       const overlapNext = end < text.length ? safeOverlap : 0;
-
-      // Check if chunk starts mid-word
-      const isOrphan = start > 0 && /\w/.test(text[start - 1]) && /\w/.test(text[start]);
+      const isOrphan = detectOrphan(text, start);
 
       chunks.push({
         id: `fixed-${index}`,
@@ -48,25 +47,39 @@ export function chunkFixed(text: string, config: ChunkingConfig): ChunkMetadata[
     const tokens = enc.encode(text);
     let tokenStart = 0;
     let index = 0;
+    let searchCursor = 0;
 
     while (tokenStart < tokens.length) {
       const tokenEnd = Math.min(tokenStart + chunkSize, tokens.length);
       const chunkTokens = tokens.slice(tokenStart, tokenEnd);
       const chunkText = enc.decode(chunkTokens);
 
-      const overlapTokens = Math.min(safeOverlap, chunkTokens.length);
+      const { startCharIndex, endCharIndex, nextCursor } = findChunkIndices(text, chunkText, searchCursor);
+      searchCursor = nextCursor;
+
+      let actualOverlapChars = 0;
+      if (index > 0) {
+        const prevText = chunks[index - 1].text;
+        const maxPossible = Math.min(prevText.length, chunkText.length);
+        for (let len = maxPossible; len > 0; len--) {
+          if (prevText.endsWith(chunkText.slice(0, len))) {
+            actualOverlapChars = len;
+            break;
+          }
+        }
+      }
 
       chunks.push({
         id: `fixed-token-${index}`,
         index,
         text: chunkText,
-        startCharIndex: -1, // approximate for token slice
-        endCharIndex: -1,
+        startCharIndex,
+        endCharIndex,
         charCount: chunkText.length,
         tokenCount: chunkTokens.length,
-        overlapPrevChars: index > 0 ? overlapTokens : 0,
-        overlapNextChars: tokenEnd < tokens.length ? overlapTokens : 0,
-        isOrphan: false,
+        overlapPrevChars: actualOverlapChars > 0 ? actualOverlapChars : (index > 0 ? safeOverlap : 0),
+        overlapNextChars: tokenEnd < tokens.length ? safeOverlap : 0,
+        isOrphan: detectOrphan(text, startCharIndex),
       });
 
       tokenStart += step;

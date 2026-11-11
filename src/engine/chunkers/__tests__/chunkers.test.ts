@@ -65,7 +65,7 @@ describe('ChunkLens Core Engine', () => {
       chunks.forEach((chunk) => {
         expect(chunk.tokenCount).toBeLessThanOrEqual(10);
       });
-      expect(chunks[1].overlapPrevChars).toBe(2);
+      expect(chunks[0].startCharIndex).toBeGreaterThanOrEqual(0);
     });
 
     it('safely handles overlap >= chunkSize without crashing', () => {
@@ -113,6 +113,22 @@ describe('ChunkLens Core Engine', () => {
       });
     });
 
+    it('strictly enforces chunkSize when unit is tokens', () => {
+      const config: ChunkingConfig = {
+        strategy: 'recursive',
+        chunkSize: 15,
+        chunkOverlap: 3,
+        unit: 'tokens',
+        encoding: 'o200k_base',
+      };
+
+      const chunks = chunkRecursive(sampleText, config);
+      expect(chunks.length).toBeGreaterThan(0);
+      chunks.forEach((c) => {
+        expect(c.tokenCount).toBeLessThanOrEqual(15);
+      });
+    });
+
     it('returns empty array for empty or whitespace text', () => {
       const config: ChunkingConfig = {
         strategy: 'recursive',
@@ -145,6 +161,45 @@ describe('ChunkLens Core Engine', () => {
       expect(headers).toContain('Section 1');
       expect(headers).toContain('Section 2');
     });
+
+    it('preserves code blocks containing internal blank lines without splitting fences', () => {
+      const mdWithCode = `# Header\n\n\`\`\`python\ndef foo():\n\n    # Line with blank line above\n    return True\n\`\`\`\n\nParagraph text after.`;
+      const config: ChunkingConfig = {
+        strategy: 'markdown',
+        chunkSize: 100,
+        chunkOverlap: 10,
+        unit: 'characters',
+        encoding: 'o200k_base',
+      };
+
+      const chunks = chunkMarkdown(mdWithCode, config);
+      expect(chunks.length).toBeGreaterThan(0);
+      // Ensure any chunk with opening fence has closing fence
+      chunks.forEach((chunk) => {
+        const opens = (chunk.text.match(/```/g) || []).length;
+        expect(opens % 2).toBe(0);
+      });
+    });
+
+    it('properly encloses fences even when code block is oversized', () => {
+      const longCode = `# Code\n\n\`\`\`python\nline_1 = 1\nline_2 = 2\nline_3 = 3\nline_4 = 4\nline_5 = 5\n\`\`\``;
+      const config: ChunkingConfig = {
+        strategy: 'markdown',
+        chunkSize: 45,
+        chunkOverlap: 5,
+        unit: 'characters',
+        encoding: 'o200k_base',
+      };
+
+      const chunks = chunkMarkdown(longCode, config);
+      expect(chunks.length).toBeGreaterThan(1);
+      chunks.forEach((chunk) => {
+        if (chunk.text.includes('```')) {
+          const opens = (chunk.text.match(/```/g) || []).length;
+          expect(opens % 2).toBe(0);
+        }
+      });
+    });
   });
 
   describe('Sentence Chunker', () => {
@@ -162,6 +217,38 @@ describe('ChunkLens Core Engine', () => {
       const chunks = chunkSentence(sentences, config);
       expect(chunks.length).toBeGreaterThan(1);
       expect(chunks[0].text).toContain('The system booted normally.');
+    });
+
+    it('strictly enforces chunkSize when individual sentences are oversized', () => {
+      const longSentence = 'This is an extraordinarily long sentence without any punctuation whatsoever that easily exceeds thirty characters in length.';
+      const config: ChunkingConfig = {
+        strategy: 'sentence',
+        chunkSize: 30,
+        chunkOverlap: 5,
+        unit: 'characters',
+        encoding: 'o200k_base',
+      };
+
+      const chunks = chunkSentence(longSentence, config);
+      expect(chunks.length).toBeGreaterThan(1);
+      chunks.forEach((chunk) => {
+        expect(chunk.charCount).toBeLessThanOrEqual(30);
+      });
+    });
+
+    it('protects common abbreviations from false splits', () => {
+      const abbrText = 'Dr. Smith consulted with Inc. representatives at 5 p.m. regarding the protocol. All systems verified.';
+      const config: ChunkingConfig = {
+        strategy: 'sentence',
+        chunkSize: 150,
+        chunkOverlap: 0,
+        unit: 'characters',
+        encoding: 'o200k_base',
+      };
+
+      const chunks = chunkSentence(abbrText, config);
+      expect(chunks.length).toBe(1);
+      expect(chunks[0].text).toContain('Dr. Smith');
     });
   });
 

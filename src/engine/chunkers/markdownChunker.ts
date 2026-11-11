@@ -1,43 +1,79 @@
 import { ChunkMetadata, ChunkingConfig } from '../types';
 import { countTokens } from '../tokenizers/tokenizer';
+import { createLengthFn, findChunkIndices, detectOrphan, splitOversizedText } from './utils';
 
 interface MarkdownSection {
   header: string;
   level: number;
-  content: string;
+  blocks: string[];
 }
 
 export function chunkMarkdown(text: string, config: ChunkingConfig): ChunkMetadata[] {
   if (!text || text.trim().length === 0) return [];
 
   const { chunkSize, chunkOverlap, unit, encoding } = config;
-  const lengthFn = (str: string) => (unit === 'tokens' ? countTokens(str, encoding) : str.length);
+  const safeOverlap = Math.min(chunkOverlap, Math.max(0, chunkSize - 1));
+  const lengthFn = createLengthFn(unit, encoding);
 
-  // Line-by-line parser tracking headers and fenced code blocks
+  // Parse lines, separating into sections and preserving code blocks atomically
   const lines = text.split('\n');
   const sections: MarkdownSection[] = [];
   let currentHeader = 'Introduction';
   let currentLevel = 1;
-  let currentLines: string[] = [];
+  let currentBlocks: string[] = [];
+  let activeParagraphLines: string[] = [];
   let inCodeBlock = false;
+  let codeBlockLines: string[] = [];
+
+  const flushParagraph = () => {
+    if (activeParagraphLines.length > 0) {
+      currentBlocks.push(activeParagraphLines.join('\n'));
+      activeParagraphLines = [];
+    }
+  };
+
+  const flushCodeBlock = () => {
+    if (codeBlockLines.length > 0) {
+      currentBlocks.push(codeBlockLines.join('\n'));
+      codeBlockLines = [];
+    }
+  };
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+    const isFence = line.trim().startsWith('```');
 
-    if (line.trim().startsWith('```')) {
-      inCodeBlock = !inCodeBlock;
-      currentLines.push(line);
+    if (isFence) {
+      if (!inCodeBlock) {
+        // Start of code block: flush any pending paragraph
+        flushParagraph();
+        inCodeBlock = true;
+        codeBlockLines.push(line);
+      } else {
+        // End of code block
+        codeBlockLines.push(line);
+        inCodeBlock = false;
+        flushCodeBlock();
+      }
       continue;
     }
 
-    if (!inCodeBlock && /^#{1,6}\s+/.test(line)) {
-      if (currentLines.length > 0) {
+    if (inCodeBlock) {
+      // Retain all lines inside code block, even empty ones
+      codeBlockLines.push(line);
+      continue;
+    }
+
+    // Check for Markdown headings (only outside code blocks)
+    if (/^#{1,6}\s+/.test(line)) {
+      flushParagraph();
+      if (currentBlocks.length > 0) {
         sections.push({
           header: currentHeader,
           level: currentLevel,
-          content: currentLines.join('\n'),
+          blocks: currentBlocks,
         });
-        currentLines = [];
+        currentBlocks = [];
       }
 
       const match = line.match(/^(#{1,6})\s+(.*)$/);
@@ -45,143 +81,147 @@ export function chunkMarkdown(text: string, config: ChunkingConfig): ChunkMetada
         currentLevel = match[1].length;
         currentHeader = match[2].trim();
       }
-      currentLines.push(line);
+      activeParagraphLines.push(line);
+    } else if (line.trim() === '') {
+      // Blank line outside code block indicates paragraph boundary
+      flushParagraph();
     } else {
-      currentLines.push(line);
+      activeParagraphLines.push(line);
     }
   }
 
-  if (currentLines.length > 0) {
+  // Flush any remaining active lines
+  if (inCodeBlock) {
+    flushCodeBlock();
+  }
+  flushParagraph();
+
+  if (currentBlocks.length > 0) {
     sections.push({
       header: currentHeader,
       level: currentLevel,
-      content: currentLines.join('\n'),
+      blocks: currentBlocks,
     });
   }
 
-  // Now create chunks from sections, breaking oversized sections if necessary
-  const chunks: ChunkMetadata[] = [];
-  let chunkIndex = 0;
+  // Now assemble chunks respecting headers, code blocks, and overlap
+  const rawChunks: { text: string; header: string }[] = [];
 
   for (const section of sections) {
-    const sectionText = section.content;
-    const sectionLen = lengthFn(sectionText);
+    let buffer: string[] = [];
+    let bufferLen = 0;
 
-    if (sectionLen <= chunkSize) {
-      if (sectionText.trim()) {
-        const start = text.indexOf(sectionText);
-        chunks.push({
-          id: `md-${chunkIndex}`,
-          index: chunkIndex,
-          text: sectionText,
-          startCharIndex: start,
-          endCharIndex: start !== -1 ? start + sectionText.length : -1,
-          charCount: sectionText.length,
-          tokenCount: countTokens(sectionText, encoding),
-          overlapPrevChars: chunkIndex > 0 ? chunkOverlap : 0,
-          overlapNextChars: chunkOverlap,
-          isOrphan: false,
-          sectionHeader: section.header,
-        });
-        chunkIndex++;
-      }
-    } else {
-      // Split section by paragraphs or lines without breaking code fences
-      const paragraphs = sectionText.split(/\n\s*\n/);
-      let buffer: string[] = [];
-      let bufferLen = 0;
+    for (const block of section.blocks) {
+      const blockLen = lengthFn(block);
 
-      for (const p of paragraphs) {
-        const pLen = lengthFn(p);
-        if (bufferLen + pLen <= chunkSize) {
-          buffer.push(p);
-          bufferLen += pLen;
-        } else {
-          if (buffer.length > 0) {
-            const chunkStr = buffer.join('\n\n');
-            const start = text.indexOf(chunkStr);
-            chunks.push({
-              id: `md-${chunkIndex}`,
-              index: chunkIndex,
-              text: chunkStr,
-              startCharIndex: start,
-              endCharIndex: start !== -1 ? start + chunkStr.length : -1,
-              charCount: chunkStr.length,
-              tokenCount: countTokens(chunkStr, encoding),
-              overlapPrevChars: chunkIndex > 0 ? chunkOverlap : 0,
-              overlapNextChars: chunkOverlap,
-              isOrphan: false,
-              sectionHeader: section.header,
-            });
-            chunkIndex++;
-            buffer = [];
-            bufferLen = 0;
+      if (bufferLen + blockLen + (buffer.length > 0 ? lengthFn('\n\n') : 0) <= chunkSize) {
+        buffer.push(block);
+        bufferLen += blockLen + (buffer.length > 1 ? lengthFn('\n\n') : 0);
+      } else {
+        // Flush existing buffer
+        if (buffer.length > 0) {
+          const chunkStr = buffer.join('\n\n');
+          rawChunks.push({ text: chunkStr, header: section.header });
+
+          // Paragraph-level overlap: retain trailing blocks that fit in safeOverlap
+          const nextBuffer: string[] = [];
+          let nextBufferLen = 0;
+          for (let i = buffer.length - 1; i >= 0; i--) {
+            const b = buffer[i];
+            const bLen = lengthFn(b);
+            if (nextBufferLen + bLen + (nextBuffer.length > 0 ? lengthFn('\n\n') : 0) <= safeOverlap) {
+              nextBuffer.unshift(b);
+              nextBufferLen += bLen + (nextBuffer.length > 1 ? lengthFn('\n\n') : 0);
+            } else {
+              break;
+            }
           }
+          buffer = nextBuffer;
+          bufferLen = nextBufferLen;
+        }
 
-          if (pLen > chunkSize) {
-            // Hard split paragraph
-            const words = p.split(' ');
-            let wordBuffer: string[] = [];
-            let wordBufferLen = 0;
-            for (const w of words) {
-              const wLen = lengthFn(w);
-              if (wordBufferLen + wLen <= chunkSize) {
-                wordBuffer.push(w);
-                wordBufferLen += wLen + 1;
+        if (blockLen > chunkSize) {
+          // Block itself exceeds chunkSize
+          if (block.startsWith('```')) {
+            // It's an oversized code block: split lines while protecting fences
+            const blockLines = block.split('\n');
+            const openFence = blockLines[0]; // e.g. ```python
+            const contentLines = blockLines.slice(1, blockLines.length - 1);
+            let codeSubBuffer: string[] = [];
+            let codeSubLen = lengthFn(openFence) + lengthFn('\n```');
+
+            for (const cLine of contentLines) {
+              const cLineLen = lengthFn(cLine) + 1;
+              if (codeSubLen + cLineLen <= chunkSize) {
+                codeSubBuffer.push(cLine);
+                codeSubLen += cLineLen;
               } else {
-                if (wordBuffer.length > 0) {
-                  const chunkStr = wordBuffer.join(' ');
-                  const start = text.indexOf(chunkStr);
-                  chunks.push({
-                    id: `md-${chunkIndex}`,
-                    index: chunkIndex,
-                    text: chunkStr,
-                    startCharIndex: start,
-                    endCharIndex: start !== -1 ? start + chunkStr.length : -1,
-                    charCount: chunkStr.length,
-                    tokenCount: countTokens(chunkStr, encoding),
-                    overlapPrevChars: chunkIndex > 0 ? chunkOverlap : 0,
-                    overlapNextChars: chunkOverlap,
-                    isOrphan: false,
-                    sectionHeader: section.header,
-                  });
-                  chunkIndex++;
+                if (codeSubBuffer.length > 0) {
+                  const chunkCode = `${openFence}\n${codeSubBuffer.join('\n')}\n\`\`\``;
+                  rawChunks.push({ text: chunkCode, header: section.header });
+                  codeSubBuffer = [];
+                  codeSubLen = lengthFn(openFence) + lengthFn('\n```');
                 }
-                wordBuffer = [w];
-                wordBufferLen = wLen;
+                codeSubBuffer.push(cLine);
+                codeSubLen += cLineLen;
               }
             }
-            if (wordBuffer.length > 0) {
-              buffer = [wordBuffer.join(' ')];
-              bufferLen = wordBufferLen;
+
+            if (codeSubBuffer.length > 0) {
+              const chunkCode = `${openFence}\n${codeSubBuffer.join('\n')}\n\`\`\``;
+              rawChunks.push({ text: chunkCode, header: section.header });
             }
           } else {
-            buffer.push(p);
-            bufferLen = pLen;
+            // Standard oversized text block
+            const subChunks = splitOversizedText(block, chunkSize, safeOverlap, unit, encoding);
+            for (const sc of subChunks) {
+              rawChunks.push({ text: sc, header: section.header });
+            }
           }
+        } else {
+          buffer.push(block);
+          bufferLen += blockLen + (buffer.length > 1 ? lengthFn('\n\n') : 0);
         }
       }
+    }
 
-      if (buffer.length > 0) {
-        const chunkStr = buffer.join('\n\n');
-        const start = text.indexOf(chunkStr);
-        chunks.push({
-          id: `md-${chunkIndex}`,
-          index: chunkIndex,
-          text: chunkStr,
-          startCharIndex: start,
-          endCharIndex: start !== -1 ? start + chunkStr.length : -1,
-          charCount: chunkStr.length,
-          tokenCount: countTokens(chunkStr, encoding),
-          overlapPrevChars: chunkIndex > 0 ? chunkOverlap : 0,
-          overlapNextChars: 0,
-          isOrphan: false,
-          sectionHeader: section.header,
-        });
-        chunkIndex++;
-      }
+    if (buffer.length > 0) {
+      const chunkStr = buffer.join('\n\n');
+      rawChunks.push({ text: chunkStr, header: section.header });
     }
   }
 
-  return chunks;
+  // Map into structured ChunkMetadata with precise offsets
+  let searchCursor = 0;
+  return rawChunks.map((item, idx) => {
+    const chunkStr = item.text;
+    const { startCharIndex, endCharIndex, nextCursor } = findChunkIndices(text, chunkStr, searchCursor);
+    searchCursor = nextCursor;
+
+    let actualOverlapChars = 0;
+    if (idx > 0) {
+      const prevChunk = rawChunks[idx - 1].text;
+      const maxPossible = Math.min(prevChunk.length, chunkStr.length);
+      for (let len = maxPossible; len > 0; len--) {
+        if (prevChunk.endsWith(chunkStr.slice(0, len))) {
+          actualOverlapChars = len;
+          break;
+        }
+      }
+    }
+
+    return {
+      id: `md-${idx}`,
+      index: idx,
+      text: chunkStr,
+      startCharIndex,
+      endCharIndex,
+      charCount: chunkStr.length,
+      tokenCount: countTokens(chunkStr, encoding),
+      overlapPrevChars: actualOverlapChars > 0 ? actualOverlapChars : (idx > 0 ? safeOverlap : 0),
+      overlapNextChars: idx < rawChunks.length - 1 ? safeOverlap : 0,
+      isOrphan: detectOrphan(text, startCharIndex),
+      sectionHeader: item.header,
+    };
+  });
 }
