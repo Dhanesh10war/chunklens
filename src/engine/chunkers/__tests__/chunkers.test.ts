@@ -81,17 +81,26 @@ describe('ChunkLens Core Engine', () => {
       expect(chunks.length).toBeGreaterThan(0);
     });
 
-    it('flags orphan mid-word cuts', () => {
+    it('flags orphan mid-word cuts and verifies detectOrphan utility', () => {
       const config: ChunkingConfig = {
         strategy: 'fixed',
-        chunkSize: 8,
+        chunkSize: 5,
         chunkOverlap: 0,
         unit: 'characters',
         encoding: 'o200k_base',
       };
 
-      const chunks = chunkFixed('abcdefgh ijklmnop', config);
-      expect(chunks.length).toBeGreaterThan(1);
+      const chunks = chunkFixed('supercalifragilistic', config);
+      expect(chunks.length).toBe(4);
+      expect(chunks[0].isOrphan).toBe(false); // starts at index 0
+      expect(chunks[1].isOrphan).toBe(true);  // starts at index 5 ('c' inside word)
+      expect(chunks[2].isOrphan).toBe(true);  // starts at index 10 ('r' inside word)
+
+      // Direct boundary checks on word breaks vs mid-word
+      const wordBreakText = 'hello world';
+      const chunksWordBreak = chunkFixed(wordBreakText, { ...config, chunkSize: 6 });
+      expect(chunksWordBreak[0].isOrphan).toBe(false);
+      expect(chunksWordBreak[1].isOrphan).toBe(false); // starts at 'w' after space
     });
   });
 
@@ -287,7 +296,13 @@ describe('ChunkLens Core Engine', () => {
       expect(result.totalChunkTokens).toBeGreaterThan(0);
       expect(result.chunks.length).toBeGreaterThan(0);
       expect(result.executionTimeMs).toBeGreaterThanOrEqual(0);
-      expect(result.estimatedCostUsd).toBeGreaterThanOrEqual(0);
+
+      const expectedTotalChunkTokens = result.chunks.reduce((sum, c) => sum + c.tokenCount, 0);
+      expect(result.totalChunkTokens).toBe(expectedTotalChunkTokens);
+      expect(result.avgTokensPerChunk).toBe(Math.round(expectedTotalChunkTokens / result.chunks.length));
+      expect(result.minTokensPerChunk).toBe(Math.min(...result.chunks.map(c => c.tokenCount)));
+      expect(result.maxTokensPerChunk).toBe(Math.max(...result.chunks.map(c => c.tokenCount)));
+      expect(result.estimatedCostUsd).toBeCloseTo(expectedTotalChunkTokens * 0.00000002, 10);
     });
 
     it('handles empty input cleanly without NaN metrics', () => {
