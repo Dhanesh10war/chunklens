@@ -1,7 +1,7 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { ChunkingConfig, ChunkingStrategy, TokenizerEncoding, ChunkUnit } from '../engine/types';
 import { SAMPLE_DOCUMENTS } from '../data/samples';
-import { Sliders, Sparkles, Upload, Cpu } from 'lucide-react';
+import { Sliders, Sparkles, Upload, Cpu, ListFilter } from 'lucide-react';
 import { cn } from '../utils/cn';
 
 interface ControlsPanelProps {
@@ -20,6 +20,30 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
   onFileUpload,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [separatorsText, setSeparatorsText] = useState<string>(
+    config.separators ? config.separators.map((s) => JSON.stringify(s)).join(', ') : ''
+  );
+
+  const handleSeparatorsChange = (raw: string) => {
+    setSeparatorsText(raw);
+    if (!raw.trim()) {
+      onChangeConfig({ ...config, separators: undefined });
+      return;
+    }
+    const parts = raw.split(',').map((s) => {
+      let t = s.trim();
+      if ((t.startsWith('"') && t.endsWith('"')) || (t.startsWith("'") && t.endsWith("'"))) {
+        t = t.slice(1, -1);
+      }
+      return t.replace(/\\n/g, '\n').replace(/\\t/g, '\t');
+    });
+    onChangeConfig({ ...config, separators: parts });
+  };
+
+  const handleResetSeparators = () => {
+    setSeparatorsText('');
+    onChangeConfig({ ...config, separators: undefined });
+  };
 
   const handleStrategyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onChangeConfig({
@@ -237,6 +261,39 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
           />
         </div>
       </div>
+
+      {/* Advanced Recursive Separator Hierarchy Control */}
+      {config.strategy === 'recursive' && (
+        <div className="pt-2 border-t border-slate-800/60 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div className="flex items-center space-x-2">
+            <span className="font-mono text-slate-400 flex items-center gap-1.5 text-[11px]">
+              <ListFilter className="h-3 w-3 text-primary-400" />
+              Delimiter Hierarchy:
+            </span>
+            <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-surface-elevated text-primary-300 border border-slate-700">
+              {JSON.stringify(config.separators || ['\\n\\n', '\\n', '. ', ' ', ''])}
+            </span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <input
+              type="text"
+              placeholder='e.g. "\\n\\n", "\\n", ". ", " ", ""'
+              value={separatorsText}
+              onChange={(e) => handleSeparatorsChange(e.target.value)}
+              className="bg-[#090d16] border border-slate-700 rounded px-2.5 py-1 text-slate-200 text-xs font-mono w-72 focus:outline-none focus:border-primary-500"
+              title="Comma-separated delimiter list in descending order of precedence"
+            />
+            {config.separators && (
+              <button
+                onClick={handleResetSeparators}
+                className="text-[11px] text-slate-400 hover:text-slate-200 px-2 py-1 rounded bg-slate-800 border border-slate-700 transition-colors"
+              >
+                Reset
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

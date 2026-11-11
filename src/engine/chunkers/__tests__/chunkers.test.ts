@@ -129,6 +129,24 @@ describe('ChunkLens Core Engine', () => {
       });
     });
 
+    it('respects custom separator hierarchies like markdown horizontal rules', () => {
+      const customDoc = 'Header block\n---\nSecond block\n---\nThird block';
+      const config: ChunkingConfig = {
+        strategy: 'recursive',
+        chunkSize: 20,
+        chunkOverlap: 0,
+        unit: 'characters',
+        encoding: 'o200k_base',
+        separators: ['\n---\n', '\n', ' '],
+      };
+
+      const chunks = chunkRecursive(customDoc, config);
+      expect(chunks.length).toBe(3);
+      expect(chunks[0].text).toBe('Header block');
+      expect(chunks[1].text).toBe('Second block');
+      expect(chunks[2].text).toBe('Third block');
+    });
+
     it('returns empty array for empty or whitespace text', () => {
       const config: ChunkingConfig = {
         strategy: 'recursive',
