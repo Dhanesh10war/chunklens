@@ -61,4 +61,21 @@
   - Ran `npm run test` (31 passed across 2 test files).
   - Ran `npm run typecheck` (passed with 0 errors).
   - Ran `npm run build` (passed).
+- **Git Commit:** `2655564`
+
+---
+
+## Batch 4: Metrics Accuracy, Overlap Slider Clamping, & Reliability
+- **Issue IDs:** ISS-01, ISS-02
+- **Goal:** Enforce automatic overlap clamping on chunk size change to eliminate `chunkOverlap > chunkSize` desyncs; add file size limits (10MB) and `reader.onerror` error handling; calculate total chunk tokens (RAG ingestion volume) alongside raw document tokens; compute vector cost accurately from total ingested chunk tokens.
+- **Files Modified:**
+  - `src/engine/types.ts`: Added `totalChunkTokens: number` to `ChunkingResult`.
+  - `src/engine/chunkers/index.ts`: Computed `totalChunkTokens` and calculated `estimatedCostUsd` based on actual ingested tokens.
+  - `src/components/MetricsBar.tsx`: Displayed Ingested Tokens (with Source Doc tokens tooltip) and updated cost calculation.
+  - `src/components/ControlsPanel.tsx`: Added automatic clamping to chunk size and overlap sliders; added 10MB file upload guard and `reader.onerror` handler.
+  - `src/engine/chunkers/__tests__/chunkers.test.ts`: Added assertions verifying `totalChunkTokens` and cost calculation.
+- **Verification:**
+  - Ran `npm run test` (31 passed across 2 test files).
+  - Ran `npm run typecheck` (passed with 0 errors).
+  - Ran `npm run build` (passed).
 - **Git Commit:** Pending.

@@ -31,18 +31,21 @@ export function executeChunking(text: string, config: ChunkingConfig): ChunkingR
   const totalTokens = countTokens(text, config.encoding);
 
   const chunkTokenCounts = chunks.map(c => c.tokenCount);
-  const avgTokens = chunks.length > 0 ? Math.round(chunkTokenCounts.reduce((a, b) => a + b, 0) / chunks.length) : 0;
+  const totalChunkTokens = chunkTokenCounts.reduce((a, b) => a + b, 0);
+  const avgTokens = chunks.length > 0 ? Math.round(totalChunkTokens / chunks.length) : 0;
   const minTokens = chunks.length > 0 ? Math.min(...chunkTokenCounts) : 0;
   const maxTokens = chunks.length > 0 ? Math.max(...chunkTokenCounts) : 0;
 
+  // In RAG pipelines, vector embedding cost is paid on the total tokens of the ingested chunks (including overlap)
   // text-embedding-3-small is $0.02 per 1M tokens ($0.00000002 per token)
-  const estimatedCostUsd = (totalTokens * 0.00000002);
+  const estimatedCostUsd = (totalChunkTokens * 0.00000002);
 
   return {
     strategy: config.strategy,
     chunks,
     totalChars,
     totalTokens,
+    totalChunkTokens,
     avgTokensPerChunk: avgTokens,
     minTokensPerChunk: minTokens,
     maxTokensPerChunk: maxTokens,

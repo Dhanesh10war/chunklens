@@ -43,12 +43,23 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Enforce 10MB limit to protect browser memory and responsiveness
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Selected file exceeds 10 MB limit. Please upload a smaller text document to maintain real-time performance.');
+      e.target.value = '';
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = (event) => {
       const text = event.target?.result as string;
-      if (text) {
+      if (typeof text === 'string') {
         onFileUpload(text, file.name);
       }
+    };
+    reader.onerror = () => {
+      console.error('Failed to read file:', file.name);
+      alert(`Error reading file: ${file.name}`);
     };
     reader.readAsText(file);
     // Reset file input value so re-uploading the same file triggers change
@@ -183,9 +194,15 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
             max={config.unit === 'tokens' ? 2048 : 8000}
             step={config.unit === 'tokens' ? 25 : 100}
             value={config.chunkSize}
-            onChange={(e) =>
-              onChangeConfig({ ...config, chunkSize: parseInt(e.target.value, 10) || 500 })
-            }
+            onChange={(e) => {
+              const newSize = parseInt(e.target.value, 10) || 500;
+              const maxOverlap = Math.floor(newSize * 0.5);
+              onChangeConfig({
+                ...config,
+                chunkSize: newSize,
+                chunkOverlap: Math.min(config.chunkOverlap, maxOverlap),
+              });
+            }}
             className="w-full accent-primary-500 bg-slate-800 h-1.5 rounded-lg appearance-none cursor-pointer"
           />
         </div>
@@ -204,9 +221,14 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
             max={Math.floor(config.chunkSize * 0.5)}
             step={config.unit === 'tokens' ? 5 : 20}
             value={config.chunkOverlap}
-            onChange={(e) =>
-              onChangeConfig({ ...config, chunkOverlap: parseInt(e.target.value, 10) || 0 })
-            }
+            onChange={(e) => {
+              const maxOverlap = Math.floor(config.chunkSize * 0.5);
+              const requested = parseInt(e.target.value, 10) || 0;
+              onChangeConfig({
+                ...config,
+                chunkOverlap: Math.min(requested, maxOverlap),
+              });
+            }}
             className="w-full accent-amber-500 bg-slate-800 h-1.5 rounded-lg appearance-none cursor-pointer"
           />
         </div>

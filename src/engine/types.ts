@@ -33,6 +33,7 @@ export interface ChunkingResult {
   chunks: ChunkMetadata[];
   totalChars: number;
   totalTokens: number;
+  totalChunkTokens: number;
   avgTokensPerChunk: number;
   minTokensPerChunk: number;
   maxTokensPerChunk: number;

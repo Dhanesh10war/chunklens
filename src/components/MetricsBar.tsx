@@ -10,6 +10,7 @@ export const MetricsBar: React.FC<MetricsBarProps> = ({ result }) => {
   const {
     chunks,
     totalTokens,
+    totalChunkTokens,
     totalChars,
     avgTokensPerChunk,
     minTokensPerChunk,
@@ -35,15 +36,17 @@ export const MetricsBar: React.FC<MetricsBarProps> = ({ result }) => {
           </div>
         </div>
 
-        {/* Metric 2: Total Tokens */}
+        {/* Metric 2: Ingested & Source Tokens */}
         <div className="flex items-center space-x-2">
           <div className="p-1 rounded bg-accent-cyan/10 text-accent-cyan">
             <Hash className="h-3.5 w-3.5" />
           </div>
           <div>
-            <span className="text-slate-400">Total Tokens: </span>
-            <span className="text-white font-semibold">{totalTokens.toLocaleString()}</span>
-            <span className="text-slate-500 text-[10px] ml-1">({totalChars.toLocaleString()} chars)</span>
+            <span className="text-slate-400">Ingested Tokens: </span>
+            <span className="text-white font-semibold">{totalChunkTokens.toLocaleString()}</span>
+            <span className="text-slate-500 text-[10px] ml-1" title="Tokens in source text">
+              (Doc: {totalTokens.toLocaleString()} tok / {totalChars.toLocaleString()} ch)
+            </span>
           </div>
         </div>
 

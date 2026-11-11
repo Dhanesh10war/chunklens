@@ -266,6 +266,7 @@ describe('ChunkLens Core Engine', () => {
       expect(result.strategy).toBe('recursive');
       expect(result.totalChars).toBe(sampleText.length);
       expect(result.totalTokens).toBeGreaterThan(0);
+      expect(result.totalChunkTokens).toBeGreaterThan(0);
       expect(result.chunks.length).toBeGreaterThan(0);
       expect(result.executionTimeMs).toBeGreaterThanOrEqual(0);
       expect(result.estimatedCostUsd).toBeGreaterThanOrEqual(0);
