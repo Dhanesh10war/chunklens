@@ -1,12 +1,14 @@
 import React from 'react';
 import { ChunkingResult } from '../engine/types';
 import { Layers, Hash, Activity, Clock, DollarSign, AlertCircle } from 'lucide-react';
+import { cn } from '../utils/cn';
 
 interface MetricsBarProps {
   result: ChunkingResult;
+  isProcessing?: boolean;
 }
 
-export const MetricsBar: React.FC<MetricsBarProps> = ({ result }) => {
+export const MetricsBar: React.FC<MetricsBarProps> = ({ result, isProcessing = false }) => {
   const {
     chunks,
     totalTokens,
@@ -75,14 +77,19 @@ export const MetricsBar: React.FC<MetricsBarProps> = ({ result }) => {
           </div>
         </div>
 
-        {/* Metric 5: Runtime Latency */}
+        {/* Metric 5: Runtime Latency & Worker State */}
         <div className="flex items-center space-x-2">
           <div className="p-1 rounded bg-surface text-slate-400 border border-border">
-            <Clock className="h-3.5 w-3.5" />
+            <Clock className={cn("h-3.5 w-3.5", isProcessing && "animate-spin text-primary")} />
           </div>
-          <div>
+          <div className="flex items-center space-x-1.5">
             <span className="text-slate-400">Execution: </span>
             <span className="text-emerald-400 font-semibold tabular-nums">{executionTimeMs} ms</span>
+            {isProcessing && (
+              <span className="text-[10px] text-primary-400 font-sans animate-pulse font-medium">
+                (Worker computing)
+              </span>
+            )}
           </div>
         </div>
 

@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useDeferredValue } from 'react';
 import { ChunkingConfig } from './engine/types';
 import { SAMPLE_DOCUMENTS } from './data/samples';
-import { executeChunking } from './engine/chunkers';
+import { useChunkingWorker } from './engine/worker/useChunkingWorker';
 import { Header } from './components/Header';
 import { ControlsPanel } from './components/ControlsPanel';
 import { MetricsBar } from './components/MetricsBar';
@@ -43,10 +43,8 @@ export const App: React.FC = () => {
   const deferredText = useDeferredValue(rawText);
   const deferredConfig = useDeferredValue(config);
 
-  // Reactive chunking execution using deferred inputs
-  const chunkingResult = useMemo(() => {
-    return executeChunking(deferredText, deferredConfig);
-  }, [deferredText, deferredConfig]);
+  // Background Web Worker offloads tokenization and chunk slicing from main UI thread
+  const { result: chunkingResult, isProcessing } = useChunkingWorker(deferredText, deferredConfig);
 
   const handleSelectSample = (sampleId: string) => {
     const sample = SAMPLE_DOCUMENTS.find((s) => s.id === sampleId);
@@ -90,7 +88,7 @@ export const App: React.FC = () => {
       />
 
       {/* Real-Time Metrics Bar */}
-      <MetricsBar result={chunkingResult} />
+      <MetricsBar result={chunkingResult} isProcessing={isProcessing} />
 
       {/* Main Workspace Area */}
       <main className="flex-1 flex flex-col overflow-hidden">

@@ -97,3 +97,16 @@
   - Unit Tests: 43 passed (6 test files) -> **49 passed (7 test files)**.
   - TypeScript: 0 diagnostic errors (`tsc -b`).
   - Production Bundle: 106.83 kB main JS bundle, 24.96 kB CSS (vite build in 7.01s).
+
+
+---
+
+## Enhancement ENH-03: Web Worker Chunking Engine Offload (Completed)
+- **Date:** November 11, 2026
+- **Summary:** Decoupled document chunking and BPE tokenization from the main UI thread by implementing a dedicated background Web Worker (`src/engine/worker/chunking.worker.ts`) and reactive hook (`src/engine/worker/useChunkingWorker.ts`). When chunk size or overlap sliders are adjusted rapidly, requests are processed asynchronously in the worker and stale responses from interim slider frames are dropped, guaranteeing 60 FPS responsiveness on large documents (>50,000 chars). Includes transparent synchronous fallback for non-Worker environments (Node/SSR/Vitest) and a live computing status indicator in `MetricsBar.tsx`.
+- **Metrics Before / After:**
+  - Tokenization Thread: Main browser thread -> **Dedicated Background Web Worker**.
+  - UI Responsiveness on Large Docs: Main thread blocking during slider scrub -> **Strictly non-blocking 60 FPS**.
+  - Unit Tests: 49 passed (7 test files) -> **51 passed (8 test files)**.
+  - TypeScript: 0 diagnostic errors (`tsc -b`).
+  - Production Bundle: 107.82 kB main JS bundle, 25.06 kB CSS (chunking worker isolated into 5.61 MB worker chunk).
