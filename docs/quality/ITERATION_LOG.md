@@ -110,3 +110,16 @@
   - Unit Tests: 49 passed (7 test files) -> **51 passed (8 test files)**.
   - TypeScript: 0 diagnostic errors (`tsc -b`).
   - Production Bundle: 107.82 kB main JS bundle, 25.06 kB CSS (chunking worker isolated into 5.61 MB worker chunk).
+
+
+---
+
+## Enhancement ENH-04: Tabular CSV/JSON Chunker with Schema Retention (Completed)
+- **Date:** November 11, 2026
+- **Summary:** Added the 5th core chunking strategy: Tabular & CSV Schema-Preserving Chunking (`src/engine/chunkers/tabularChunker.ts`). Partitions CSV, TSV, and JSON record datasets by rows while guaranteeing that every single generated chunk retains the schema header (column definitions or JSON key schemas), completely eliminating LLM context loss and hallucinations during vector retrieval. Supports row-level overlap, token or character sizing, code export templates for Python/LangChain/LlamaIndex, and includes a preloaded E-Commerce Product Catalog CSV sample in `src/data/samples.ts`.
+- **Metrics Before / After:**
+  - Chunking Strategies: 4 algorithms -> **5 algorithms (added Tabular & CSV)**.
+  - Preloaded Samples: 5 corpora -> **6 corpora (added Product Catalog CSV)**.
+  - Unit Tests: 51 passed (8 test files) -> **56 passed (9 test files)**.
+  - TypeScript: 0 diagnostic errors (`tsc -b`).
+  - Production Bundle: 116.67 kB main JS bundle, 25.06 kB CSS (vite build in 6.79s).

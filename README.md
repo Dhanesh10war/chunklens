@@ -16,9 +16,10 @@ Retrieval-Augmented Generation (RAG) applications live and die by document chunk
 
 ## ✨ Features
 
-- **4 Production Chunking Algorithms:**
+- **5 Production Chunking Algorithms:**
   - 🔄 **Recursive Character:** Delimiter-based splitting mirroring LangChain's `RecursiveCharacterTextSplitter`.
   - 📑 **Markdown AST (Header-Aware):** Preserves header hierarchies and protects code fences (` ``` `) from being broken in half.
+  - 📊 **Tabular & CSV (Schema-Preserving):** Partitions tabular rows and JSON arrays while automatically prepending column definitions to every chunk.
   - 🎯 **Sentence Boundary:** Grammatical boundary splitting mirroring LlamaIndex's `SentenceSplitter`.
   - 🪟 **Fixed Window:** Exact character or token sliding windows with custom overlap.
 - **⚡ Exact BPE Token Calculation:**
@@ -122,8 +123,8 @@ Every commit is validated via GitHub Actions CI:
 
 - [x] v0.1: 4 core chunking algorithms, interactive visual canvas, tiktoken integration, and code export.
 - [x] v0.2: In-browser pairwise semantic similarity heatmap, boundary continuity scoring, and client-side PDF ingestion.
-- [ ] v0.3: Direct CSV/JSON tabular dataset chunking with schema preservation.
-- [ ] v0.4: Web Worker engine offload for massive documents (>100k words) & CLI CI/CD linter.
+- [x] v0.3: Direct CSV/JSON tabular dataset chunking with schema preservation & background Web Worker engine offload.
+- [ ] v0.4: Multi-model tokenizer comparison (Claude/Llama) & CLI CI/CD linter.
 
 ---
 

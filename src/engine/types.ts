@@ -1,4 +1,4 @@
-export type ChunkingStrategy = 'recursive' | 'fixed' | 'markdown' | 'sentence';
+export type ChunkingStrategy = 'recursive' | 'fixed' | 'markdown' | 'sentence' | 'tabular';
 
 export type TokenizerEncoding = 'o200k_base' | 'cl100k_base';
 

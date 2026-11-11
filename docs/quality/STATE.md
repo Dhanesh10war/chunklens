@@ -61,7 +61,7 @@
 | **ENH-02** | Client-Side PDF Ingestion (`pdfjs-dist`) | User Value | High | S (1d) | High | Parse text from non-scanned PDFs via in-browser worker | ✅ COMPLETED |
 | **ENH-01** | In-Browser Local Embeddings & Cosine Heatmaps | Differentiation | High | M (3d) | Med | Web Worker with ONNX `all-MiniLM-L6-v2` embedding generation | ✅ COMPLETED |
 | **ENH-03** | Web Worker Engine Offload | Scale | Med | S (1d) | High | Run `executeChunking` in dedicated worker if document > 25k chars | ✅ COMPLETED |
-| **ENH-04** | Tabular CSV/JSON Chunker with Schema Retention | User Value | High | M (2d) | High | Chunk rows while prepending column schema to every chunk | Proposed for v0.3 |
+| **ENH-04** | Tabular CSV/JSON Chunker with Schema Retention | User Value | High | M (2d) | High | Chunk rows while prepending column schema to every chunk | ✅ COMPLETED |
 | **ENH-05** | Multi-Model Tokenizer Comparison (Claude/Llama) | Differentiation | Med | S (1d) | Med | Display side-by-side token count diffs across providers | Proposed for v0.2 |
 
 ---
@@ -80,6 +80,6 @@
 ---
 
 ## 6. "Start Here Next Time" (Top 3 Recommendations)
-1. **ENH-04 (Tabular CSV/JSON Chunker):** Implement structured row chunker with header schema preservation.
-2. **ENH-05 (Multi-Model Tokenizer Comparison):** Display side-by-side token variance across Claude, Llama 3, and OpenAI.
-3. **CLI CI/CD Linter (`npx chunklens test ./docs`):** Automated GitHub Actions token limit and orphan check.
+1. **ENH-05 (Multi-Model Tokenizer Comparison):** Display side-by-side token variance across Claude, Llama 3, and OpenAI.
+2. **CLI CI/CD Linter (`npx chunklens test ./docs`):** Automated GitHub Actions token limit and orphan check.
+3. **Interactive Query Retrieval Simulator:** Real-time top-k vector search simulation against chunk embeddings.

@@ -82,6 +82,39 @@ text_splitter = RecursiveCharacterTextSplitter(
 `;
       }
 
+      if (strategy === 'tabular') {
+        return `# LangChain Python Tabular & CSV Schema-Preserving Splitter
+# Automatically retains column header on every chunk for high-precision RAG retrieval
+
+def chunk_tabular_dataset(csv_text: str, chunk_size: int = ${chunkSize}) -> list[str]:
+    lines = [l for l in csv_text.splitlines() if l.strip()]
+    if not lines:
+        return []
+    header = lines[0]
+    chunks = []
+    current_rows = []
+    current_len = len(header) + 1
+
+    for row in lines[1:]:
+        row_len = len(row) + 1
+        if current_rows and current_len + row_len > chunk_size:
+            chunks.append(f"{header}\\n" + "\\n".join(current_rows))
+            current_rows = [row]
+            current_len = len(header) + 1 + row_len
+        else:
+            current_rows.append(row)
+            current_len += row_len
+
+    if current_rows:
+        chunks.append(f"{header}\\n" + "\\n".join(current_rows))
+    return chunks
+
+# Example usage:
+# chunks = chunk_tabular_dataset(raw_csv_text)
+# print(f"Generated {len(chunks)} schema-preserved tabular chunks")
+`;
+      }
+
       if (strategy === 'fixed') {
         return `# LangChain Python Fixed Character/Token Splitter
 # Install requirement: pip install langchain-text-splitters tiktoken
@@ -169,6 +202,43 @@ parser = MarkdownNodeParser()
 `;
       }
 
+      if (strategy === 'tabular') {
+        return `# LlamaIndex Python Tabular & CSV Schema-Preserving Splitter
+# Automatically retains column header on every chunk for high-precision RAG retrieval
+
+from llama_index.core import Document
+
+def parse_tabular_documents(csv_text: str, chunk_size: int = ${chunkSize}) -> list[Document]:
+    lines = [l for l in csv_text.splitlines() if l.strip()]
+    if not lines:
+        return []
+    header = lines[0]
+    docs = []
+    current_rows = []
+    current_len = len(header) + 1
+
+    for row in lines[1:]:
+        row_len = len(row) + 1
+        if current_rows and current_len + row_len > chunk_size:
+            text_block = f"{header}\\n" + "\\n".join(current_rows)
+            docs.append(Document(text=text_block, extra_info={"schema": header}))
+            current_rows = [row]
+            current_len = len(header) + 1 + row_len
+        else:
+            current_rows.append(row)
+            current_len += row_len
+
+    if current_rows:
+        text_block = f"{header}\\n" + "\\n".join(current_rows)
+        docs.append(Document(text=text_block, extra_info={"schema": header}))
+    return docs
+
+# Example usage:
+# docs = parse_tabular_documents(raw_csv_text)
+# print(f"Generated {len(docs)} schema-preserved LlamaIndex documents")
+`;
+      }
+
       if (strategy === 'fixed') {
         return `# LlamaIndex Python Fixed Token Splitter Implementation
 # Install requirement: pip install llama-index llama-index-core tiktoken
@@ -247,6 +317,41 @@ const subSplitter = new RecursiveCharacterTextSplitter({
 `;
       }
 
+      if (strategy === 'tabular') {
+        return `// LangChain.js / TypeScript Tabular CSV Schema Splitter
+
+export function chunkTabularCsv(csvText: string, maxChunkSize: number = ${chunkSize}): string[] {
+  const lines = csvText.split(/\\r?\\n/).filter((l) => l.trim().length > 0);
+  if (lines.length === 0) return [];
+  const header = lines[0];
+  const chunks: string[] = [];
+  let currentRows: string[] = [];
+  let currentLen = header.length + 1;
+
+  for (const row of lines.slice(1)) {
+    const rowLen = row.length + 1;
+    if (currentRows.length > 0 && currentLen + rowLen > maxChunkSize) {
+      chunks.push(\`\${header}\\n\${currentRows.join('\\n')}\`);
+      currentRows = [row];
+      currentLen = header.length + 1 + rowLen;
+    } else {
+      currentRows.push(row);
+      currentLen += rowLen;
+    }
+  }
+
+  if (currentRows.length > 0) {
+    chunks.push(\`\${header}\\n\${currentRows.join('\\n')}\`);
+  }
+  return chunks;
+}
+
+// Example usage:
+// const chunks = chunkTabularCsv(rawCsvText);
+// console.log(\`Generated \${chunks.length} schema-preserved CSV chunks\`);
+`;
+      }
+
       return `// LangChain.js / TypeScript Text Splitter
 // Install requirement: npm install @langchain/textsplitters js-tiktoken
 
@@ -277,6 +382,42 @@ const splitter = new RecursiveCharacterTextSplitter({
 
     case 'native-python':
     default:
+      if (strategy === 'tabular') {
+        return `# Standalone Native Python Tabular & CSV Chunker (Zero External Dependencies)
+# No pip install required. Works anywhere.
+
+def chunk_csv_tabular(csv_text: str, max_chunk_size: int = ${chunkSize}) -> list[str]:
+    """
+    Chunks CSV records while prepending the header row to every chunk.
+    """
+    lines = [l for l in csv_text.splitlines() if l.strip()]
+    if not lines:
+        return []
+    header = lines[0]
+    chunks = []
+    current_rows = []
+    current_len = len(header) + 1
+
+    for row in lines[1:]:
+        row_len = len(row) + 1
+        if current_rows and current_len + row_len > max_chunk_size:
+            chunks.append(f"{header}\\n" + "\\n".join(current_rows))
+            current_rows = [row]
+            current_len = len(header) + 1 + row_len
+        else:
+            current_rows.append(row)
+            current_len += row_len
+
+    if current_rows:
+        chunks.append(f"{header}\\n" + "\\n".join(current_rows))
+    return chunks
+
+# Example usage:
+# chunks = chunk_csv_tabular(raw_csv_text)
+# print(f"Generated {len(chunks)} chunks with schema headers")
+`;
+      }
+
       if (strategy === 'markdown') {
         return `# Standalone Native Python Markdown Chunker (Zero External Dependencies)
 # No pip install required. Works anywhere.

@@ -3,6 +3,7 @@ import { chunkFixed } from './fixedChunker';
 import { chunkRecursive } from './recursiveChunker';
 import { chunkMarkdown } from './markdownChunker';
 import { chunkSentence } from './sentenceChunker';
+import { chunkTabular } from './tabularChunker';
 import { countTokens } from '../tokenizers/tokenizer';
 
 export function executeChunking(text: string, config: ChunkingConfig): ChunkingResult {
@@ -18,6 +19,9 @@ export function executeChunking(text: string, config: ChunkingConfig): ChunkingR
       break;
     case 'sentence':
       chunks = chunkSentence(text, config);
+      break;
+    case 'tabular':
+      chunks = chunkTabular(text, config);
       break;
     case 'recursive':
     default:

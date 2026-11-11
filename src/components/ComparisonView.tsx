@@ -56,6 +56,7 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ primaryConfig, r
             }
             className="h-7 bg-canvas border border-border rounded px-2 text-slate-200 text-xs focus-ring hover:border-border-hover transition-colors"
           >
+            <option value="tabular">Tabular &amp; CSV</option>
             <option value="markdown">Markdown AST</option>
             <option value="sentence">Sentence Boundary</option>
             <option value="recursive">Recursive Character</option>

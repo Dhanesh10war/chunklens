@@ -204,6 +204,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
             className="h-8 w-full bg-canvas border border-border rounded px-2.5 text-xs text-slate-200 focus-ring hover:border-border-hover transition-colors"
           >
             <option value="recursive">Recursive Character (LangChain)</option>
+            <option value="tabular">Tabular &amp; CSV (Schema-Preserving)</option>
             <option value="markdown">Markdown AST (Header-Aware)</option>
             <option value="sentence">Sentence Boundary (LlamaIndex)</option>
             <option value="fixed">Fixed Window (Sliding)</option>

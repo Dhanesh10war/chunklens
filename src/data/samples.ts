@@ -241,4 +241,26 @@ def ingest_document(payload: IngestRequest, db: Session = Depends(get_db)):
     )
 `,
   },
+  {
+    id: 'tabular-csv',
+    title: 'Product Catalog CSV',
+    category: 'Structured Tabular Data',
+    description: 'Tabular CSV records containing product SKUs, categories, pricing, ratings, and stock levels.',
+    content: `sku,product_name,category,brand,price_usd,stock_level,rating_stars,supplier_id
+SKU-9021,Aperture Precision Mouse,Peripherals,LogiTech,89.99,142,4.8,SUP-101
+SKU-9022,Mechanical Cobalt Keyboard,Peripherals,Keychron,149.50,56,4.9,SUP-102
+SKU-9023,Ergonomic Obsidian Standing Desk,Furniture,Autonomous,549.00,18,4.7,SUP-103
+SKU-9024,Noise Cancelling Studio Headphones,Audio,Sony,299.99,78,4.8,SUP-104
+SKU-9025,Reference Nearfield Monitor Speakers,Audio,Yamaha,349.00,32,4.9,SUP-104
+SKU-9026,Solid Walnut Desk Riser,Furniture,Grovemade,120.00,95,4.6,SUP-105
+SKU-9027,Braided 100W USB-C Cable (2m),Accessories,Anker,24.99,480,4.8,SUP-106
+SKU-9028,Curved 34-inch QD-OLED Monitor,Displays,Alienware,899.99,22,4.9,SUP-107
+SKU-9029,Aluminum Laptop Cooling Stand,Accessories,TwelveSouth,69.95,115,4.5,SUP-108
+SKU-9030,Smart LED Monitor Light Bar,Lighting,BenQ,109.00,64,4.7,SUP-109
+SKU-9031,Thunderbolt 4 Multi-Port Dock,Peripherals,CalDigit,379.99,41,4.9,SUP-110
+SKU-9032,High-Density Wool Felt Desk Pad,Accessories,DeltaHub,45.00,210,4.6,SUP-111
+SKU-9033,4K Ultra-HD AI Streaming Webcam,Video,Obsbot,249.00,38,4.7,SUP-112
+SKU-9034,Cardioid USB/XLR Dynamic Microphone,Audio,Shure,269.00,52,4.9,SUP-113
+SKU-9035,Motorized Desktop Cable Tray,Furniture,Fully,55.00,175,4.4,SUP-103`,
+  },
 ];
