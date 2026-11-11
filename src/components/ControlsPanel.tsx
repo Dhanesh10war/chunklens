@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { ChunkingConfig, ChunkingStrategy, TokenizerEncoding, ChunkUnit } from '../engine/types';
 import { SAMPLE_DOCUMENTS } from '../data/samples';
 import { Sliders, Sparkles, Upload, Cpu } from 'lucide-react';
+import { cn } from '../utils/cn';
 
 interface ControlsPanelProps {
   config: ChunkingConfig;
@@ -80,11 +81,12 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
               <button
                 key={sample.id}
                 onClick={() => onSelectSample(sample.id)}
-                className={`text-xs px-2.5 py-1 rounded-md transition-colors ${
+                className={cn(
+                  'text-xs px-2.5 py-1 rounded-md transition-colors',
                   selectedSampleId === sample.id
                     ? 'bg-primary-500/20 text-primary-300 border border-primary-500/40 font-medium'
                     : 'bg-surface-elevated text-slate-400 border border-slate-800 hover:text-slate-200 hover:border-slate-700'
-                }`}
+                )}
               >
                 {sample.title.split(' ')[0]} {sample.title.split(' ')[1] || ''}
               </button>
@@ -146,21 +148,23 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
             <div className="flex bg-[#090d16] p-0.5 rounded-md border border-slate-700">
               <button
                 onClick={() => handleUnitToggle('tokens')}
-                className={`flex-1 text-[11px] py-1 rounded transition-colors ${
+                className={cn(
+                  'flex-1 text-[11px] py-1 rounded transition-colors',
                   config.unit === 'tokens'
                     ? 'bg-primary-500/30 text-primary-200 font-semibold'
                     : 'text-slate-400 hover:text-slate-200'
-                }`}
+                )}
               >
                 Tokens
               </button>
               <button
                 onClick={() => handleUnitToggle('characters')}
-                className={`flex-1 text-[11px] py-1 rounded transition-colors ${
+                className={cn(
+                  'flex-1 text-[11px] py-1 rounded transition-colors',
                   config.unit === 'characters'
                     ? 'bg-primary-500/30 text-primary-200 font-semibold'
                     : 'text-slate-400 hover:text-slate-200'
-                }`}
+                )}
               >
                 Chars
               </button>

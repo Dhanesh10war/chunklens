@@ -9,6 +9,7 @@ import { VisualCanvas } from './components/VisualCanvas';
 import { ComparisonView } from './components/ComparisonView';
 import { ExportModal } from './components/ExportModal';
 import { Edit3, Eye, FileText } from 'lucide-react';
+import { cn } from './utils/cn';
 
 export const App: React.FC = () => {
   // Active sample or custom document text
@@ -84,22 +85,24 @@ export const App: React.FC = () => {
           <div className="flex items-center space-x-1 bg-surface-elevated p-0.5 rounded border border-slate-700">
             <button
               onClick={() => setActiveTab('visualizer')}
-              className={`flex items-center space-x-1 px-2.5 py-1 rounded text-xs transition-colors ${
+              className={cn(
+                'flex items-center space-x-1 px-2.5 py-1 rounded text-xs transition-colors',
                 activeTab === 'visualizer'
                   ? 'bg-primary-500 text-white font-medium'
                   : 'text-slate-400 hover:text-slate-200'
-              }`}
+              )}
             >
               <Eye className="h-3.5 w-3.5" />
               <span>Chunks</span>
             </button>
             <button
               onClick={() => setActiveTab('editor')}
-              className={`flex items-center space-x-1 px-2.5 py-1 rounded text-xs transition-colors ${
+              className={cn(
+                'flex items-center space-x-1 px-2.5 py-1 rounded text-xs transition-colors',
                 activeTab === 'editor'
                   ? 'bg-primary-500 text-white font-medium'
                   : 'text-slate-400 hover:text-slate-200'
-              }`}
+              )}
             >
               <Edit3 className="h-3.5 w-3.5" />
               <span>Edit Raw Text</span>

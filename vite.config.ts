@@ -13,4 +13,16 @@ export default defineConfig({
   optimizeDeps: {
     include: ['js-tiktoken'],
   },
+  build: {
+    chunkSizeWarningLimit: 6000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-icons': ['lucide-react'],
+          'tokenizer-tiktoken': ['js-tiktoken'],
+        },
+      },
+    },
+  },
 });

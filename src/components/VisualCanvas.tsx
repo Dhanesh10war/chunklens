@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChunkMetadata } from '../engine/types';
 import { Copy, Check, Eye, AlertTriangle, Bookmark, Hash } from 'lucide-react';
+import { cn } from '../utils/cn';
 
 interface VisualCanvasProps {
   chunks: ChunkMetadata[];
@@ -27,7 +28,7 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({ chunks }) => {
           <span className="text-slate-400 font-medium">Viewing {chunks.length} Chunks</span>
           {selectedChunk && (
             <span className="text-primary-400 font-mono bg-primary-500/10 px-2 py-0.5 rounded border border-primary-500/20">
-              Inspecting #{selectedChunk.index + 1}
+              Inspecting #{selectedChunk.index + 1} ({selectedChunk.tokenCount} tokens)
             </span>
           )}
         </div>
@@ -36,21 +37,23 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({ chunks }) => {
         <div className="flex items-center space-x-1 bg-surface-elevated p-0.5 rounded-md border border-slate-700">
           <button
             onClick={() => setViewMode('cards')}
-            className={`px-2.5 py-1 rounded text-xs transition-colors ${
+            className={cn(
+              'px-2.5 py-1 rounded text-xs transition-colors',
               viewMode === 'cards'
                 ? 'bg-primary-500 text-white font-medium shadow-sm'
                 : 'text-slate-400 hover:text-slate-200'
-            }`}
+            )}
           >
             Chunk Cards
           </button>
           <button
             onClick={() => setViewMode('stream')}
-            className={`px-2.5 py-1 rounded text-xs transition-colors ${
+            className={cn(
+              'px-2.5 py-1 rounded text-xs transition-colors',
               viewMode === 'stream'
                 ? 'bg-primary-500 text-white font-medium shadow-sm'
                 : 'text-slate-400 hover:text-slate-200'
-            }`}
+            )}
           >
             Continuous Stream
           </button>
@@ -75,11 +78,13 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({ chunks }) => {
                 <div
                   key={chunk.id}
                   onClick={() => setSelectedChunkId(isSelected ? null : chunk.id)}
-                  className={`group rounded-xl border p-4 transition-all cursor-pointer ${badgeClass} ${
+                  className={cn(
+                    'group rounded-xl border p-4 transition-all cursor-pointer',
+                    badgeClass,
                     isSelected
                       ? 'ring-2 ring-primary-500 shadow-lg shadow-primary-500/10 border-primary-500'
                       : 'hover:border-slate-600'
-                  }`}
+                  )}
                 >
                   {/* Card Header Bar */}
                   <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/10 text-xs font-mono">
@@ -136,6 +141,11 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({ chunks }) => {
                   {chunk.overlapPrevChars > 0 && (
                     <div className="mt-2 pt-2 border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-slate-400">
                       <span>Overlap with previous: ~{chunk.overlapPrevChars} chars</span>
+                      {chunk.startCharIndex >= 0 && (
+                        <span className="text-slate-500">
+                          Offsets: [{chunk.startCharIndex} .. {chunk.endCharIndex}]
+                        </span>
+                      )}
                     </div>
                   )}
                 </div>
@@ -144,25 +154,70 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({ chunks }) => {
           </div>
         ) : (
           /* Continuous Highlighted Stream View */
-          <div className="max-w-5xl mx-auto p-6 rounded-xl bg-surface border border-slate-800">
-            <h3 className="text-xs font-mono text-slate-400 mb-4 pb-2 border-b border-slate-800 uppercase tracking-wider">
-              Continuous Document Stream with Chunk Boundaries
-            </h3>
-            <div className="text-sm font-mono leading-relaxed space-y-1">
+          <div className="max-w-5xl mx-auto p-6 rounded-xl bg-surface border border-slate-800 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <h3 className="text-xs font-mono text-slate-300 uppercase tracking-wider font-semibold">
+                Continuous Document Stream & Boundary Highlights
+              </h3>
+              <div className="flex items-center space-x-3 text-xs font-mono text-slate-400">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-3 h-3 rounded bg-amber-500/30 border border-amber-500/60 inline-block"></span>
+                  Overlapping context
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="px-1 py-0.5 rounded bg-primary-500/20 text-primary-300 text-[10px]">#N</span>
+                  Chunk boundary
+                </span>
+              </div>
+            </div>
+
+            <div className="text-xs font-mono leading-relaxed space-y-3">
               {chunks.map((chunk) => {
                 const badgeColor = `chunk-badge-${chunk.index % 5}`;
+                const isSelected = selectedChunkId === chunk.id;
+                const hasOverlap = chunk.overlapPrevChars > 0 && chunk.overlapPrevChars < chunk.text.length;
+                const overlapText = hasOverlap ? chunk.text.slice(0, chunk.overlapPrevChars) : '';
+                const uniqueText = hasOverlap ? chunk.text.slice(chunk.overlapPrevChars) : chunk.text;
+
                 return (
-                  <span
+                  <div
                     key={chunk.id}
-                    onClick={() => setSelectedChunkId(chunk.id)}
-                    className={`inline px-1 py-0.5 mx-0.5 rounded border text-xs cursor-pointer hover:opacity-100 transition-opacity ${badgeColor} ${
-                      selectedChunkId === chunk.id ? 'ring-2 ring-primary-500' : 'opacity-85'
-                    }`}
-                    title={`Chunk #${chunk.index + 1}: ${chunk.tokenCount} tokens`}
+                    onClick={() => setSelectedChunkId(isSelected ? null : chunk.id)}
+                    className={cn(
+                      'p-3 rounded-lg border transition-all cursor-pointer',
+                      badgeColor,
+                      isSelected ? 'ring-2 ring-primary-500' : 'hover:border-slate-600'
+                    )}
                   >
-                    <sup className="font-bold text-[9px] mr-1 text-primary-400">[{chunk.index + 1}]</sup>
-                    {chunk.text}
-                  </span>
+                    <div className="flex items-center justify-between pb-1.5 mb-2 border-b border-white/10 text-[11px] font-mono">
+                      <div className="flex items-center space-x-2">
+                        <span className="font-bold px-2 py-0.5 rounded bg-black/40 border border-white/10 text-primary-300">
+                          Chunk #{chunk.index + 1}
+                        </span>
+                        {chunk.sectionHeader && (
+                          <span className="text-slate-400">[{chunk.sectionHeader}]</span>
+                        )}
+                      </div>
+                      <div className="flex items-center space-x-3 text-slate-400">
+                        <span>{chunk.tokenCount} tokens ({chunk.charCount} chars)</span>
+                        {chunk.overlapPrevChars > 0 && (
+                          <span className="text-amber-400">overlap: {chunk.overlapPrevChars} ch</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="whitespace-pre-wrap">
+                      {hasOverlap && (
+                        <span
+                          className="overlap-highlight px-1 py-0.5 rounded text-amber-200 mr-1"
+                          title={`Overlapping context (~${chunk.overlapPrevChars} chars)`}
+                        >
+                          {overlapText}
+                        </span>
+                      )}
+                      <span>{uniqueText}</span>
+                    </div>
+                  </div>
                 );
               })}
             </div>

@@ -55,16 +55,20 @@ npm run dev
 ```
 Open your browser at `http://localhost:5173`.
 
-### Run Test Suite
+### Run Test Suite & Type Check
 ```bash
+# Run unit tests
 npm run test
+
+# Run strict TypeScript type check
+npm run typecheck
 ```
 
 ### Production Build
 ```bash
 npm run build
 ```
-Outputs static assets into `dist/` ready to be hosted for free on Cloudflare Pages, GitHub Pages, or Vercel.
+Outputs optimized static assets into `dist/` with automated vendor code-splitting, ready to be hosted for free on Cloudflare Pages, GitHub Pages, or Vercel.
 
 ---
 
@@ -79,7 +83,7 @@ Outputs static assets into `dist/` ready to be hosted for free on Cloudflare Pag
         ▼                       ▼                       ▼
 ┌──────────────┐      ┌──────────────────┐      ┌──────────────┐
 │ Text Parsers │ ───► │  Chunking Engine │ ───► │  BPE Token   │
-│ (MD/TXT/PDF) │      │ (Recursive / MD) │      │ (js-tiktoken)│
+│ (MD/TXT/Code)│      │(Recursive/MD/Sent│      │ (js-tiktoken)│
 └──────────────┘      └──────────────────┘      └──────────────┘
                                 │
                                 ▼
@@ -93,10 +97,19 @@ Outputs static assets into `dist/` ready to be hosted for free on Cloudflare Pag
 ## 📦 Zero-Cost Deployment Plan
 
 ChunkLens is designed to run indefinitely on permanent $0 free-tier infrastructure:
-- **Hosting:** Cloudflare Pages (Free unlimited bandwidth & requests)
-- **SSL / CDN:** Cloudflare Global Edge Network
+- **Hosting:** Cloudflare Pages, Vercel, or GitHub Pages (Free static hosting)
+- **SSL / CDN:** Global Edge CDN
 - **Compute:** 100% Client-side browser thread
-- **Telemetry:** Privacy-first anonymous events via Umami Cloud (zero cookies, zero document content captured)
+- **Privacy:** Zero server calls, zero document content transmission, zero cookies
+
+---
+
+## 🚦 Continuous Integration
+
+Every commit is validated via GitHub Actions CI:
+- Strict TypeScript type-checking (`tsc -b`)
+- Unit test suite execution (`vitest run`)
+- Production build validation (`vite build`)
 
 ---
 

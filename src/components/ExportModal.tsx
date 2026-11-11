@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ChunkingConfig, CodeExportFramework } from '../engine/types';
 import { generateExportCode } from '../exporters/codeExporters';
 import { X, Copy, Check, Terminal } from 'lucide-react';
+import { cn } from '../utils/cn';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -61,11 +62,12 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 px-3 py-2 text-xs font-medium border-b-2 transition-all whitespace-nowrap ${
+              className={cn(
+                'flex items-center space-x-2 px-3 py-2 text-xs font-medium border-b-2 transition-all whitespace-nowrap',
                 activeTab === tab.id
                   ? 'border-primary-500 text-primary-300 bg-primary-500/10 rounded-t'
                   : 'border-transparent text-slate-400 hover:text-slate-200'
-              }`}
+              )}
             >
               <span>{tab.icon}</span>
               <span>{tab.label}</span>

@@ -25,7 +25,6 @@ export interface ChunkingConfig {
   unit: ChunkUnit;
   encoding: TokenizerEncoding;
   separators?: string[];
-  keepSeparators?: boolean;
 }
 
 export interface ChunkingResult {

@@ -78,4 +78,24 @@
   - Ran `npm run test` (31 passed across 2 test files).
   - Ran `npm run typecheck` (passed with 0 errors).
   - Ran `npm run build` (passed).
+- **Git Commit:** `54e6e3b`
+
+---
+
+## Batch 5: UX/DX Polish, Bundle Optimization, Dead Code Removal & CI/CD
+- **Issue IDs:** ISS-07, ISS-08, ISS-09, ISS-10, ISS-11, ISS-12
+- **Goal:** Polish continuous stream view to highlight overlaps with `.overlap-highlight` and eliminate text repetition; expand Variant B in Comparison View with complete unit, overlap, and encoding controls; optimize Vite build with Rollup manualChunks code-splitting to bring main JS chunk down from 5.8MB to 77.5KB; wire `clsx` and `tailwind-merge` into shared `cn()` helper and remove dead `keepSeparators`; align `README.md` docs with code and add GitHub Actions CI workflow.
+- **Files Modified:**
+  - `src/utils/cn.ts`: Created shared `cn()` helper utilizing `clsx` and `tailwind-merge`.
+  - `src/engine/types.ts`: Removed dead `keepSeparators` interface field.
+  - `src/components/VisualCanvas.tsx`: Rendered stream view with boundary pills, chunk text, and `.overlap-highlight` highlighting for overlapping prefixes.
+  - `src/components/ComparisonView.tsx`: Added unit toggle ('tokens' vs 'characters'), overlap slider/input, and encoding selector to Variant B.
+  - `src/components/Header.tsx`, `src/components/ControlsPanel.tsx`, `src/components/ExportModal.tsx`, `src/App.tsx`: Refactored class name concatenation to `cn()`.
+  - `vite.config.ts`: Added Rollup `manualChunks` splitting (`vendor-react`, `vendor-icons`, `tokenizer-tiktoken`), reducing main bundle size to 77.5 kB.
+  - `.github/workflows/ci.yml`: Created automated GitHub Actions CI workflow running typecheck, unit tests, and production build on push/PR.
+  - `README.md`: Corrected supported document types (MD/TXT/Code), documented `npm run typecheck`, clarified client-side zero-leakage privacy guarantee, and added CI section.
+- **Verification:**
+  - Ran `npm run test` (31 passed across 2 test files).
+  - Ran `npm run typecheck` (passed with 0 errors).
+  - Ran `npm run build` (passed in 4.10s, main chunk 77.5 kB, zero chunk size warnings).
 - **Git Commit:** Pending.

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Layers, ShieldCheck, Github, Code2, SplitSquareVertical } from 'lucide-react';
+import { cn } from '../utils/cn';
 
 interface HeaderProps {
   onExportClick: () => void;
@@ -41,11 +42,12 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center space-x-3">
           <button
             onClick={onToggleCompare}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${
+            className={cn(
+              'flex items-center space-x-1.5 px-3 py-1.5 rounded-md text-xs font-medium border transition-colors',
               isCompareMode
                 ? 'bg-primary-500/20 border-primary-500 text-primary-300'
                 : 'bg-surface border-slate-800 text-slate-300 hover:border-slate-700'
-            }`}
+            )}
           >
             <SplitSquareVertical className="h-4 w-4" />
             <span className="hidden sm:inline">Compare</span>
