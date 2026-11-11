@@ -79,6 +79,10 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
     reader.onload = (event) => {
       const text = event.target?.result as string;
       if (typeof text === 'string') {
+        if (!text.trim()) {
+          alert(`File "${file.name}" is empty or contains only whitespace.`);
+          return;
+        }
         onFileUpload(text, file.name);
       }
     };
