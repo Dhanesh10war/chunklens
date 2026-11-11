@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "typecheck": "tsc -b"
+    "test:verbose": "vitest run --reporter=verbose",
+    "typecheck": "tsc -b",
+    "lint": "tsc -b"
   },
   "dependencies": {
     "clsx": "^2.1.1",
