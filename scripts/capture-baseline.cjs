@@ -5,7 +5,8 @@ const path = require('path');
 
 const CHROME_PATH = '/home/drago/.cache/puppeteer/chrome/linux-146.0.7680.153/chrome-linux64/chrome';
 const DIST_DIR = path.resolve(__dirname, '../dist');
-const OUT_DIR = path.resolve(__dirname, '../docs/design/before');
+const targetDirName = process.argv[2] || 'before';
+const OUT_DIR = path.resolve(__dirname, '../docs/design', targetDirName);
 
 if (!fs.existsSync(OUT_DIR)) {
   fs.mkdirSync(OUT_DIR, { recursive: true });
@@ -266,8 +267,9 @@ async function run() {
       a11yViolationsCount: metrics.a11yViolationsCount,
     });
 
+    const metricsFilename = targetDirName === 'after' ? 'redesign-metrics.json' : 'baseline-metrics.json';
     fs.writeFileSync(
-      path.join(OUT_DIR, 'baseline-metrics.json'),
+      path.join(OUT_DIR, metricsFilename),
       JSON.stringify(metrics, null, 2)
     );
 

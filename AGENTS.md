@@ -7,21 +7,31 @@
 - **Verbose Tests:** `npm run test:verbose` (`vitest run --reporter=verbose`)
 - **Production Build:** `npm run build` (`tsc -b && vite build`)
 - **Local Dev Server:** `npm run dev` (`vite`)
+- **Visual Capture & Audit:** `node --experimental-websocket scripts/capture-baseline.cjs after`
 
 ## Architecture Pointers
 - **Engine Core (`src/engine/`):**
-  - `chunkers/`: Algorithm implementations (`markdownChunker`, `sentenceChunker`, `recursiveChunker`, `fixedChunker`, `utils.ts`).
-  - `tokenizers/`: BPE tokenizer wrapper (`tokenizer.ts` using `js-tiktoken`).
+  - `chunkers/`: Algorithm implementations (`markdownChunker`, `sentenceChunker`, `recursiveChunker`, `fixedChunker`, `tabularChunker`, `utils.ts`).
+  - `tokenizers/`: BPE tokenizer wrapper (`tokenizer.ts`, `multiModelTokenizer.ts` using `js-tiktoken`).
   - `types.ts`: Universal schemas (`ChunkingConfig`, `ChunkMetadata`, `ChunkingResult`).
 - **Exporters (`src/exporters/`):**
   - `codeExporters.ts`: Strategy-aware Python/TS code generator.
   - `dataExporters.ts`: RFC 4180 CSV & JSON dataset generator.
 - **State & Utilities (`src/utils/`):**
   - `storage.ts`: Isomorphic `localStorage` persistence with schema defaults.
+  - `theme.ts`: Dark/Light theme manager with `prefers-color-scheme` support.
+  - `pdfParser.ts`: In-browser PDF text extractor using `pdfjs-dist` with resilient worker initialization.
   - `clipboard.ts`: Async clipboard write with `execCommand('copy')` fallback for headless/test environments.
   - `cn.ts`: Class name merger (`clsx` + `tailwind-merge`).
-- **UI Components (`src/components/`):**
-  - `ControlsPanel.tsx`, `MetricsBar.tsx`, `VisualCanvas.tsx`, `ComparisonView.tsx`, `ExportModal.tsx`, `Header.tsx`.
+- **Component Primitives (`src/components/ui/`):**
+  - `Button.tsx`, `Input.tsx`, `Select.tsx`, `SliderWithInput.tsx`, `SegmentedControl.tsx`, `Tooltip.tsx`, `Toast.tsx`, `Skeleton.tsx`.
+- **Application Shell (`src/components/`):**
+  - `Header.tsx`: 48px top bar with document title, privacy badge, theme toggle, and ⌘K quick action trigger.
+  - `Sidebar.tsx`: 300px collapsible configuration drawer (<1024px responsive overlay).
+  - `MetricsBar.tsx`: Slim hairline summary strip with inline metric pairs and tabular numerals.
+  - `VisualCanvas.tsx`: Hero continuous reading column with OKLCH chunk color bands and diagonal-hatch overlap ribbons.
+  - `ChunkInspector.tsx`: 320px pro inspector (<768px responsive bottom sheet) detailing boundary split reasons and neighbor context.
+  - `CommandPalette.tsx`: ⌘K floating quick actions launcher.
 
 ## Do-Not-Modify List
 - `package-lock.json` (do not hand-edit).
@@ -34,22 +44,22 @@
 - **Large Tokenizer Bundle:** `js-tiktoken` vocab is 5.6 MB. `vite.config.ts` uses `manualChunks` to keep application code under 100 kB. Never remove chunk splitting.
 - **Execution Directory:** The repository is located at `/home/drago/projects/Venture/chunklens`. Always run commands inside `chunklens/`.
 
-
-## UI Conventions & Design System Tokens ("Precision RAG Instrument")
+## UI Conventions & Design System Tokens (Linear / Vercel Benchmark)
 - **Palette Tokens:**
-  - Backgrounds: `bg-canvas` (`#080c14`), `bg-panel` (`#0d1422`), `bg-surface` (`#131c30`), `bg-subtle` (`#1a2640`).
-  - Borders: `border-border` (`#1e293b`), hairline subtle separators (`#212f4c`).
-  - Primary Accent: Precision Cobalt (`#3b82f6` / `primary-500`), `primary-light: #60a5fa`, `primary-dark: #1d4ed8`.
-  - Chunk Spectrum: 5 luminance-matched badge tokens (`chunk-badge-0` through `chunk-badge-4`).
-- **Border Radii:** Strictly 3 scales (`rounded-sm: 4px`, `rounded-md: 6px`, `rounded-lg: 8px`). Never use arbitrary `rounded-xl` or `rounded-2xl`.
+  - Dark Mode: `bg-base` (`#0A0A0B` near-black neutral), `bg-surface` (`#111113`), `bg-elevated` (`#17171A`), `border-default` (`rgba(255,255,255,0.10)`), `border-subtle` (`rgba(255,255,255,0.06)`).
+  - Text Tokens: `text-primary` (`#EDEDEF`), `text-secondary` (`#A1A1AA`), `text-tertiary` (`#8A8A93` at 5.9:1 contrast).
+  - Single Accent: Desaturated Indigo `oklch(0.68 0.14 275)` (reserved for single solid `Export` action and focus rings).
+  - Chunk Spectrum: 8-hue OKLCH palette (`var(--chunk-0)` through `var(--chunk-7)`).
+  - Overlap Pattern: `repeating-linear-gradient(-45deg, ...)` diagonal hatch.
+- **Border Radii:** Strictly 6px controls, 8px panels/cards, 12px modal sheets.
 - **Interaction & Feedback:**
-  - Compression on Click: Use `.active-press` (`active:scale-[0.98] transition-transform`) on interactive buttons and cards.
-  - Focus Indicator: Use `.focus-ring` (`focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:ring-offset-canvas`) on all clickable elements.
+  - Active Press: `.active-press` (`active:scale-[0.98] transition-transform duration-100 ease-out`).
+  - Focus Ring: `.focus-ring` (2px accent-ring, 2px offset).
 - **Typography & Numerals:**
-  - All token counts, chunk metrics, and numerical displays must use `tabular-nums font-mono` to prevent layout reflow during parameter tuning.
+  - All token counts, chunk metrics, and numerical displays must use `tabular-nums font-mono`.
 - **Forbidden Patterns (Zero Tolerance):**
-  - No purple-indigo gradients (`bg-gradient-to-r from-purple-500 to-indigo-600`).
-  - No neon glow drop shadows (`shadow-[0_0_...]`).
-  - No meaningless sparkle icons (`Sparkles` from lucide-react).
-  - No glassmorphic backdrop blurs (`backdrop-blur-sm`).
-  - No raw emojis in UI tab or action buttons.
+  - No purple/indigo gradients or glows (`bg-gradient-to-r`).
+  - No decorative shadows or glassmorphic blur on UI chrome.
+  - No meaningless sparkle icons (`Sparkles`).
+  - No uppercase tracked labels (use sentence case).
+  - No emojis in buttons or tabs.

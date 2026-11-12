@@ -118,6 +118,7 @@ export const Header: React.FC<HeaderProps> = ({
                 size="sm"
                 icon={<Cpu className="h-3.5 w-3.5 text-text-secondary" />}
                 onClick={onTokenizerClick}
+                aria-label="Compare tokenizers and embedding costs"
               >
                 <span className="hidden md:inline">Tokenizers</span>
               </Button>
@@ -131,6 +132,7 @@ export const Header: React.FC<HeaderProps> = ({
               size="sm"
               icon={<SplitSquareVertical className="h-3.5 w-3.5 text-text-secondary" />}
               onClick={onToggleCompare}
+              aria-label="Toggle side-by-side comparison"
               className={isCompareMode ? 'border-accent text-text-primary bg-accent-subtle' : ''}
             >
               <span className="hidden md:inline">Compare</span>
@@ -144,6 +146,7 @@ export const Header: React.FC<HeaderProps> = ({
               size="sm"
               icon={<Code2 className="h-3.5 w-3.5" />}
               onClick={onExportClick}
+              aria-label="Export code and chunks"
             >
               <span>Export</span>
             </Button>

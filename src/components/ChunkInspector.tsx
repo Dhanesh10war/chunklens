@@ -112,15 +112,25 @@ export const ChunkInspector: React.FC<ChunkInspectorProps> = ({
   const paletteIdx = chunk.index % 8;
 
   return (
-    <aside
-      className={cn(
-        'w-80 shrink-0 border-l border-border-default bg-surface flex flex-col h-full overflow-hidden select-none',
-        className
-      )}
-      aria-label="Chunk Inspector"
-    >
-      {/* Inspector Topbar */}
-      <div className="h-10 px-3 border-b border-border-default flex items-center justify-between text-xs bg-surface shrink-0">
+    <>
+      {/* Mobile Backdrop (< 768px) */}
+      <div
+        className="fixed inset-0 bg-black/50 backdrop-blur-xs z-30 md:hidden"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      <aside
+        className={cn(
+          'fixed inset-x-0 bottom-0 z-40 max-h-[75vh] w-full rounded-t-xl border-t shadow-elevated md:static md:z-auto md:w-80 md:rounded-none md:border-t-0 md:border-l md:shadow-none border-border-default bg-surface flex flex-col overflow-hidden select-none animate-in slide-in-from-bottom duration-200 md:animate-none',
+          className
+        )}
+        aria-label="Chunk Inspector"
+      >
+        {/* Mobile Pull Indicator */}
+        <div className="w-10 h-1 bg-border-default rounded-full mx-auto my-1.5 md:hidden shrink-0" />
+
+        {/* Inspector Topbar */}
+        <div className="h-10 px-3 border-b border-border-default flex items-center justify-between text-xs bg-surface shrink-0">
         <div className="flex items-center space-x-2">
           <span
             className="w-2.5 h-2.5 rounded-full inline-block shrink-0"
@@ -307,5 +317,6 @@ export const ChunkInspector: React.FC<ChunkInspectorProps> = ({
         </div>
       </div>
     </aside>
+    </>
   );
 };

@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { ChunkingConfig, ChunkingStrategy, TokenizerEncoding, ChunkUnit } from '../engine/types';
 import { SAMPLE_DOCUMENTS } from '../data/samples';
-import { Upload, RotateCcw, FileText, Check, AlertCircle } from 'lucide-react';
+import { Upload, RotateCcw, FileText, Check, AlertCircle, X } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Select } from './ui/Select';
 import { Input } from './ui/Input';
@@ -29,6 +29,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectSample,
   onFileUpload,
   isOpen,
+  onClose,
   className,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -154,14 +155,33 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const overlapStep = isTokens ? 5 : 20;
 
   return (
-    <aside
-      aria-label="Configuration Sidebar"
-      className={cn(
-        'w-[300px] shrink-0 border-r border-border-default bg-surface flex flex-col h-full overflow-y-auto select-none',
-        className
-      )}
-    >
-      <div className="p-4 flex flex-col gap-5 text-xs">
+    <>
+      {/* Mobile/Tablet Backdrop (< 1024px) */}
+      <div
+        className="fixed inset-0 bg-black/50 backdrop-blur-xs z-30 lg:hidden"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      <aside
+        aria-label="Configuration Sidebar"
+        className={cn(
+          'fixed inset-y-0 left-0 z-40 w-[300px] lg:static lg:z-auto shrink-0 border-r border-border-default bg-surface flex flex-col h-full overflow-y-auto select-none shadow-elevated lg:shadow-none animate-in slide-in-from-left duration-200 lg:animate-none',
+          className
+        )}
+      >
+        {/* Mobile Header Bar (< 1024px) */}
+        <div className="flex items-center justify-between p-3 border-b border-border-default lg:hidden bg-elevated/50">
+          <span className="text-xs font-semibold text-text-primary">Configuration</span>
+          <button
+            onClick={onClose}
+            className="p-1 rounded text-text-secondary hover:text-text-primary hover:bg-surface active-press focus-ring transition-colors"
+            aria-label="Close configuration drawer"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="p-4 flex flex-col gap-5 text-xs">
         {/* SECTION 1: SOURCE */}
         <div className="flex flex-col gap-2.5">
           <div className="flex items-center justify-between">
@@ -357,5 +377,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
     </aside>
+    </>
   );
 };
