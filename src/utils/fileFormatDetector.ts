@@ -25,18 +25,25 @@ export interface DetectedFormatInfo {
 
 /**
  * Checks if a byte buffer starts with the PDF magic header: %PDF- (0x25, 0x50, 0x44, 0x46, 0x2D)
+ * Safely guards against detached or zero-byte ArrayBuffers.
  */
 export function isPdfBuffer(buffer: ArrayBuffer | Uint8Array): boolean {
-  const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
-  if (bytes.length < 5) return false;
-  // %PDF-
-  return (
-    bytes[0] === 0x25 &&
-    bytes[1] === 0x50 &&
-    bytes[2] === 0x44 &&
-    bytes[3] === 0x46 &&
-    bytes[4] === 0x2d
-  );
+  try {
+    if (buffer instanceof ArrayBuffer && (buffer as any).detached) return false;
+    if (buffer.byteLength < 5) return false;
+    const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+    if (bytes.length < 5) return false;
+    // %PDF-
+    return (
+      bytes[0] === 0x25 &&
+      bytes[1] === 0x50 &&
+      bytes[2] === 0x44 &&
+      bytes[3] === 0x46 &&
+      bytes[4] === 0x2d
+    );
+  } catch {
+    return false;
+  }
 }
 
 /**

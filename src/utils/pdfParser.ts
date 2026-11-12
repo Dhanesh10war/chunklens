@@ -28,7 +28,11 @@ export async function extractTextFromPdf(data: ArrayBuffer | Uint8Array): Promis
   }
 
   const getDoc = lib.getDocument || pdfjs.getDocument;
-  const uint8 = data instanceof Uint8Array ? data : new Uint8Array(data);
+  // Always create an isolated clone so pdf.js worker transfer never detaches caller's buffer
+  const uint8 =
+    data instanceof Uint8Array
+      ? new Uint8Array(data.slice().buffer)
+      : new Uint8Array(data.slice(0));
 
   const loadingTask = getDoc({
     data: uint8,

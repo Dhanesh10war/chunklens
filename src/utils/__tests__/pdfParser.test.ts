@@ -67,4 +67,16 @@ describe('extractTextFromPdf', () => {
     expect(result.pageCount).toBe(1);
     expect(result.text).toBe('');
   });
+
+  it('does not detach caller ArrayBuffer during PDF extraction', async () => {
+    const pdfBytes = createSyntheticPdf('Cloned ArrayBuffer preservation check');
+    const rawBuffer = pdfBytes.slice().buffer as ArrayBuffer;
+
+    const result = await extractTextFromPdf(rawBuffer);
+    expect(result.text).toContain('Cloned ArrayBuffer preservation check');
+
+    // Verify rawBuffer was not detached by pdf.js worker transfer
+    expect(rawBuffer.byteLength).toBeGreaterThan(0);
+    expect(() => new Uint8Array(rawBuffer)).not.toThrow();
+  });
 });

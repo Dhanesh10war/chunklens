@@ -98,14 +98,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
         setIsExtractingPdf(true);
         try {
           const { extractTextFromPdf } = await import('../utils/pdfParser');
-          const result = await extractTextFromPdf(buffer);
+          const result = await extractTextFromPdf(buffer.slice(0));
           if (!result.text.trim()) {
             const msg = `No readable text found in "${file.name}". Document might be a scanned image.`;
             setUploadError(msg);
             toastError('PDF Unreadable', msg);
             return;
           }
-          const formatInfo = detectFileFormat(file.name, result.text, buffer);
+          const formatInfo: DetectedFormatInfo = {
+            formatId: 'pdf',
+            label: 'PDF Document',
+            badge: 'PDF',
+            extension: file.name.match(/\.[0-9a-z]+$/i)?.[0] || '.pdf',
+            recommendedStrategy: 'recursive',
+            confidence: 'high',
+            description: `Extracted ${result.pageCount} pages with structural page markers.`,
+          };
           onFileUpload(result.text, file.name, formatInfo);
           success(
             'Format Recognized: PDF Document',
