@@ -7,7 +7,7 @@ import { Select } from './ui/Select';
 import { Input } from './ui/Input';
 import { SegmentedControl } from './ui/SegmentedControl';
 import { SliderWithInput } from './ui/SliderWithInput';
-import { extractTextFromPdf } from '../utils/pdfParser';
+import { detectFileFormat, isPdfBuffer, DetectedFormatInfo } from '../utils/fileFormatDetector';
 import { useToast } from './ui/Toast';
 import { cn } from '../utils/cn';
 
@@ -16,7 +16,8 @@ interface SidebarProps {
   onChangeConfig: (newConfig: ChunkingConfig) => void;
   selectedSampleId: string | null;
   onSelectSample: (id: string) => void;
-  onFileUpload: (text: string, filename: string) => void;
+  onFileUpload: (text: string, filename: string, detectedFormat?: DetectedFormatInfo) => void;
+  detectedFormat?: DetectedFormatInfo | null;
   isOpen: boolean;
   onClose?: () => void;
   className?: string;
@@ -28,12 +29,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
   selectedSampleId,
   onSelectSample,
   onFileUpload,
+  detectedFormat,
   isOpen,
   onClose,
   className,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isExtractingPdf, setIsExtractingPdf] = useState(false);
+  const [isDraggingFile, setIsDraggingFile] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const { success, error: toastError } = useToast();
 
@@ -76,9 +79,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     });
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const processUploadedFile = async (file: File) => {
     setUploadError(null);
 
     // Enforce 10MB limit
@@ -86,16 +87,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
       const msg = 'File exceeds 10 MB limit. Please select a smaller document.';
       setUploadError(msg);
       toastError('Upload Failed', msg);
-      e.target.value = '';
       return;
     }
 
-    if (file.name.toLowerCase().endsWith('.pdf')) {
-      setIsExtractingPdf(true);
-      const reader = new FileReader();
-      reader.onload = async (event) => {
+    try {
+      const buffer = await file.arrayBuffer();
+      const isPdf = file.name.toLowerCase().endsWith('.pdf') || isPdfBuffer(buffer);
+
+      if (isPdf) {
+        setIsExtractingPdf(true);
         try {
-          const buffer = event.target?.result as ArrayBuffer;
+          const { extractTextFromPdf } = await import('../utils/pdfParser');
           const result = await extractTextFromPdf(buffer);
           if (!result.text.trim()) {
             const msg = `No readable text found in "${file.name}". Document might be a scanned image.`;
@@ -103,45 +105,44 @@ export const Sidebar: React.FC<SidebarProps> = ({
             toastError('PDF Unreadable', msg);
             return;
           }
-          onFileUpload(result.text, file.name);
-          success('PDF Ingested', `Extracted ${result.pageCount} pages from "${file.name}"`);
-        } catch (err) {
-          const msg = `Failed to parse PDF: ${err instanceof Error ? err.message : 'Unknown error'}`;
-          setUploadError(msg);
-          toastError('PDF Extraction Error', msg);
+          const formatInfo = detectFileFormat(file.name, result.text, buffer);
+          onFileUpload(result.text, file.name, formatInfo);
+          success(
+            'Format Recognized: PDF Document',
+            `Extracted ${result.pageCount} pages. Recommended algorithm: ${formatInfo.recommendedStrategy}.`
+          );
         } finally {
           setIsExtractingPdf(false);
         }
-      };
-      reader.onerror = () => {
-        setIsExtractingPdf(false);
-        const msg = `Error reading file "${file.name}"`;
-        setUploadError(msg);
-        toastError('Read Error', msg);
-      };
-      reader.readAsArrayBuffer(file);
-      e.target.value = '';
-      return;
-    }
+        return;
+      }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const content = event.target?.result as string;
+      // Read text content
+      const content = new TextDecoder('utf-8').decode(buffer);
       if (!content || !content.trim()) {
         const msg = `Uploaded file "${file.name}" is empty.`;
         setUploadError(msg);
         toastError('Empty File', msg);
         return;
       }
-      onFileUpload(content, file.name);
-      success('File Uploaded', `Loaded "${file.name}" (${content.length.toLocaleString()} chars)`);
-    };
-    reader.onerror = () => {
-      const msg = `Failed to read "${file.name}"`;
+
+      const formatInfo = detectFileFormat(file.name, content);
+      onFileUpload(content, file.name, formatInfo);
+      success(
+        `Format Recognized: ${formatInfo.label}`,
+        `Detected [${formatInfo.badge}]. Recommending ${formatInfo.recommendedStrategy} chunking.`
+      );
+    } catch (err) {
+      const msg = `Failed to process "${file.name}": ${err instanceof Error ? err.message : 'Unknown error'}`;
       setUploadError(msg);
-      toastError('Read Error', msg);
-    };
-    reader.readAsText(file);
+      toastError('Processing Error', msg);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    processUploadedFile(file);
     e.target.value = '';
   };
 
@@ -215,12 +216,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
             })}
           </div>
 
-          {/* Upload Button */}
-          <div>
+          {/* Upload Button & Dropzone */}
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              setIsDraggingFile(true);
+            }}
+            onDragLeave={() => setIsDraggingFile(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setIsDraggingFile(false);
+              const file = e.dataTransfer.files?.[0];
+              if (file) processUploadedFile(file);
+            }}
+            className={cn(
+              'rounded-md transition-all',
+              isDraggingFile && 'ring-2 ring-accent bg-accent-subtle/20'
+            )}
+          >
             <input
               ref={fileInputRef}
               type="file"
-              accept=".txt,.md,.json,.csv,.py,.js,.ts,.pdf"
+              accept=".txt,.md,.markdown,.json,.jsonl,.csv,.tsv,.py,.js,.ts,.html,.pdf"
               onChange={handleFileChange}
               className="hidden"
               id="file-upload-input"
@@ -234,9 +251,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onClick={() => fileInputRef.current?.click()}
               className="w-full"
             >
-              {isExtractingPdf ? 'Extracting PDF...' : 'Upload Document (.txt, .md, .pdf, .csv)'}
+              {isExtractingPdf
+                ? 'Extracting PDF...'
+                : isDraggingFile
+                ? 'Drop file here to detect format'
+                : 'Upload or Drop File (.md, .csv, .pdf, .json)'}
             </Button>
           </div>
+
+          {/* Active Detected Format Indicator */}
+          {detectedFormat && !selectedSampleId && (
+            <div className="p-2 rounded bg-elevated border border-border-subtle flex items-center justify-between text-[11px] font-mono select-none">
+              <span className="text-text-secondary">Detected Format:</span>
+              <span className="px-1.5 py-0.2 rounded bg-surface border border-border-default text-accent font-semibold flex items-center gap-1">
+                <span>{detectedFormat.badge}</span>
+                <span className="text-text-tertiary font-normal">({detectedFormat.label})</span>
+              </span>
+            </div>
+          )}
 
           {/* Upload Error Banner with Recovery */}
           {uploadError && (

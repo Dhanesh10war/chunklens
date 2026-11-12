@@ -10,28 +10,35 @@ import {
   Layers,
   LayoutList,
   AlertTriangle,
+  Upload,
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { copyToClipboard } from '../utils/clipboard';
 import { SegmentedControl } from './ui/SegmentedControl';
 import { useToast } from './ui/Toast';
+import { DetectedFormatInfo } from '../utils/fileFormatDetector';
 
 interface VisualCanvasProps {
   chunks: ChunkMetadata[];
   selectedChunkId: string | null;
   onSelectChunk: (chunkId: string | null) => void;
+  detectedFormat?: DetectedFormatInfo | null;
   onLoadDefaultSample?: () => void;
   onUploadClick?: () => void;
+  onDropFile?: (file: File) => void;
 }
 
 export const VisualCanvas: React.FC<VisualCanvasProps> = ({
   chunks,
   selectedChunkId,
   onSelectChunk,
+  detectedFormat,
   onLoadDefaultSample,
   onUploadClick,
+  onDropFile,
 }) => {
   const [viewMode, setViewMode] = useState<'stream' | 'cards'>('stream');
+  const [isDragOver, setIsDragOver] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const { success } = useToast();
 
@@ -133,13 +140,55 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-bg-base overflow-hidden">
+    <div
+      onDragOver={(e) => {
+        e.preventDefault();
+        setIsDragOver(true);
+      }}
+      onDragLeave={(e) => {
+        // Only reset if leaving canvas boundary
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+          setIsDragOver(false);
+        }
+      }}
+      onDrop={(e) => {
+        e.preventDefault();
+        setIsDragOver(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file && onDropFile) {
+          onDropFile(file);
+        }
+      }}
+      className="relative flex-1 flex flex-col h-full bg-bg-base overflow-hidden"
+    >
+      {/* Drag & Drop Visual Target Overlay */}
+      {isDragOver && (
+        <div className="absolute inset-0 z-40 bg-bg-base/90 backdrop-blur-xs flex flex-col items-center justify-center border-2 border-dashed border-accent m-4 rounded-xl text-center select-none pointer-events-none animate-in fade-in duration-100">
+          <div className="h-12 w-12 rounded-full bg-accent-subtle border border-accent/30 flex items-center justify-center text-accent mb-2">
+            <Upload className="h-6 w-6" />
+          </div>
+          <p className="text-sm font-semibold text-text-primary">Drop document to auto-detect format</p>
+          <p className="text-xs text-text-secondary mt-1">Supports PDF, Markdown, CSV, JSON, and Source Code</p>
+        </div>
+      )}
+
       {/* Sub-header Toolbar: View Switcher & Stepper */}
       <div className="h-9 px-4 sm:px-6 border-b border-border-default bg-surface/30 flex items-center justify-between text-xs select-none shrink-0">
         <div className="flex items-center space-x-3">
           <span className="text-text-secondary font-mono text-[11px] tabular-nums">
             {chunks.length} chunks generated
           </span>
+
+          {detectedFormat && (
+            <span
+              className="hidden sm:inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-[10px] font-mono border border-border-default bg-surface text-text-secondary select-none"
+              title={`Format: ${detectedFormat.label} (${detectedFormat.description})`}
+            >
+              <span className="font-semibold text-accent">{detectedFormat.badge}</span>
+              <span className="text-text-tertiary">·</span>
+              <span>{detectedFormat.label}</span>
+            </span>
+          )}
 
           {selectedChunk && (
             <div className="flex items-center space-x-1 font-mono text-xs">

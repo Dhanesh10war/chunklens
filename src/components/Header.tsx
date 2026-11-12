@@ -15,9 +15,11 @@ import {
 import { Button } from './ui/Button';
 import { Tooltip } from './ui/Tooltip';
 import { useTheme } from '../utils/theme';
+import { DetectedFormatInfo } from '../utils/fileFormatDetector';
 
 interface HeaderProps {
   documentTitle: string;
+  detectedFormat?: DetectedFormatInfo | null;
   onResetDocument: () => void;
   onExportClick: () => void;
   onTokenizerClick?: () => void;
@@ -30,6 +32,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   documentTitle,
+  detectedFormat,
   onResetDocument,
   onExportClick,
   onTokenizerClick,
@@ -71,6 +74,13 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="text-xs text-text-secondary truncate font-mono" title={documentTitle}>
               {documentTitle}
             </span>
+            {detectedFormat && (
+              <Tooltip content={`Format: ${detectedFormat.label} · Recommended: ${detectedFormat.recommendedStrategy}`}>
+                <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-medium border border-border-default bg-elevated text-accent select-none shrink-0">
+                  {detectedFormat.badge}
+                </span>
+              </Tooltip>
+            )}
             <Tooltip content="Reset document & settings to defaults">
               <button
                 onClick={onResetDocument}

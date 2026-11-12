@@ -16,6 +16,8 @@ import { ToastProvider } from './components/ui/Toast';
 import { SegmentedControl } from './components/ui/SegmentedControl';
 import { Layers, Grid3X3, Edit3 } from 'lucide-react';
 import { loadStoredSession, saveStoredSession, clearStoredSession, DEFAULT_SESSION } from './utils/storage';
+import { DetectedFormatInfo, detectFileFormat, isPdfBuffer } from './utils/fileFormatDetector';
+import { useToast } from './components/ui/Toast';
 
 export const AppContent: React.FC = () => {
   // Load restored session or default sample
@@ -24,6 +26,9 @@ export const AppContent: React.FC = () => {
   const [selectedSampleId, setSelectedSampleId] = useState<string | null>(initialSession.selectedSampleId);
   const [documentTitle, setDocumentTitle] = useState<string>(initialSession.documentTitle);
   const [rawText, setRawText] = useState<string>(initialSession.rawText);
+  const [detectedFormat, setDetectedFormat] = useState<DetectedFormatInfo | null>(
+    initialSession.detectedFormat || (initialSession.rawText ? detectFileFormat(initialSession.documentTitle, initialSession.rawText) : null)
+  );
 
   // Chunking parameters
   const [config, setConfig] = useState<ChunkingConfig>(initialSession.config);
@@ -37,6 +42,7 @@ export const AppContent: React.FC = () => {
   const [isExportModalOpen, setIsExportModalOpen] = useState<boolean>(false);
   const [isTokenizerModalOpen, setIsTokenizerModalOpen] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'visualizer' | 'heatmap' | 'editor'>('visualizer');
+  const { success } = useToast();
 
   // Persist session changes to localStorage
   useEffect(() => {
@@ -45,8 +51,9 @@ export const AppContent: React.FC = () => {
       documentTitle,
       rawText,
       config,
+      detectedFormat,
     });
-  }, [selectedSampleId, documentTitle, rawText, config]);
+  }, [selectedSampleId, documentTitle, rawText, config, detectedFormat]);
 
   // Global keyboard shortcuts: '[' toggles sidebar, ']' toggles inspector, Cmd+K opens palette
   useEffect(() => {
@@ -83,14 +90,57 @@ export const AppContent: React.FC = () => {
       setDocumentTitle(sample.title);
       setRawText(sample.content);
       setSelectedChunkId(null);
+      const fmt = detectFileFormat(sample.title, sample.content);
+      setDetectedFormat(fmt);
     }
   };
 
-  const handleFileUpload = (content: string, filename: string) => {
+  const handleFileUpload = (content: string, filename: string, formatInfo?: DetectedFormatInfo) => {
+    const detected = formatInfo || detectFileFormat(filename, content);
     setSelectedSampleId(null);
     setDocumentTitle(filename);
     setRawText(content);
+    setDetectedFormat(detected);
     setSelectedChunkId(null);
+
+    // Auto-align optimal chunking strategy if different from current
+    if (detected.recommendedStrategy !== config.strategy) {
+      const updatedConfig: ChunkingConfig = {
+        ...config,
+        strategy: detected.recommendedStrategy,
+      };
+      if (detected.suggestedSeparators) {
+        updatedConfig.separators = detected.suggestedSeparators;
+      }
+      setConfig(updatedConfig);
+      success(
+        `Auto-Selected ${detected.recommendedStrategy.toUpperCase()} Strategy`,
+        `Optimized for ${detected.label} (${detected.badge})`
+      );
+    }
+  };
+
+  const handleDropFile = async (file: File) => {
+    try {
+      const buffer = await file.arrayBuffer();
+      const isPdf = file.name.toLowerCase().endsWith('.pdf') || isPdfBuffer(buffer);
+      if (isPdf) {
+        const { extractTextFromPdf } = await import('./utils/pdfParser');
+        const result = await extractTextFromPdf(buffer);
+        if (result.text.trim()) {
+          const formatInfo = detectFileFormat(file.name, result.text, buffer);
+          handleFileUpload(result.text, file.name, formatInfo);
+        }
+      } else {
+        const content = new TextDecoder('utf-8').decode(buffer);
+        if (content.trim()) {
+          const formatInfo = detectFileFormat(file.name, content);
+          handleFileUpload(content, file.name, formatInfo);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to process dropped file:', err);
+    }
   };
 
   const handleResetToDefaults = () => {
@@ -99,6 +149,7 @@ export const AppContent: React.FC = () => {
     setDocumentTitle(DEFAULT_SESSION.documentTitle);
     setRawText(DEFAULT_SESSION.rawText);
     setConfig(DEFAULT_SESSION.config);
+    setDetectedFormat(DEFAULT_SESSION.detectedFormat || null);
     setSelectedChunkId(null);
   };
 
@@ -116,6 +167,7 @@ export const AppContent: React.FC = () => {
       {/* 48px Header */}
       <Header
         documentTitle={documentTitle}
+        detectedFormat={detectedFormat}
         onResetDocument={handleResetToDefaults}
         onExportClick={() => setIsExportModalOpen(true)}
         onTokenizerClick={() => setIsTokenizerModalOpen(true)}
@@ -135,6 +187,7 @@ export const AppContent: React.FC = () => {
           selectedSampleId={selectedSampleId}
           onSelectSample={handleSelectSample}
           onFileUpload={handleFileUpload}
+          detectedFormat={detectedFormat}
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
         />
@@ -200,6 +253,8 @@ export const AppContent: React.FC = () => {
                   setSelectedChunkId(chunkId);
                   if (chunkId) setIsInspectorOpen(true);
                 }}
+                detectedFormat={detectedFormat}
+                onDropFile={handleDropFile}
                 onLoadDefaultSample={() => handleSelectSample('attention-paper')}
                 onUploadClick={() => setIsSidebarOpen(true)}
               />
@@ -212,6 +267,7 @@ export const AppContent: React.FC = () => {
                 totalChunks={chunkingResult.chunks.length}
                 prevChunk={prevChunk}
                 nextChunk={nextChunk}
+                detectedFormat={detectedFormat}
                 onSelectPrev={() => {
                   if (selectedChunkIdx > 0) {
                     setSelectedChunkId(chunkingResult.chunks[selectedChunkIdx - 1].id);

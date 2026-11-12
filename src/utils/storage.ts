@@ -1,5 +1,6 @@
 import { ChunkingConfig } from '../engine/types';
 import { SAMPLE_DOCUMENTS } from '../data/samples';
+import { DetectedFormatInfo } from './fileFormatDetector';
 
 export const STORAGE_KEY = 'chunklens_session_v1';
 
@@ -8,6 +9,7 @@ export interface StoredSession {
   documentTitle: string;
   rawText: string;
   config: ChunkingConfig;
+  detectedFormat?: DetectedFormatInfo | null;
 }
 
 export const DEFAULT_CONFIG: ChunkingConfig = {
@@ -23,6 +25,15 @@ export const DEFAULT_SESSION: StoredSession = {
   documentTitle: SAMPLE_DOCUMENTS[0].title,
   rawText: SAMPLE_DOCUMENTS[0].content,
   config: DEFAULT_CONFIG,
+  detectedFormat: {
+    formatId: 'markdown',
+    label: 'Markdown Document',
+    badge: 'MD',
+    extension: '.md',
+    recommendedStrategy: 'markdown',
+    confidence: 'high',
+    description: 'Hierarchical Markdown text with H1–H6 section structure.',
+  },
 };
 
 function getStorage(): Storage | null {
@@ -57,6 +68,7 @@ export function loadStoredSession(): StoredSession {
         selectedSampleId: parsed.selectedSampleId ?? null,
         documentTitle: parsed.documentTitle || 'Untitled Document',
         rawText: parsed.rawText,
+        detectedFormat: parsed.detectedFormat ?? null,
         config: {
           ...DEFAULT_CONFIG,
           ...parsed.config,

@@ -15,12 +15,14 @@ import { copyToClipboard } from '../utils/clipboard';
 import { useToast } from './ui/Toast';
 import { Tooltip } from './ui/Tooltip';
 import { cn } from '../utils/cn';
+import { DetectedFormatInfo } from '../utils/fileFormatDetector';
 
 interface ChunkInspectorProps {
   chunk: ChunkMetadata | null;
   totalChunks: number;
   prevChunk?: ChunkMetadata | null;
   nextChunk?: ChunkMetadata | null;
+  detectedFormat?: DetectedFormatInfo | null;
   onSelectPrev: () => void;
   onSelectNext: () => void;
   onClose: () => void;
@@ -36,6 +38,7 @@ export const ChunkInspector: React.FC<ChunkInspectorProps> = ({
   totalChunks,
   prevChunk,
   nextChunk,
+  detectedFormat,
   onSelectPrev,
   onSelectNext,
   onClose,
@@ -206,6 +209,14 @@ export const ChunkInspector: React.FC<ChunkInspectorProps> = ({
               {charsPerToken} ch/tok
             </span>
           </div>
+          {detectedFormat && (
+            <div className="mt-1.5 flex items-center justify-between px-2 py-1.5 rounded bg-surface border border-border-subtle text-[11px] font-mono text-text-secondary">
+              <span>File Format</span>
+              <span className="font-semibold text-accent">
+                {detectedFormat.badge} ({detectedFormat.label})
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Boundary Diagnostics */}
