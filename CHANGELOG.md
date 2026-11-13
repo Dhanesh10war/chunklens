@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Interactive "How to Verify" privacy popover with DevTools audit steps, collapsing to icon + tooltip below 1200px (3.2).
+
 ### Changed
 - Self-hosted Inter and JetBrains Mono woff2 fonts; eliminated Google Fonts (3.1).
 - Implemented single-source strict Content Security Policy (`connect-src 'none'`) with zero network egress proof (3.1).

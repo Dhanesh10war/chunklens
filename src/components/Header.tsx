@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   Layers,
-  ShieldCheck,
   Github,
   Code2,
   SplitSquareVertical,
@@ -14,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Tooltip } from './ui/Tooltip';
+import { PrivacyPopover } from './PrivacyPopover';
 import { useTheme } from '../utils/theme';
 import { DetectedFormatInfo } from '../utils/fileFormatDetector';
 
@@ -94,14 +94,9 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Center: Quiet Privacy Indicator */}
-        <div className="hidden lg:flex items-center space-x-1.5 text-xs text-text-tertiary font-mono">
-          <Tooltip content="All chunking, BPE tokenization and TF-IDF similarity execute entirely in your local browser runtime. Zero text or metadata is sent to any external server.">
-            <div className="flex items-center space-x-1 cursor-default hover:text-text-secondary transition-colors">
-              <ShieldCheck className="h-3.5 w-3.5 text-status-success" />
-              <span>100% client-side · zero network egress</span>
-            </div>
-          </Tooltip>
+        {/* Center: Privacy Indicator & How to Verify Popover */}
+        <div className="flex items-center">
+          <PrivacyPopover />
         </div>
 
         {/* Right: Actions */}
