@@ -1,12 +1,22 @@
 import { describe, it, expect, vi } from 'vitest';
-import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { Header } from '../Header';
+import { DetectedFormatInfo } from '../../utils/fileFormatDetector';
 
 describe('Header Component (Responsive Priority & Overflow Menu - Item 3.6)', () => {
+  const mockFormat: DetectedFormatInfo = {
+    formatId: 'markdown',
+    label: 'Markdown',
+    extension: '.md',
+    recommendedStrategy: 'markdown',
+    badge: 'MD',
+    confidence: 'high',
+    description: 'Markdown document with structural headings',
+  };
+
   const defaultProps = {
     documentTitle: 'Quarterly Financial Performance',
-    detectedFormat: { label: 'Markdown', recommendedStrategy: 'markdown', badge: 'MD' as const },
+    detectedFormat: mockFormat,
     onResetDocument: vi.fn(),
     onExportClick: vi.fn(),
     onTokenizerClick: vi.fn(),

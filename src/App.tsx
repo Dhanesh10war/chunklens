@@ -215,7 +215,6 @@ export const AppContent: React.FC = () => {
           <MetricsBar
             result={chunkingResult}
             isProcessing={isProcessing}
-            onOpenTokenizerModal={() => setIsTokenizerModalOpen(true)}
           />
 
           {/* Canvas Subnavigation Bar */}

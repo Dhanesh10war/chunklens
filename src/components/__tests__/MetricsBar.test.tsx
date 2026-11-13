@@ -71,4 +71,11 @@ describe('MetricsBar Component (SSR markup & count reconciliation)', () => {
     expect(html).toContain('Compute');
     expect(html).toContain('1.25<!-- --> ms');
   });
+
+  it('renders wrapped two-row layout for mobile viewports below 768px (Amendment C)', () => {
+    const html = renderToString(<MetricsBar result={mockResult} />);
+    expect(html).toContain('md:hidden');
+    expect(html).toContain('data-testid="mobile-metric-tokens"');
+    expect(html).toContain('Cost');
+  });
 });
