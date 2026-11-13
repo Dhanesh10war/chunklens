@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- Reconciled Document vs Ingested token counts with tooltips and unit tests (3.5).
 - Replaced live-looking mock API key in `api-reference` sample corpus with placeholder `YOUR_API_KEY` (3.8).
 
 ## [0.2.0] - 2026-11-12

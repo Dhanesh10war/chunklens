@@ -23,7 +23,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
   const show = () => {
     timeoutRef.current = window.setTimeout(() => {
-      setIsVisible(true), delayMs;
+      setIsVisible(true);
     }, delayMs);
   };
 
