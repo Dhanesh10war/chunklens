@@ -1,52 +1,64 @@
 {
-  "timestamp": "2026-11-13T05:37:51.622Z",
+  "timestamp": "2026-11-13T06:52:13.178Z",
   "screenshotsCount": 18,
   "loadedAudit_1440": {
     "state": "loaded",
     "viewport": "1440x900",
-    "totalDomNodes": 373,
-    "violationsCount": 0,
-    "violations": [],
+    "totalDomNodes": 414,
+    "customDomA11yViolationsCount": 0,
+    "customDomA11yViolations": [],
+    "sub12Count": 0,
+    "sub12Elements": [],
     "hasAlertRole": false
   },
   "loadedAudit_375": {
     "state": "loaded",
     "viewport": "375x812",
-    "totalDomNodes": 221,
-    "violationsCount": 0,
-    "violations": [],
+    "totalDomNodes": 249,
+    "customDomA11yViolationsCount": 0,
+    "customDomA11yViolations": [],
+    "sub12Count": 0,
+    "sub12Elements": [],
     "hasAlertRole": false
   },
   "emptyAudit_1440": {
     "state": "empty",
     "viewport": "1440x900",
-    "totalDomNodes": 436,
-    "violationsCount": 0,
-    "violations": [],
+    "totalDomNodes": 477,
+    "customDomA11yViolationsCount": 0,
+    "customDomA11yViolations": [],
+    "sub12Count": 0,
+    "sub12Elements": [],
     "hasAlertRole": false
   },
   "emptyAudit_375": {
     "state": "empty",
     "viewport": "375x812",
-    "totalDomNodes": 286,
-    "violationsCount": 0,
-    "violations": [],
+    "totalDomNodes": 314,
+    "customDomA11yViolationsCount": 0,
+    "customDomA11yViolations": [],
+    "sub12Count": 0,
+    "sub12Elements": [],
     "hasAlertRole": false
   },
   "errorAudit_1440": {
     "state": "error",
     "viewport": "1440x900",
-    "totalDomNodes": 477,
-    "violationsCount": 0,
-    "violations": [],
+    "totalDomNodes": 518,
+    "customDomA11yViolationsCount": 0,
+    "customDomA11yViolations": [],
+    "sub12Count": 0,
+    "sub12Elements": [],
     "hasAlertRole": true
   },
   "errorAudit_375": {
     "state": "error",
     "viewport": "375x812",
-    "totalDomNodes": 307,
-    "violationsCount": 0,
-    "violations": [],
+    "totalDomNodes": 335,
+    "customDomA11yViolationsCount": 0,
+    "customDomA11yViolations": [],
+    "sub12Count": 0,
+    "sub12Elements": [],
     "hasAlertRole": true
   },
   "keyboardCheck": {
@@ -56,5 +68,22 @@
     "allCardsFocusable": true,
     "hasAlertBanner": true,
     "alertText": "Failed to process “corrupt.pdf”Invalid PDF format: File structure is malformed.Still displaying: “current document”Choose another fileDismiss"
+  },
+  "exportContrastCheck": {
+    "textColor": "rgb(255, 255, 255)",
+    "backgroundColor": "rgb(79, 70, 229)",
+    "textLuminance": 1,
+    "bgLuminance": 0.11699725241042669,
+    "contrastRatio": 6.29,
+    "satisfiesWcagAA": true
+  },
+  "overflowMenuCheck": {
+    "triggerFound": true,
+    "menuRenderedOnOpen": true,
+    "itemsCount": 6,
+    "firstItemFocusedOnOpen": true,
+    "secondItemFocusedOnArrowDown": true,
+    "menuClosedAfterEscape": true,
+    "focusReturnedToTrigger": true
   }
 }

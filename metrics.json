@@ -1,15 +1,15 @@
 {
-  "timestamp": "2026-11-13T05:10:00.000Z",
-  "release": "v0.3-batch-2a",
-  "commit": "db22f8f",
+  "timestamp": "2026-11-13T06:52:13.000Z",
+  "release": "v0.3-batch-2b",
+  "commit": "0066d76",
   "tests": {
-    "total": 103,
-    "passed": 103,
+    "total": 115,
+    "passed": 115,
     "failed": 0,
     "passRate": 1.0,
     "flaky": 0,
-    "testFiles": 18,
-    "durationMs": 5700
+    "testFiles": 19,
+    "durationMs": 5260
   },
   "coverage": {
     "provider": "unknown (vitest/coverage-v8 not installed in baseline)",
@@ -23,19 +23,28 @@
     "lintErrors": 0
   },
   "a11y": {
-    "axeViolations": 0,
-    "contrastFloor": "5.9:1 (#8A8A93 on #0A0A0B)"
+    "customDomA11yViolations": 0,
+    "axePlaywrightStatus": "pending user execution of playwright install and npm install",
+    "exportContrastRatio": 6.29,
+    "exportContrastDetails": "6.29:1 (rendered button: #FFFFFF on #4F46E5 in dark mode; 7.90:1 in light mode)",
+    "sub12TextCount": 0,
+    "overflowMenuFocusReturn": true
   },
   "build": {
-    "durationMs": 6710,
-    "indexJsKb": 187.49,
-    "indexJsGzipKb": 52.18,
-    "indexCssKb": 32.74,
-    "indexCssGzipKb": 6.82,
+    "durationMs": 6820,
+    "indexJsKb": 131.77,
+    "indexJsGzipKb": 39.23,
+    "indexCssKb": 33.37,
+    "indexCssGzipKb": 6.98,
     "vendorReactKb": 134.67,
     "vendorReactGzipKb": 43.22,
-    "vendorIconsKb": 26.37,
-    "vendorIconsGzipKb": 6.76,
+    "vendorIconsKb": 27.02,
+    "vendorIconsGzipKb": 6.86,
+    "comparisonViewKb": 6.98,
+    "commandPaletteKb": 7.31,
+    "similarityHeatmapKb": 11.98,
+    "tokenizerComparisonModalKb": 18.60,
+    "exportModalKb": 21.24,
     "pdfEngineKb": 512.51,
     "pdfEngineGzipKb": 155.91,
     "pdfWorkerKb": 1298.21,

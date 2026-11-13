@@ -1,38 +1,44 @@
 # Quality State & Continuous Improvement Tracking
 **Project:** ChunkLens — Visual Document Chunking & Token Optimization Workbench for RAG Pipelines  
-**Current Iteration:** Release v0.3 (Batch 2a Complete, Pre-Batch 2b)  
+**Current Iteration:** Release v0.3 (Batch 2b Complete)  
 **Date:** November 13, 2026  
 **Branch:** `agent/release-v0.3`  
 
 ---
 
 ## 1. Executive Status
-- **Health:** Production Grade (v0.3-dev)
+- **Health:** Production Grade (v0.3-rc)
 - **TypeScript:** Strict type-checking passed (`npm run typecheck`, 0 diagnostic errors)
-- **Unit & Integration Tests:** 108 tests passing across 18 test suites (`npm run test`, 100% pass, 0 flaky)
-- **Axe / Accessibility:** 0 violations across loaded, empty, and error states at 1440px and 375px viewports (WCAG 2.2 AA compliant)
-- **Zero Network Egress:** Strict CSP (`connect-src 'none'`) verified live via Chrome DevTools Protocol (`scripts/test-egress.cjs`). Playwright E2E suite (`e2e/networkEgress.spec.ts`) is written, not yet run pending Playwright package installation in offline sandbox.
-- **PDF Engine:** Buffer detachment bug resolved with isolated byte cloning; verified twice in a row in `preview` and `dev` mode without hanging (`scripts/test-pdf-upload.cjs`).
-- **Bundle Architecture:** Code-split via Rollup `manualChunks` with self-hosted WOFF2 fonts and strict CSP.
+- **Unit & Integration Tests:** 115 tests passing across 19 test suites (`npm run test`, 100% pass, 0 flaky)
+- **Custom DOM A11y Checks:** 0 violations across loaded, empty, and error states at 1440px and 375px viewports (button names, form labels, duplicate IDs, ARIA roles, tabindex verified).
+- **Axe-Core E2E Status:** `@axe-core/playwright` and `e2e/networkEgress.spec.ts` are written and staged; awaiting user execution of `npm install` and `playwright install`.
+- **Zero Network Egress:** Strict CSP (`connect-src 'none'`) verified live via Chrome DevTools Protocol (`scripts/test-egress.cjs`).
+- **Export Button Contrast:** Measured 6.29:1 rendered contrast in Chrome browser (`#FFFFFF` on `#4F46E5`), satisfying WCAG 2.2 AA $\ge 4.5:1$. Split tokens guarantee 7.90:1 in light mode (`#4338CA`) and 6.29:1 in dark mode (`#4F46E5`).
+- **Typography Floor:** Strict 12px text floor verified by automated code grep rule and browser computed-style audit (0 sub-12px elements).
+- **Bundle Architecture:** Code-split with heavy modals (`TokenizerComparisonModal`, `ExportModal`, `CommandPalette`, `ComparisonView`, `SimilarityHeatmap`) lazy-loaded via `React.lazy`, bringing `index.js` down to **131.77 kB raw** / **39.23 kB gzip** (well below the 185 kB limit).
 
 ---
 
 ## 2. Release Ratchet Table
 
-| Metric | v0.2.0 Baseline | v0.3 Batch 1 | v0.3 Batch 2a | Target v0.8 | Status |
-| :--- | :---: | :---: | :---: | :---: | :--- |
-| **Unit / Integration Tests** | 66 (10 suites) | 86 (12 suites) | **108 (18 suites)** | $\ge 120$ | ✅ Ratcheted (+42) |
-| **Typecheck Errors** | 0 | 0 | **0** | 0 | ✅ Clean |
-| **Axe Violations (1440 & 375)** | 0 | 0 | **0 (Loaded, Empty, Error)** | 0 | ✅ Zero violations |
-| **External Network Requests** | Google Fonts | 0 (Strict CSP) | **0 (Strict CSP)** | 0 | ✅ Verified |
-| **Main JS Bundle (Raw / Gzip)** | 136.20 kB / 42.1 kB | 187.94 kB / 52.2 kB | **188.65 kB / 52.43 kB** | $< 200$ kB | ✅ Monitored |
-| **React Vendor (Raw / Gzip)** | 134.67 kB / 43.2 kB | 134.67 kB / 43.2 kB | **134.67 kB / 43.22 kB** | $< 150$ kB | ✅ Stable |
-| **Icons Chunk (Raw / Gzip)** | 23.89 kB / 6.1 kB | 26.37 kB / 6.76 kB | **26.37 kB / 6.76 kB** | $< 35$ kB | ✅ Stable |
-| **PDF Engine (Raw / Gzip)** | 512.51 kB / 155.9 kB | 512.51 kB / 155.9 kB | **512.51 kB / 155.91 kB** | Isolated chunk | ✅ Split |
-| **Tiktoken Tokenizer (Raw / Gzip)**| 5,603 kB / 2,568 kB | 5,603 kB / 2,568 kB | **5,603.11 kB / 2,567.88 kB**| Shared chunk | 🔄 Consolidating in 2b |
-| **Chunking Worker (Raw)** | 5,614 kB | 5,614 kB | **5,613.94 kB** | Dedicated worker | 🔄 Shared table in 2b |
-| **CSS Bundle (Raw / Gzip)** | 28.5 kB / 5.8 kB | 32.87 kB / 6.85 kB | **32.87 kB / 6.85 kB** | $< 50$ kB | ✅ Compact |
-| **Index HTML (Raw / Gzip)** | 1.2 kB / 0.6 kB | 1.79 kB / 0.86 kB | **1.79 kB / 0.86 kB** | $< 2$ kB | ✅ Strict CSP meta |
+| Metric | v0.2.0 Baseline (`ffb2f16`) | v0.3 Batch 1 | v0.3 Batch 2a | v0.3 Batch 2b (Current) | Target v0.8 | Status |
+| :--- | :---: | :---: | :---: | :---: | :---: | :--- |
+| **Unit / Integration Tests** | 86 (12 suites) | 86 (12 suites) | 108 (18 suites) | **115 (19 suites)** | $\ge 120$ | ✅ Ratcheted (+29) |
+| **TypeScript Diagnostics** | 0 errors | 0 errors | 0 errors | **0 errors** | 0 | ✅ Clean |
+| **Custom DOM A11y Violations (1440 & 375)** | 0 | 0 | 0 | **0 (Loaded, Empty, Error)** | 0 | ✅ Zero violations |
+| **External Network Requests** | Google Fonts | 0 (Strict CSP) | 0 (Strict CSP) | **0 (Strict CSP)** | 0 | ✅ Verified zero egress |
+| **Main JS Bundle (`index.js` Raw / Gzip)** | 172.06 kB / 48.33 kB | 187.94 kB / 52.20 kB | 188.65 kB / 52.43 kB | **131.77 kB / 39.23 kB** | $< 185$ kB | ✅ 53 kB under budget |
+| **React Vendor Bundle (Raw / Gzip)** | 134.67 kB / 43.22 kB | 134.67 kB / 43.22 kB | 134.67 kB / 43.22 kB | **134.67 kB / 43.22 kB** | $< 150$ kB | ✅ Stable |
+| **Lucide Icons Chunk (Raw / Gzip)** | 23.89 kB / 6.10 kB | 26.37 kB / 6.76 kB | 26.37 kB / 6.76 kB | **27.02 kB / 6.86 kB** | $< 35$ kB | ✅ Stable |
+| **PDF Engine (`pdfjs-dist` Raw / Gzip)** | 512.51 kB / 155.91 kB | 512.51 kB / 155.91 kB | 512.51 kB / 155.91 kB | **512.51 kB / 155.91 kB** | Isolated chunk | ✅ Split |
+| **PDF Worker Chunk (Raw)** | 1,298.21 kB | 1,298.21 kB | 1,298.21 kB | **1,298.21 kB** | Dedicated worker | ✅ Split |
+| **Tiktoken Tokenizer Chunk (Raw / Gzip)**| 5,603.11 kB / 2,567.88 kB | 5,603.11 kB / 2,567.88 kB | 5,603.11 kB / 2,567.88 kB | **5,603.11 kB / 2,567.88 kB**| Shared chunk | 🔄 Consolidating in v0.4 |
+| **Chunking Worker Chunk (Raw)** | 5,613.94 kB | 5,613.94 kB | 5,613.94 kB | **5,613.94 kB** | Dedicated worker | 🔄 Shared rank table in v0.4 |
+| **CSS Bundle (Raw / Gzip)** | 28.50 kB / 5.80 kB | 32.87 kB / 6.85 kB | 32.87 kB / 6.85 kB | **33.37 kB / 6.98 kB** | $< 50$ kB | ✅ Compact |
+| **Index HTML (Raw / Gzip)** | 1.20 kB / 0.60 kB | 1.79 kB / 0.86 kB | 1.79 kB / 0.86 kB | **1.79 kB / 0.87 kB** | $< 2$ kB | ✅ Strict CSP |
+| **Export Button Contrast** | UNMEASURED | UNMEASURED | UNMEASURED | **6.29:1 (browser) / 7.90:1 (CSS)** | $\ge 4.5:1$ | ✅ 100% WCAG AA |
+| **Text Floor Minimum** | 10px | 10px | 10px | **12px (0 sub-12px elements)**| $\ge 12$px | ✅ Enforced |
+| **Overflow Menu Keyboard Navigation** | N/A | N/A | N/A | **Focus return + arrow keys verified**| Accessible | ✅ Verified |
 
 ---
 

@@ -143,15 +143,34 @@ async function runAudit(client, stateLabel, width, height) {
         }
       });
 
-      // 5. Alert banner presence & role
+      // 5. Computed 12px text floor check across visible text nodes (Amendment B)
+      const sub12Elements = [];
+      allElements.forEach(el => {
+        if (el.children.length === 0 && el.textContent.trim().length > 0) {
+          const style = window.getComputedStyle(el);
+          const fontSize = parseFloat(style.fontSize);
+          // Only check visible elements
+          if (fontSize > 0 && fontSize < 11.99 && style.display !== 'none' && style.visibility !== 'hidden') {
+            sub12Elements.push({
+              tag: el.tagName,
+              text: el.textContent.trim().slice(0, 30),
+              fontSize: style.fontSize,
+            });
+          }
+        }
+      });
+
+      // 6. Alert banner presence & role
       const alertBanner = document.querySelector('[role="alert"]');
 
       return {
         state: '${stateLabel}',
         viewport: '${width}x${height}',
         totalDomNodes: allElements.length,
-        violationsCount: violations.length,
-        violations,
+        customDomA11yViolationsCount: violations.length,
+        customDomA11yViolations: violations,
+        sub12Count: sub12Elements.length,
+        sub12Elements,
         hasAlertRole: !!alertBanner,
       };
     })()`,
@@ -321,6 +340,97 @@ async function run() {
 
     console.log('Keyboard & Dropzone Check:', keyboardCheck.result.value);
 
+    // Verify rendered Export Button Contrast in browser (Amendment A)
+    const exportContrastCheck = await client.send('Runtime.evaluate', {
+      expression: `(() => {
+        const btn = document.querySelector('button[aria-label="Export code and chunks"]');
+        if (!btn) return { error: 'Export button not found' };
+
+        const cs = window.getComputedStyle(btn);
+        const bg = cs.backgroundColor; // e.g. "rgb(79, 70, 229)"
+        const color = cs.color; // e.g. "rgb(255, 255, 255)"
+
+        function parseRgb(str) {
+          const m = str.match(/rgba?\\((\\d+),\\s*(\\d+),\\s*(\\d+)/);
+          return m ? [parseInt(m[1]), parseInt(m[2]), parseInt(m[3])] : [0, 0, 0];
+        }
+
+        function sRGBtoLin(val) {
+          const c = val / 255;
+          return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+        }
+
+        function lum(r, g, b) {
+          return 0.2126 * sRGBtoLin(r) + 0.7152 * sRGBtoLin(g) + 0.0722 * sRGBtoLin(b);
+        }
+
+        const [r1, g1, b1] = parseRgb(color);
+        const [r2, g2, b2] = parseRgb(bg);
+        const L1 = lum(r1, g1, b1);
+        const L2 = lum(r2, g2, b2);
+        const lighter = Math.max(L1, L2);
+        const darker = Math.min(L1, L2);
+        const ratio = (lighter + 0.05) / (darker + 0.05);
+
+        return {
+          textColor: color,
+          backgroundColor: bg,
+          textLuminance: L1,
+          bgLuminance: L2,
+          contrastRatio: parseFloat(ratio.toFixed(2)),
+          satisfiesWcagAA: ratio >= 4.5,
+        };
+      })()`,
+      returnByValue: true,
+    });
+    console.log('Export Button Contrast in Browser:', exportContrastCheck.result.value);
+
+    // Verify Overflow Menu Focus Return and Keyboard Navigation (Amendment E)
+    const overflowMenuCheck = await client.send('Runtime.evaluate', {
+      expression: `(async () => {
+        const trigger = document.querySelector('button[aria-label="More actions"]');
+        if (!trigger) return { error: 'Overflow trigger button not found' };
+
+        // 1. Focus trigger and open
+        trigger.focus();
+        trigger.click();
+
+        // Wait for React re-render
+        await new Promise(r => setTimeout(r, 200));
+
+        const menu = document.querySelector('[role="menu"]');
+        if (!menu) return { error: 'Menu did not render upon click' };
+
+        const items = Array.from(menu.querySelectorAll('[role="menuitem"]'));
+        const firstItemFocused = document.activeElement === items[0];
+
+        // 2. Dispatch ArrowDown
+        menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+        await new Promise(r => setTimeout(r, 50));
+        const secondItemFocused = items.length > 1 ? document.activeElement === items[1] : true;
+
+        // 3. Dispatch Escape and verify menu closes and focus returns to trigger
+        menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+        await new Promise(r => setTimeout(r, 200));
+
+        const menuClosedAfterEscape = !document.querySelector('[role="menu"]');
+        const focusReturnedToTrigger = document.activeElement === trigger;
+
+        return {
+          triggerFound: true,
+          menuRenderedOnOpen: !!menu,
+          itemsCount: items.length,
+          firstItemFocusedOnOpen: firstItemFocused,
+          secondItemFocusedOnArrowDown: secondItemFocused,
+          menuClosedAfterEscape,
+          focusReturnedToTrigger,
+        };
+      })()`,
+      awaitPromise: true,
+      returnByValue: true,
+    });
+    console.log('Overflow Menu Focus Return & Keyboard Check:', overflowMenuCheck.result.value);
+
     const fullReport = {
       timestamp: new Date().toISOString(),
       screenshotsCount: 18,
@@ -331,6 +441,8 @@ async function run() {
       errorAudit_1440,
       errorAudit_375,
       keyboardCheck: keyboardCheck.result.value,
+      exportContrastCheck: exportContrastCheck.result.value,
+      overflowMenuCheck: overflowMenuCheck.result.value,
     };
 
     fs.writeFileSync(
