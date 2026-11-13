@@ -91,7 +91,7 @@ export const PrivacyPopover: React.FC<PrivacyPopoverProps> = ({ className }) => 
               <span className="h-1.5 w-1.5 rounded-full bg-status-success mt-1.5 shrink-0" />
               <p>
                 <strong className="text-text-primary font-medium">Strict Content Security Policy:</strong>{' '}
-                Production enforces <code className="px-1 py-0.5 rounded bg-elevated font-mono text-[11px] text-text-primary">connect-src 'none'</code>, mathematically preventing any outbound fetch, XHR, WebSockets, or telemetry beacons.
+                Production enforces <code className="px-1 py-0.5 rounded bg-elevated font-mono text-xs text-text-primary">connect-src 'none'</code>, mathematically preventing any outbound fetch, XHR, WebSockets, or telemetry beacons.
               </p>
             </div>
 
@@ -112,17 +112,17 @@ export const PrivacyPopover: React.FC<PrivacyPopoverProps> = ({ className }) => 
 
           {/* How to verify in DevTools */}
           <div className="mt-3.5 pt-3 border-t border-border-subtle bg-elevated/40 rounded p-2.5">
-            <div className="flex items-center justify-between text-[11px] font-medium text-text-primary mb-1">
+            <div className="flex items-center justify-between text-xs font-medium text-text-primary mb-1">
               <span>How to verify in DevTools:</span>
               <button
                 onClick={handleCopyVerification}
-                className="flex items-center space-x-1 text-[10px] text-accent hover:underline font-mono"
+                className="flex items-center space-x-1 text-xs text-accent hover:underline font-mono"
               >
                 {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
                 <span>{copied ? 'Copied' : 'Copy steps'}</span>
               </button>
             </div>
-            <ol className="list-decimal list-inside space-y-0.5 text-[11px] text-text-tertiary">
+            <ol className="list-decimal list-inside space-y-0.5 text-xs text-text-tertiary">
               <li>Open Browser DevTools (<kbd className="font-mono">F12</kbd> or <kbd className="font-mono">⌘⌥I</kbd>)</li>
               <li>Switch to the <strong className="text-text-secondary">Network</strong> tab</li>
               <li>Upload a file or toggle chunk sizes</li>

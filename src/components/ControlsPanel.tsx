@@ -131,7 +131,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
       {/* Sample Pills & Upload */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center space-x-2">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
             <BookOpen className="h-3.5 w-3.5 text-primary-400" />
             Corpus:
           </span>
@@ -225,7 +225,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
               <button
                 onClick={() => handleUnitToggle('tokens')}
                 className={cn(
-                  'flex-1 text-[11px] rounded active-press focus-ring transition-colors',
+                  'flex-1 text-xs rounded active-press focus-ring transition-colors',
                   config.unit === 'tokens'
                     ? 'bg-primary-600/30 text-primary-200 font-semibold border border-primary-500/30'
                     : 'text-slate-400 hover:text-slate-200'
@@ -236,7 +236,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
               <button
                 onClick={() => handleUnitToggle('characters')}
                 className={cn(
-                  'flex-1 text-[11px] rounded active-press focus-ring transition-colors',
+                  'flex-1 text-xs rounded active-press focus-ring transition-colors',
                   config.unit === 'characters'
                     ? 'bg-primary-600/30 text-primary-200 font-semibold border border-primary-500/30'
                     : 'text-slate-400 hover:text-slate-200'
@@ -252,7 +252,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
               onChange={(e) =>
                 onChangeConfig({ ...config, encoding: e.target.value as TokenizerEncoding })
               }
-              className="h-8 bg-canvas border border-border rounded px-2 text-[11px] text-slate-200 focus-ring hover:border-border-hover transition-colors"
+              className="h-8 bg-canvas border border-border rounded px-2 text-xs text-slate-200 focus-ring hover:border-border-hover transition-colors"
             >
               <option value="o200k_base">GPT-4o (o200k)</option>
               <option value="cl100k_base">GPT-4 (cl100k)</option>
@@ -318,11 +318,11 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
       {config.strategy === 'recursive' && (
         <div className="pt-2.5 border-t border-border flex flex-wrap items-center justify-between gap-2 text-xs">
           <div className="flex items-center space-x-2">
-            <span className="font-mono text-slate-400 flex items-center gap-1.5 text-[11px]">
+            <span className="font-mono text-slate-400 flex items-center gap-1.5 text-xs">
               <ListFilter className="h-3 w-3 text-primary-400" />
               Precedence Delimiters:
             </span>
-            <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-surface text-primary-300 border border-border">
+            <span className="font-mono text-xs px-2 py-0.5 rounded bg-surface text-primary-300 border border-border">
               {JSON.stringify(config.separators || ['\\n\\n', '\\n', '. ', ' ', ''])}
             </span>
           </div>
@@ -338,7 +338,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
             {config.separators && (
               <button
                 onClick={handleResetSeparators}
-                className="h-7 text-[11px] text-slate-400 hover:text-slate-200 px-2 rounded bg-surface border border-border active-press focus-ring transition-colors"
+                className="h-7 text-xs text-slate-400 hover:text-slate-200 px-2 rounded bg-surface border border-border active-press focus-ring transition-colors"
               >
                 Reset
               </button>

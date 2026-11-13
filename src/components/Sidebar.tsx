@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { ChunkingConfig, ChunkingStrategy, TokenizerEncoding, ChunkUnit } from '../engine/types';
 import { SAMPLE_DOCUMENTS } from '../data/samples';
-import { Upload, RotateCcw, FileText, Check, FilePlus } from 'lucide-react';
+import { Upload, RotateCcw, FileText, Check, FilePlus, Cpu } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Select } from './ui/Select';
 import { Input } from './ui/Input';
@@ -19,6 +19,7 @@ interface SidebarProps {
   onSelectSample: (id: string) => void;
   onFileUpload: (file: File) => void;
   onNewDocument?: () => void;
+  onOpenTokenizerModal?: () => void;
   currentDocumentTitle?: string;
   detectedFormat?: DetectedFormatInfo | null;
   isOpen: boolean;
@@ -36,6 +37,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectSample,
   onFileUpload,
   onNewDocument,
+  onOpenTokenizerModal,
   detectedFormat,
   isOpen,
   onClose,
@@ -128,18 +130,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* SECTION 1: SOURCE */}
           <div className="flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-mono uppercase text-text-tertiary tracking-wider">
-                Document Source
+              <span className="text-xs font-sans font-medium text-text-secondary">
+                Document source
               </span>
               {onNewDocument && (
                 <button
                   onClick={onNewDocument}
-                  className="inline-flex items-center gap-1 text-[11px] font-mono text-accent hover:text-accent-hover hover:underline focus-ring rounded px-1"
+                  className="inline-flex items-center gap-1 text-xs font-sans text-accent hover:text-accent-hover hover:underline focus-ring rounded px-1"
                   title="Clear document and open empty dropzone"
                   aria-label="New document: clear canvas"
                 >
-                  <FilePlus className="h-3 w-3" />
-                  <span>New Document</span>
+                  <FilePlus className="h-3.5 w-3.5" />
+                  <span>New document</span>
                 </button>
               )}
             </div>
@@ -153,17 +155,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     key={sample.id}
                     onClick={() => onSelectSample(sample.id)}
                     className={cn(
-                      'flex items-center justify-between px-2.5 py-1.5 rounded text-left transition-colors active-press focus-ring',
+                      'flex items-center justify-between px-2.5 py-1.5 rounded text-left transition-colors active-press focus-ring text-xs',
                       isSelected
                         ? 'bg-elevated text-text-primary font-medium'
                         : 'text-text-secondary hover:text-text-primary hover:bg-elevated/50'
                     )}
                   >
-                    <div className="flex items-center space-x-2 truncate">
-                      <FileText className="h-3 w-3 shrink-0 text-text-tertiary" />
-                      <span className="truncate text-xs">{sample.title}</span>
+                    <div className="flex items-center space-x-2 truncate min-w-0">
+                      <FileText className="h-3.5 w-3.5 shrink-0 opacity-70" />
+                      <span className="truncate">{sample.title}</span>
                     </div>
-                    {isSelected && <Check className="h-3 w-3 text-accent shrink-0 ml-1" />}
+                    {isSelected && <Check className="h-3.5 w-3.5 text-accent shrink-0 ml-1" />}
                   </button>
                 );
               })}
@@ -202,21 +204,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 icon={<Upload className="h-3.5 w-3.5" />}
                 isLoading={isExtractingPdf}
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full"
+                className="w-full text-xs"
               >
                 {isExtractingPdf
                   ? 'Extracting PDF...'
                   : isDraggingFile
                   ? 'Drop file here to detect format'
-                  : 'Upload or Drop File (.md, .csv, .pdf, .json)'}
+                  : 'Upload or drop document'}
               </Button>
             </div>
 
             {/* Active Detected Format Indicator */}
             {detectedFormat && !selectedSampleId && (
-              <div className="p-2 rounded bg-elevated border border-border-subtle flex items-center justify-between text-[11px] font-mono select-none">
-                <span className="text-text-secondary">Detected Format:</span>
-                <span className="px-1.5 py-0.2 rounded bg-surface border border-border-default text-accent font-semibold flex items-center gap-1">
+              <div className="p-2 rounded bg-elevated border border-border-subtle flex items-center justify-between text-xs select-none">
+                <span className="text-text-secondary">Detected format:</span>
+                <span className="px-1.5 py-0.5 rounded bg-surface border border-border-default text-accent font-medium font-mono flex items-center gap-1 text-xs">
                   <span>{detectedFormat.badge}</span>
                   <span className="text-text-tertiary font-normal">({detectedFormat.label})</span>
                 </span>
@@ -238,8 +240,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {/* SECTION 2: CHUNKING STRATEGY */}
           <div className="flex flex-col gap-3">
-            <span className="text-[11px] font-mono uppercase text-text-tertiary tracking-wider">
-              Chunking Strategy
+            <span className="text-xs font-sans font-medium text-text-secondary">
+              Chunking strategy
             </span>
 
             <Select
@@ -258,7 +260,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             />
 
             {/* Strategy Context Banner */}
-            <div className="text-[11px] text-text-tertiary leading-relaxed p-2 rounded bg-elevated border border-border-subtle">
+            <div className="text-xs text-text-tertiary leading-relaxed p-2 rounded bg-elevated border border-border-subtle">
               {config.strategy === 'recursive' &&
                 'Recursively tries separators (\\n\\n, \\n, " ") to maintain semantic boundary structure.'}
               {config.strategy === 'fixed' &&
@@ -283,9 +285,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {config.separators && config.separators.length > 0 && (
                   <button
                     onClick={handleResetSeparators}
-                    className="text-[10px] text-accent hover:underline flex items-center gap-1 font-mono"
+                    className="text-xs text-accent hover:underline flex items-center gap-1 font-sans"
                   >
-                    <RotateCcw className="h-2.5 w-2.5" />
+                    <RotateCcw className="h-3 w-3" />
                     Reset to default separators
                   </button>
                 )}
@@ -297,8 +299,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {/* SECTION 3: UNIT & TOKENIZER */}
           <div className="flex flex-col gap-3">
-            <span className="text-[11px] font-mono uppercase text-text-tertiary tracking-wider">
-              Unit &amp; Tokenizer
+            <span className="text-xs font-sans font-medium text-text-secondary">
+              Unit &amp; tokenizer
             </span>
 
             <div className="space-y-1">
@@ -328,14 +330,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
               ]}
               helperText="Token estimates in inspector and comparison table will use this model."
             />
+
+            {/* Unified Tokenizer & Cost Comparison Trigger */}
+            {onOpenTokenizerModal && (
+              <button
+                type="button"
+                onClick={onOpenTokenizerModal}
+                className="w-full mt-1 h-7 px-2.5 rounded border border-border-default bg-elevated hover:bg-surface text-text-secondary hover:text-text-primary text-xs font-sans font-medium flex items-center justify-center space-x-1.5 transition-colors active-press focus-ring"
+                aria-label="Compare multi-model tokenizers and embedding costs"
+              >
+                <Cpu className="h-3.5 w-3.5 text-accent" />
+                <span>Compare models &amp; costs...</span>
+              </button>
+            )}
           </div>
 
           <div className="h-px bg-border-subtle" />
 
           {/* SECTION 4: SIZE & OVERLAP */}
           <div className="flex flex-col gap-4">
-            <span className="text-[11px] font-mono uppercase text-text-tertiary tracking-wider">
-              Size &amp; Overlap
+            <span className="text-xs font-sans font-medium text-text-secondary">
+              Size &amp; overlap
             </span>
 
             <SliderWithInput

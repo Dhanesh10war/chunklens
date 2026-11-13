@@ -45,7 +45,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         {(error || helperText) && (
           <span
             className={cn(
-              'text-[11px] leading-tight',
+              'text-xs leading-tight',
               error ? 'text-status-error' : 'text-text-tertiary'
             )}
           >

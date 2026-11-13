@@ -49,7 +49,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             <ChevronDown className="h-3.5 w-3.5" />
           </div>
         </div>
-        {helperText && <span className="text-[11px] text-text-tertiary leading-tight">{helperText}</span>}
+        {helperText && <span className="text-xs text-text-tertiary leading-tight">{helperText}</span>}
       </div>
     );
   }

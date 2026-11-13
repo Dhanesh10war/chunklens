@@ -66,7 +66,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 
         {/* Hero Banner */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-accent-subtle text-accent border border-accent/20 select-none">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono bg-accent-subtle text-accent border border-accent/20 select-none">
             <ShieldCheck className="h-3.5 w-3.5" />
             <span>100% Client-Side · Zero Network Egress</span>
           </div>
@@ -133,7 +133,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-text-tertiary font-mono pt-1">
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-text-tertiary font-mono pt-1">
               <span>Limit: 10 MB</span>
               <span>·</span>
               <span>Automatic format recognition</span>
@@ -173,7 +173,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsPasting(false)}
-                  className="text-text-tertiary hover:text-text-primary text-[11px] hover:underline"
+                  className="text-text-tertiary hover:text-text-primary text-xs hover:underline"
                 >
                   Cancel
                 </button>
@@ -187,7 +187,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
                 className="w-full text-xs font-mono p-3 rounded bg-bg-base border border-border-default text-text-primary placeholder:text-text-tertiary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent resize-y"
               />
               <div className="flex items-center justify-between text-xs">
-                <span className="text-text-tertiary font-mono text-[11px]">
+                <span className="text-text-tertiary font-mono text-xs">
                   {pastedText.length.toLocaleString()} characters
                 </span>
                 <Button
@@ -210,7 +210,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             <h2 className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
               Or Start With a Sample Corpus
             </h2>
-            <span className="text-[11px] text-text-tertiary font-mono">
+            <span className="text-xs text-text-tertiary font-mono">
               6 bundled benchmarks
             </span>
           </div>
@@ -241,16 +241,16 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
                       <span className="text-xs font-medium text-text-primary group-hover:text-accent transition-colors line-clamp-1">
                         {sample.title}
                       </span>
-                      <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-surface border border-border-default text-text-tertiary shrink-0">
+                      <span className="text-xs font-mono px-1.5 py-0.2 rounded bg-surface border border-border-default text-text-tertiary shrink-0">
                         {formattedSize}
                       </span>
                     </div>
-                    <p className="text-[11px] text-text-secondary line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-text-secondary line-clamp-2 leading-relaxed">
                       {sample.description}
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2.5 mt-2 border-t border-border-subtle text-[10px] text-text-tertiary font-mono">
+                  <div className="flex items-center justify-between pt-2.5 mt-2 border-t border-border-subtle text-xs text-text-tertiary font-mono">
                     <span className="truncate">{sample.category}</span>
                     <span className="text-accent opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
                       Load <ArrowRight className="h-2.5 w-2.5" />

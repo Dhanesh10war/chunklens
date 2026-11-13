@@ -61,14 +61,14 @@ export const Tooltip: React.FC<TooltipProps> = ({
         <div
           role="tooltip"
           className={cn(
-            'absolute z-50 pointer-events-none whitespace-nowrap rounded px-2 py-1 text-[11px] font-medium bg-elevated text-text-primary border border-border-default shadow-elevated flex items-center space-x-1.5 animate-in fade-in duration-100',
+            'absolute z-50 pointer-events-none whitespace-nowrap rounded px-2 py-1 text-xs font-medium bg-elevated text-text-primary border border-border-default shadow-elevated flex items-center space-x-1.5 animate-in fade-in duration-100',
             positionClasses,
             className
           )}
         >
           <span>{content}</span>
           {shortcut && (
-            <kbd className="font-mono text-[10px] px-1 py-0.2 rounded bg-surface border border-border-subtle text-text-tertiary">
+            <kbd className="font-mono text-xs px-1 py-0.2 rounded bg-surface border border-border-subtle text-text-tertiary">
               {shortcut}
             </kbd>
           )}

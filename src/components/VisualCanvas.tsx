@@ -157,13 +157,13 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
       {/* Sub-header Toolbar: View Switcher & Stepper */}
       <div className="h-9 px-4 sm:px-6 border-b border-border-default bg-surface/30 flex items-center justify-between text-xs select-none shrink-0">
         <div className="flex items-center space-x-3">
-          <span className="text-text-secondary font-mono text-[11px] tabular-nums">
+          <span className="text-text-secondary font-mono text-xs tabular-nums">
             {chunks.length} chunks generated
           </span>
 
           {detectedFormat && (
             <span
-              className="hidden sm:inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-[10px] font-mono border border-border-default bg-surface text-text-secondary select-none"
+              className="hidden sm:inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-xs font-mono border border-border-default bg-surface text-text-secondary select-none"
               title={`Format: ${detectedFormat.label} (${detectedFormat.description})`}
             >
               <span className="font-semibold text-accent">{detectedFormat.badge}</span>
@@ -183,7 +183,7 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
               >
                 <ChevronLeft className="h-3 w-3" />
               </button>
-              <span className="text-accent bg-accent-subtle px-1.5 py-0.2 rounded text-[11px] tabular-nums font-mono border border-accent/20">
+              <span className="text-accent bg-accent-subtle px-1.5 py-0.2 rounded text-xs tabular-nums font-mono border border-accent/20">
                 #{selectedChunk.index + 1} of {chunks.length} ({selectedChunk.tokenCount} tok)
               </span>
               <button
@@ -239,7 +239,7 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
                   {/* Overlap Diagonal Hatch Band */}
                   {chunk.overlapPrevChars > 0 && (
                     <div
-                      className="my-1 py-1 px-3 border border-dashed rounded-[4px] flex items-center justify-between text-[10px] font-mono select-none"
+                      className="my-1 py-1 px-3 border border-dashed rounded-[4px] flex items-center justify-between text-xs font-mono select-none"
                       style={{
                         backgroundImage: `repeating-linear-gradient(-45deg, var(--chunk-${prevPaletteIdx}-bg), var(--chunk-${prevPaletteIdx}-bg) 4px, var(--chunk-${paletteIdx}-bg) 4px, var(--chunk-${paletteIdx}-bg) 8px)`,
                         borderColor: `var(--chunk-${paletteIdx})`,
@@ -271,15 +271,15 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
                   >
                     {/* Gutter: Index & Token Count */}
                     <div className="w-14 shrink-0 flex flex-col items-start gap-0.5 text-text-tertiary select-none pt-0.5">
-                      <span className="font-semibold text-text-secondary tabular-nums text-[11px]">
+                      <span className="font-semibold text-text-secondary tabular-nums text-xs">
                         #{String(chunk.index + 1).padStart(2, '0')}
                       </span>
-                      <span className="text-[10px] tabular-nums font-mono">
+                      <span className="text-xs tabular-nums font-mono">
                         {chunk.tokenCount} tok
                       </span>
                       {chunk.isOrphan && (
                         <span
-                          className="text-[9px] text-status-warn font-sans font-medium px-1 rounded bg-status-warn/10 border border-status-warn/20"
+                          className="text-xs text-status-warn font-sans font-medium px-1 rounded bg-status-warn/10 border border-status-warn/20"
                           title="Mid-word or unclosed syntax cut"
                         >
                           Cut
@@ -340,24 +340,24 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
                   {/* Card Header Bar */}
                   <div className="flex items-center justify-between pb-2 mb-2 border-b border-border-subtle">
                     <div className="flex items-center space-x-2">
-                      <span className="font-semibold text-text-primary px-1.5 py-0.2 rounded bg-elevated border border-border-default tabular-nums text-[11px]">
+                      <span className="font-semibold text-text-primary px-1.5 py-0.2 rounded bg-elevated border border-border-default tabular-nums text-xs">
                         #{chunk.index + 1}
                       </span>
                       {chunk.sectionHeader && (
-                        <span className="text-[11px] text-text-secondary flex items-center space-x-1 truncate max-w-xs">
+                        <span className="text-xs text-text-secondary flex items-center space-x-1 truncate max-w-xs">
                           <Bookmark className="h-3 w-3 text-text-tertiary shrink-0" />
                           <span className="truncate">{chunk.sectionHeader}</span>
                         </span>
                       )}
                       {chunk.isOrphan && (
-                        <span className="text-[10px] text-status-warn bg-status-warn/10 border border-status-warn/20 px-1.5 py-0.2 rounded flex items-center gap-1">
+                        <span className="text-xs text-status-warn bg-status-warn/10 border border-status-warn/20 px-1.5 py-0.2 rounded flex items-center gap-1">
                           <AlertTriangle className="h-3 w-3 text-status-warn" />
                           <span>Mid-word cut</span>
                         </span>
                       )}
                     </div>
 
-                    <div className="flex items-center space-x-3 text-text-secondary text-[11px]">
+                    <div className="flex items-center space-x-3 text-text-secondary text-xs">
                       <span className="tabular-nums">
                         <strong className="text-text-primary">{chunk.tokenCount}</strong> tok ({chunk.charCount} ch)
                       </span>
@@ -386,7 +386,7 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
 
                   {/* Overlap Footnote */}
                   {chunk.overlapPrevChars > 0 && (
-                    <div className="mt-2 pt-2 border-t border-border-subtle flex items-center justify-between text-[10px] text-text-tertiary tabular-nums">
+                    <div className="mt-2 pt-2 border-t border-border-subtle flex items-center justify-between text-xs text-text-tertiary tabular-nums">
                       <span>Overlap with previous: ~{chunk.overlapPrevChars} chars</span>
                       <span>Offsets: [{chunk.startCharIndex} .. {chunk.endCharIndex}]</span>
                     </div>

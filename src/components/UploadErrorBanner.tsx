@@ -44,23 +44,23 @@ export const UploadErrorBanner: React.FC<UploadErrorBannerProps> = ({
           <p className="font-medium text-status-danger break-words leading-snug">
             Failed to process &ldquo;{error.failedFilename}&rdquo;
           </p>
-          <p className="text-text-secondary text-[11px] mt-0.5 break-words leading-relaxed">
+          <p className="text-text-secondary text-xs mt-0.5 break-words leading-relaxed">
             {error.reason}
           </p>
           {error.retainedDocTitle && (
-            <p className="text-text-tertiary text-[10px] mt-1 italic">
+            <p className="text-text-tertiary text-xs mt-1 italic">
               Still displaying: &ldquo;{error.retainedDocTitle}&rdquo;
             </p>
           )}
 
           {error.technicalDetail && (
-            <div className="mt-2 p-2 rounded bg-surface/90 border border-status-danger/20 flex flex-col gap-1.5 font-mono text-[10px]">
+            <div className="mt-2 p-2 rounded bg-surface/90 border border-status-danger/20 flex flex-col gap-1.5 font-mono text-xs">
               <div className="flex items-center justify-between text-text-tertiary">
                 <span>Technical detail:</span>
                 <button
                   type="button"
                   onClick={handleCopyDetails}
-                  className="inline-flex items-center gap-1 text-[10px] text-accent hover:underline font-sans"
+                  className="inline-flex items-center gap-1 text-xs text-accent hover:underline font-sans"
                 >
                   {copied ? <Check className="h-2.5 w-2.5 text-status-success" /> : <Copy className="h-2.5 w-2.5" />}
                   <span>{copied ? 'Copied' : 'Copy detail'}</span>
@@ -86,7 +86,7 @@ export const UploadErrorBanner: React.FC<UploadErrorBannerProps> = ({
         {onChooseAnotherFile && (
           <button
             onClick={onChooseAnotherFile}
-            className="inline-flex items-center gap-1.5 px-2 py-1 text-[11px] font-medium rounded bg-status-danger/20 hover:bg-status-danger/30 text-text-primary transition-colors focus-ring"
+            className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium rounded bg-status-danger/20 hover:bg-status-danger/30 text-text-primary transition-colors focus-ring"
           >
             <FolderOpen className="h-3 w-3" />
             <span>Choose another file</span>
@@ -94,7 +94,7 @@ export const UploadErrorBanner: React.FC<UploadErrorBannerProps> = ({
         )}
         <button
           onClick={onDismiss}
-          className="px-2 py-1 text-[11px] text-text-secondary hover:text-text-primary rounded hover:bg-surface transition-colors focus-ring"
+          className="px-2 py-1 text-xs text-text-secondary hover:text-text-primary rounded hover:bg-surface transition-colors focus-ring"
         >
           Dismiss
         </button>

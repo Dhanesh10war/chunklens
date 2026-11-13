@@ -75,7 +75,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-medium text-text-primary">{t.title}</p>
-              {t.description && <p className="text-[11px] text-text-secondary mt-0.5">{t.description}</p>}
+              {t.description && <p className="text-xs text-text-secondary mt-0.5">{t.description}</p>}
             </div>
             <button
               onClick={() => removeToast(t.id)}

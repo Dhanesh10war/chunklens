@@ -52,7 +52,7 @@ export function SegmentedControl<T extends string>({
               {opt.icon && <span className="shrink-0">{opt.icon}</span>}
               <span>{opt.label}</span>
               {opt.badge !== undefined && (
-                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-elevated text-text-tertiary">
+                <span className="text-xs font-mono px-1.5 py-0.2 rounded bg-elevated text-text-tertiary">
                   {opt.badge}
                 </span>
               )}
@@ -94,7 +94,7 @@ export function SegmentedControl<T extends string>({
             {opt.icon && <span className="shrink-0">{opt.icon}</span>}
             <span>{opt.label}</span>
             {opt.badge !== undefined && (
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-surface text-text-tertiary">
+              <span className="text-xs font-mono px-1.5 py-0.2 rounded bg-surface text-text-tertiary">
                 {opt.badge}
               </span>
             )}

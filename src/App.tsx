@@ -207,6 +207,7 @@ export const AppContent: React.FC = () => {
           uploadError={uploadError}
           onDismissError={clearError}
           isExtractingPdf={isExtractingPdf}
+          onOpenTokenizerModal={() => setIsTokenizerModalOpen(true)}
         />
 
         {/* Hero Content Canvas */}

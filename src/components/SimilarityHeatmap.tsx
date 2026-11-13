@@ -74,7 +74,7 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
             >
               {(averageContinuity * 100).toFixed(1)}%
             </span>
-            <span className="text-[11px] text-slate-500">
+            <span className="text-xs text-slate-500">
               {averageContinuity >= 0.4
                 ? '(High semantic flow)'
                 : averageContinuity >= 0.2
@@ -99,7 +99,7 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
           </div>
 
           {/* Matrix Dimension */}
-          <div className="flex items-center space-x-2 text-slate-500 font-mono text-[11px]">
+          <div className="flex items-center space-x-2 text-slate-500 font-mono text-xs">
             <span>Matrix:</span>
             <span className="text-slate-400 tabular-nums">
               {N} × {N} ({N * N} cells)
@@ -108,7 +108,7 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
         </div>
 
         {/* Legend */}
-        <div className="flex items-center space-x-3 text-[11px] text-slate-400">
+        <div className="flex items-center space-x-3 text-xs text-slate-400">
           <div className="flex items-center space-x-1.5">
             <div className="w-2.5 h-2.5 rounded-sm bg-primary-600/70 border border-primary-500/50" />
             <span>Self</span>
@@ -138,7 +138,7 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
               {chunks.map((_, colIdx) => (
                 <div
                   key={`col-head-${colIdx}`}
-                  className="w-10 text-center font-mono text-[10px] text-slate-500 shrink-0 select-none tabular-nums"
+                  className="w-10 text-center font-mono text-xs text-slate-500 shrink-0 select-none tabular-nums"
                   title={`Chunk #${colIdx + 1}`}
                 >
                   #{colIdx + 1}
@@ -152,7 +152,7 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
                 <div key={`row-${rowIdx}`} className="flex items-center">
                   {/* Row Index Label */}
                   <div
-                    className="w-12 text-right pr-2 font-mono text-[10px] text-slate-500 shrink-0 select-none tabular-nums"
+                    className="w-12 text-right pr-2 font-mono text-xs text-slate-500 shrink-0 select-none tabular-nums"
                     title={`Chunk #${rowIdx + 1}`}
                   >
                     #{rowIdx + 1}
@@ -174,7 +174,7 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
                             isAdjacent ? ' (Adjacent boundary)' : ''
                           }`}
                           className={cn(
-                            'w-10 h-8 rounded-sm text-[10px] font-mono border flex items-center justify-center transition-all select-none active-press focus-ring tabular-nums',
+                            'w-10 h-8 rounded-sm text-xs font-mono border flex items-center justify-center transition-all select-none active-press focus-ring tabular-nums',
                             getScoreColor(score, isSelf),
                             isSelected && 'ring-2 ring-primary ring-offset-1 ring-offset-canvas z-10',
                             isAdjacent && !isSelf && 'border-dashed'
@@ -241,7 +241,7 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
                 {redundantPairs.map((pair: RedundantPair, idx: number) => (
                   <li
                     key={`alert-${idx}`}
-                    className="flex flex-wrap items-center gap-2 font-mono text-[11px]"
+                    className="flex flex-wrap items-center gap-2 font-mono text-xs"
                   >
                     <button
                       onClick={() =>
@@ -253,7 +253,7 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
                     </button>
                     <span className="text-slate-400">({(pair.similarity * 100).toFixed(0)}% match)</span>
                     {pair.sharedKeywords.length > 0 && (
-                      <span className="text-slate-400 text-[10px]">
+                      <span className="text-slate-400 text-xs">
                         Shared: {pair.sharedKeywords.join(', ')}
                       </span>
                     )}
@@ -278,7 +278,7 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
                     {(activePair.score * 100).toFixed(1)}% Cosine Similarity
                   </span>
                   {activePair.row === activePair.col && (
-                    <span className="text-[10px] text-slate-400 font-mono">(Self)</span>
+                    <span className="text-xs text-slate-400 font-mono">(Self)</span>
                   )}
                 </div>
               </div>
@@ -294,14 +294,14 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
             {/* Shared Keywords Pills */}
             {activePair.sharedKeywords.length > 0 && (
               <div className="p-3 border-b border-border bg-panel">
-                <span className="text-[11px] font-medium text-slate-400 block mb-1.5">
+                <span className="text-xs font-medium text-slate-400 block mb-1.5">
                   Top Shared Distinctive Terms:
                 </span>
                 <div className="flex flex-wrap gap-1.5">
                   {activePair.sharedKeywords.map((kw: string) => (
                     <span
                       key={kw}
-                      className="px-2 py-0.5 rounded text-[10px] font-mono bg-primary-500/10 text-primary-300 border border-primary-500/30"
+                      className="px-2 py-0.5 rounded text-xs font-mono bg-primary-500/10 text-primary-300 border border-primary-500/30"
                     >
                       {kw}
                     </span>
@@ -314,7 +314,7 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {/* Chunk A */}
               <div className="p-3 rounded-md bg-canvas border border-border">
-                <div className="flex items-center justify-between mb-2 text-[11px] text-slate-400 font-mono">
+                <div className="flex items-center justify-between mb-2 text-xs text-slate-400 font-mono">
                   <span className="text-white font-semibold">Chunk #{activePair.row + 1}</span>
                   <span className="tabular-nums">
                     {activePair.chunkA.tokenCount} tok • {activePair.chunkA.charCount} ch
@@ -327,7 +327,7 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
 
               {/* Chunk B */}
               <div className="p-3 rounded-md bg-canvas border border-border">
-                <div className="flex items-center justify-between mb-2 text-[11px] text-slate-400 font-mono">
+                <div className="flex items-center justify-between mb-2 text-xs text-slate-400 font-mono">
                   <span className="text-white font-semibold">Chunk #{activePair.col + 1}</span>
                   <span className="tabular-nums">
                     {activePair.chunkB.tokenCount} tok • {activePair.chunkB.charCount} ch
