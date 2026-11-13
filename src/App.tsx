@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useDeferredValue } from 'react';
+import React, { useState, useMemo, useEffect, useDeferredValue, Suspense } from 'react';
 import { ChunkingConfig, ChunkingStrategy } from './engine/types';
 import { SAMPLE_DOCUMENTS } from './data/samples';
 import { useChunkingWorker } from './engine/worker/useChunkingWorker';
@@ -7,17 +7,29 @@ import { Sidebar } from './components/Sidebar';
 import { MetricsBar } from './components/MetricsBar';
 import { VisualCanvas } from './components/VisualCanvas';
 import { ChunkInspector } from './components/ChunkInspector';
-import { CommandPalette } from './components/CommandPalette';
-import { ComparisonView } from './components/ComparisonView';
-import { ExportModal } from './components/ExportModal';
-import { SimilarityHeatmap } from './components/SimilarityHeatmap';
-import { TokenizerComparisonModal } from './components/TokenizerComparisonModal';
 import { ToastProvider, useToast } from './components/ui/Toast';
 import { SegmentedControl } from './components/ui/SegmentedControl';
 import { Layers, Grid3X3, Edit3 } from 'lucide-react';
 import { loadStoredSession, saveStoredSession, clearStoredSession, DEFAULT_SESSION } from './utils/storage';
 import { DetectedFormatInfo, detectFileFormat } from './utils/fileFormatDetector';
 import { useDocumentUpload } from './hooks/useDocumentUpload';
+
+// Lazy-load heavy modals and auxiliary views to keep main bundle well below budget
+const CommandPalette = React.lazy(() =>
+  import('./components/CommandPalette').then((m) => ({ default: m.CommandPalette }))
+);
+const ComparisonView = React.lazy(() =>
+  import('./components/ComparisonView').then((m) => ({ default: m.ComparisonView }))
+);
+const ExportModal = React.lazy(() =>
+  import('./components/ExportModal').then((m) => ({ default: m.ExportModal }))
+);
+const SimilarityHeatmap = React.lazy(() =>
+  import('./components/SimilarityHeatmap').then((m) => ({ default: m.SimilarityHeatmap }))
+);
+const TokenizerComparisonModal = React.lazy(() =>
+  import('./components/TokenizerComparisonModal').then((m) => ({ default: m.TokenizerComparisonModal }))
+);
 
 export const AppContent: React.FC = () => {
   // Load restored session or default sample
@@ -240,16 +252,20 @@ export const AppContent: React.FC = () => {
                 />
               </div>
             ) : activeTab === 'heatmap' ? (
-              <SimilarityHeatmap chunks={chunkingResult.chunks} />
+              <Suspense fallback={<div className="p-8 text-center text-xs text-text-tertiary">Loading heatmap...</div>}>
+                <SimilarityHeatmap chunks={chunkingResult.chunks} />
+              </Suspense>
             ) : isCompareMode ? (
-              <ComparisonView
-                rawText={deferredText}
-                primaryConfig={config}
-                onApplyVariantB={(newConfig) => {
-                  setConfig(newConfig);
-                  setIsCompareMode(false);
-                }}
-              />
+              <Suspense fallback={<div className="p-8 text-center text-xs text-text-tertiary">Loading comparison...</div>}>
+                <ComparisonView
+                  rawText={deferredText}
+                  primaryConfig={config}
+                  onApplyVariantB={(newConfig) => {
+                    setConfig(newConfig);
+                    setIsCompareMode(false);
+                  }}
+                />
+              </Suspense>
             ) : (
               <VisualCanvas
                 chunks={chunkingResult.chunks}
@@ -297,44 +313,56 @@ export const AppContent: React.FC = () => {
       </div>
 
       {/* Command Palette Modal (Cmd+K) */}
-      <CommandPalette
-        isOpen={isCommandPaletteOpen}
-        onClose={() => setIsCommandPaletteOpen(false)}
-        onSelectStrategy={(strategy: ChunkingStrategy) => setConfig({ ...config, strategy })}
-        currentStrategy={config.strategy}
-        onSelectSample={handleSelectSample}
-        onNewDocument={handleNewDocument}
-        onResetDocument={handleResetToDefaults}
-        onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
-        onToggleInspector={() => {
-          if (!isInspectorOpen && !selectedChunkId && chunkingResult.chunks.length > 0) {
-            setSelectedChunkId(chunkingResult.chunks[0].id);
-          }
-          setIsInspectorOpen((prev) => !prev);
-        }}
-        onOpenExport={() => setIsExportModalOpen(true)}
-        onOpenTokenizer={() => setIsTokenizerModalOpen(true)}
-        onSelectTab={setActiveTab}
-        onToggleCompare={() => setIsCompareMode(!isCompareMode)}
-      />
+      <Suspense fallback={null}>
+        {isCommandPaletteOpen && (
+          <CommandPalette
+            isOpen={isCommandPaletteOpen}
+            onClose={() => setIsCommandPaletteOpen(false)}
+            onSelectStrategy={(strategy: ChunkingStrategy) => setConfig({ ...config, strategy })}
+            currentStrategy={config.strategy}
+            onSelectSample={handleSelectSample}
+            onNewDocument={handleNewDocument}
+            onResetDocument={handleResetToDefaults}
+            onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
+            onToggleInspector={() => {
+              if (!isInspectorOpen && !selectedChunkId && chunkingResult.chunks.length > 0) {
+                setSelectedChunkId(chunkingResult.chunks[0].id);
+              }
+              setIsInspectorOpen((prev) => !prev);
+            }}
+            onOpenExport={() => setIsExportModalOpen(true)}
+            onOpenTokenizer={() => setIsTokenizerModalOpen(true)}
+            onSelectTab={setActiveTab}
+            onToggleCompare={() => setIsCompareMode(!isCompareMode)}
+          />
+        )}
+      </Suspense>
 
       {/* Code & Data Export Modal */}
-      <ExportModal
-        isOpen={isExportModalOpen}
-        onClose={() => setIsExportModalOpen(false)}
-        config={config}
-        chunks={chunkingResult.chunks}
-        docTitle={documentTitle}
-      />
+      <Suspense fallback={null}>
+        {isExportModalOpen && (
+          <ExportModal
+            isOpen={isExportModalOpen}
+            onClose={() => setIsExportModalOpen(false)}
+            config={config}
+            chunks={chunkingResult.chunks}
+            docTitle={documentTitle}
+          />
+        )}
+      </Suspense>
 
       {/* Tokenizer Comparison & Cost Analyzer Modal */}
-      <TokenizerComparisonModal
-        isOpen={isTokenizerModalOpen}
-        onClose={() => setIsTokenizerModalOpen(false)}
-        rawText={rawText}
-        chunks={chunkingResult.chunks}
-        baselineEncoding={config.encoding}
-      />
+      <Suspense fallback={null}>
+        {isTokenizerModalOpen && (
+          <TokenizerComparisonModal
+            isOpen={isTokenizerModalOpen}
+            onClose={() => setIsTokenizerModalOpen(false)}
+            rawText={rawText}
+            chunks={chunkingResult.chunks}
+            baselineEncoding={config.encoding}
+          />
+        )}
+      </Suspense>
     </div>
   );
 };
