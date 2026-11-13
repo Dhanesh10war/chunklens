@@ -12,12 +12,12 @@ import { ComparisonView } from './components/ComparisonView';
 import { ExportModal } from './components/ExportModal';
 import { SimilarityHeatmap } from './components/SimilarityHeatmap';
 import { TokenizerComparisonModal } from './components/TokenizerComparisonModal';
-import { ToastProvider } from './components/ui/Toast';
+import { ToastProvider, useToast } from './components/ui/Toast';
 import { SegmentedControl } from './components/ui/SegmentedControl';
 import { Layers, Grid3X3, Edit3 } from 'lucide-react';
 import { loadStoredSession, saveStoredSession, clearStoredSession, DEFAULT_SESSION } from './utils/storage';
-import { DetectedFormatInfo, detectFileFormat, isPdfBuffer } from './utils/fileFormatDetector';
-import { useToast } from './components/ui/Toast';
+import { DetectedFormatInfo, detectFileFormat } from './utils/fileFormatDetector';
+import { useDocumentUpload } from './hooks/useDocumentUpload';
 
 export const AppContent: React.FC = () => {
   // Load restored session or default sample
@@ -44,7 +44,7 @@ export const AppContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'visualizer' | 'heatmap' | 'editor'>('visualizer');
   const { success } = useToast();
 
-  // Persist session changes to localStorage
+  // Save session changes to localStorage
   useEffect(() => {
     saveStoredSession({
       selectedSampleId,
@@ -120,36 +120,18 @@ export const AppContent: React.FC = () => {
     }
   };
 
-  const handleDropFile = async (file: File) => {
-    try {
-      const buffer = await file.arrayBuffer();
-      const isPdf = file.name.toLowerCase().endsWith('.pdf') || isPdfBuffer(buffer);
-      if (isPdf) {
-        const { extractTextFromPdf } = await import('./utils/pdfParser');
-        const result = await extractTextFromPdf(buffer.slice(0));
-        if (result.text.trim()) {
-          const formatInfo: DetectedFormatInfo = {
-            formatId: 'pdf',
-            label: 'PDF Document',
-            badge: 'PDF',
-            extension: file.name.match(/\.[0-9a-z]+$/i)?.[0] || '.pdf',
-            recommendedStrategy: 'recursive',
-            confidence: 'high',
-            description: `Extracted ${result.pageCount} pages with structural page markers.`,
-          };
-          handleFileUpload(result.text, file.name, formatInfo);
-        }
-      } else {
-        const content = new TextDecoder('utf-8').decode(buffer);
-        if (content.trim()) {
-          const formatInfo = detectFileFormat(file.name, content);
-          handleFileUpload(content, file.name, formatInfo);
-        }
-      }
-    } catch (err) {
-      console.error('Failed to process dropped file:', err);
-    }
-  };
+  // Shared Document Upload Hook (for Sidebar and Empty-State dropzone)
+  const {
+    uploadError,
+    clearError,
+    isExtractingPdf,
+    processFile: handleFileUploadProcess,
+  } = useDocumentUpload({
+    onSuccess: (content, filename, formatInfo) => {
+      handleFileUpload(content, filename, formatInfo);
+    },
+    currentDocumentTitle: documentTitle,
+  });
 
   const handleResetToDefaults = () => {
     clearStoredSession();
@@ -159,6 +141,16 @@ export const AppContent: React.FC = () => {
     setConfig(DEFAULT_SESSION.config);
     setDetectedFormat(DEFAULT_SESSION.detectedFormat || null);
     setSelectedChunkId(null);
+    clearError();
+  };
+
+  const handleNewDocument = () => {
+    setSelectedSampleId(null);
+    setDocumentTitle('');
+    setRawText('');
+    setDetectedFormat(null);
+    setSelectedChunkId(null);
+    clearError();
   };
 
   // Find inspected chunk and immediate neighbors
@@ -194,10 +186,15 @@ export const AppContent: React.FC = () => {
           onChangeConfig={setConfig}
           selectedSampleId={selectedSampleId}
           onSelectSample={handleSelectSample}
-          onFileUpload={handleFileUpload}
+          onFileUpload={handleFileUploadProcess}
+          onNewDocument={handleNewDocument}
+          currentDocumentTitle={documentTitle}
           detectedFormat={detectedFormat}
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
+          uploadError={uploadError}
+          onDismissError={clearError}
+          isExtractingPdf={isExtractingPdf}
         />
 
         {/* Hero Content Canvas */}
@@ -262,9 +259,15 @@ export const AppContent: React.FC = () => {
                   if (chunkId) setIsInspectorOpen(true);
                 }}
                 detectedFormat={detectedFormat}
-                onDropFile={handleDropFile}
-                onLoadDefaultSample={() => handleSelectSample('attention-paper')}
-                onUploadClick={() => setIsSidebarOpen(true)}
+                onDropFile={handleFileUploadProcess}
+                onSelectSample={handleSelectSample}
+                onPasteText={(text, title) => {
+                  const formatInfo = detectFileFormat(title || 'Pasted Snippet', text);
+                  handleFileUpload(text, title || 'Pasted Snippet', formatInfo);
+                }}
+                uploadError={uploadError}
+                onDismissError={clearError}
+                isExtractingPdf={isExtractingPdf}
               />
             )}
 
@@ -300,6 +303,7 @@ export const AppContent: React.FC = () => {
         onSelectStrategy={(strategy: ChunkingStrategy) => setConfig({ ...config, strategy })}
         currentStrategy={config.strategy}
         onSelectSample={handleSelectSample}
+        onNewDocument={handleNewDocument}
         onResetDocument={handleResetToDefaults}
         onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
         onToggleInspector={() => {
@@ -310,11 +314,11 @@ export const AppContent: React.FC = () => {
         }}
         onOpenExport={() => setIsExportModalOpen(true)}
         onOpenTokenizer={() => setIsTokenizerModalOpen(true)}
-        onSelectTab={(tab) => setActiveTab(tab)}
-        onToggleCompare={() => setIsCompareMode((prev) => !prev)}
+        onSelectTab={setActiveTab}
+        onToggleCompare={() => setIsCompareMode(!isCompareMode)}
       />
 
-      {/* Export Code & Dataset Modal */}
+      {/* Code & Data Export Modal */}
       <ExportModal
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
@@ -323,11 +327,11 @@ export const AppContent: React.FC = () => {
         docTitle={documentTitle}
       />
 
-      {/* Multi-Model Tokenizer Comparison Matrix Modal */}
+      {/* Tokenizer Comparison & Cost Analyzer Modal */}
       <TokenizerComparisonModal
         isOpen={isTokenizerModalOpen}
         onClose={() => setIsTokenizerModalOpen(false)}
-        rawText={deferredText}
+        rawText={rawText}
         chunks={chunkingResult.chunks}
         baselineEncoding={config.encoding}
       />

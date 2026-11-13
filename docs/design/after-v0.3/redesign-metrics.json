@@ -1,0 +1,60 @@
+{
+  "timestamp": "2026-11-13T05:37:51.622Z",
+  "screenshotsCount": 18,
+  "loadedAudit_1440": {
+    "state": "loaded",
+    "viewport": "1440x900",
+    "totalDomNodes": 373,
+    "violationsCount": 0,
+    "violations": [],
+    "hasAlertRole": false
+  },
+  "loadedAudit_375": {
+    "state": "loaded",
+    "viewport": "375x812",
+    "totalDomNodes": 221,
+    "violationsCount": 0,
+    "violations": [],
+    "hasAlertRole": false
+  },
+  "emptyAudit_1440": {
+    "state": "empty",
+    "viewport": "1440x900",
+    "totalDomNodes": 436,
+    "violationsCount": 0,
+    "violations": [],
+    "hasAlertRole": false
+  },
+  "emptyAudit_375": {
+    "state": "empty",
+    "viewport": "375x812",
+    "totalDomNodes": 286,
+    "violationsCount": 0,
+    "violations": [],
+    "hasAlertRole": false
+  },
+  "errorAudit_1440": {
+    "state": "error",
+    "viewport": "1440x900",
+    "totalDomNodes": 477,
+    "violationsCount": 0,
+    "violations": [],
+    "hasAlertRole": true
+  },
+  "errorAudit_375": {
+    "state": "error",
+    "viewport": "375x812",
+    "totalDomNodes": 307,
+    "violationsCount": 0,
+    "violations": [],
+    "hasAlertRole": true
+  },
+  "keyboardCheck": {
+    "dropzoneAccessible": true,
+    "dropzoneLabel": "Upload document dropzone: drop files or click to browse",
+    "cardsCount": 6,
+    "allCardsFocusable": true,
+    "hasAlertBanner": true,
+    "alertText": "Failed to process “corrupt.pdf”Invalid PDF format: File structure is malformed.Still displaying: “current document”Choose another fileDismiss"
+  }
+}

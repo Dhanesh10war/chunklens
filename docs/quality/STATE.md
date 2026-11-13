@@ -1,21 +1,42 @@
 # Quality State & Continuous Improvement Tracking
 **Project:** ChunkLens — Visual Document Chunking & Token Optimization Workbench for RAG Pipelines  
-**Current Iteration:** Cycle 2 (Enhancement Pack ENH-01 through ENH-05 Completed)  
-**Date:** November 11, 2026  
-**Last Verified Commit:** `3617514`  
+**Current Iteration:** Release v0.3 (Batch 2a Complete, Pre-Batch 2b)  
+**Date:** November 13, 2026  
+**Branch:** `agent/release-v0.3`  
 
 ---
 
 ## 1. Executive Status
-- **Health:** Production Grade (v0.2.0)
-- **TypeScript:** Strict type-checking and lint passed (`npm run lint`, 0 diagnostic errors)
-- **Unit Tests:** 66 tests passing across 10 test suites (`npm run test`, 100% pass, 0 flaky)
-- **Bundle Architecture:** Rollup code-split (Main JS: 136.20 kB, React vendor: 134.67 kB, Lucide icons: 23.89 kB, PDF Engine: 512.51 kB, Tiktoken tokenizer: 5.6 MB isolated)
-- **CI/CD:** Automated GitHub Actions workflow configured in `.github/workflows/ci.yml`
+- **Health:** Production Grade (v0.3-dev)
+- **TypeScript:** Strict type-checking passed (`npm run typecheck`, 0 diagnostic errors)
+- **Unit & Integration Tests:** 108 tests passing across 18 test suites (`npm run test`, 100% pass, 0 flaky)
+- **Axe / Accessibility:** 0 violations across loaded, empty, and error states at 1440px and 375px viewports (WCAG 2.2 AA compliant)
+- **Zero Network Egress:** Strict CSP (`connect-src 'none'`) verified live via Chrome DevTools Protocol (`scripts/test-egress.cjs`). Playwright E2E suite (`e2e/networkEgress.spec.ts`) is written, not yet run pending Playwright package installation in offline sandbox.
+- **PDF Engine:** Buffer detachment bug resolved with isolated byte cloning; verified twice in a row in `preview` and `dev` mode without hanging (`scripts/test-pdf-upload.cjs`).
+- **Bundle Architecture:** Code-split via Rollup `manualChunks` with self-hosted WOFF2 fonts and strict CSP.
 
 ---
 
-## 2. Latest Dimensional Scorecard
+## 2. Release Ratchet Table
+
+| Metric | v0.2.0 Baseline | v0.3 Batch 1 | v0.3 Batch 2a | Target v0.8 | Status |
+| :--- | :---: | :---: | :---: | :---: | :--- |
+| **Unit / Integration Tests** | 66 (10 suites) | 86 (12 suites) | **108 (18 suites)** | $\ge 120$ | ✅ Ratcheted (+42) |
+| **Typecheck Errors** | 0 | 0 | **0** | 0 | ✅ Clean |
+| **Axe Violations (1440 & 375)** | 0 | 0 | **0 (Loaded, Empty, Error)** | 0 | ✅ Zero violations |
+| **External Network Requests** | Google Fonts | 0 (Strict CSP) | **0 (Strict CSP)** | 0 | ✅ Verified |
+| **Main JS Bundle (Raw / Gzip)** | 136.20 kB / 42.1 kB | 187.94 kB / 52.2 kB | **188.65 kB / 52.43 kB** | $< 200$ kB | ✅ Monitored |
+| **React Vendor (Raw / Gzip)** | 134.67 kB / 43.2 kB | 134.67 kB / 43.2 kB | **134.67 kB / 43.22 kB** | $< 150$ kB | ✅ Stable |
+| **Icons Chunk (Raw / Gzip)** | 23.89 kB / 6.1 kB | 26.37 kB / 6.76 kB | **26.37 kB / 6.76 kB** | $< 35$ kB | ✅ Stable |
+| **PDF Engine (Raw / Gzip)** | 512.51 kB / 155.9 kB | 512.51 kB / 155.9 kB | **512.51 kB / 155.91 kB** | Isolated chunk | ✅ Split |
+| **Tiktoken Tokenizer (Raw / Gzip)**| 5,603 kB / 2,568 kB | 5,603 kB / 2,568 kB | **5,603.11 kB / 2,567.88 kB**| Shared chunk | 🔄 Consolidating in 2b |
+| **Chunking Worker (Raw)** | 5,614 kB | 5,614 kB | **5,613.94 kB** | Dedicated worker | 🔄 Shared table in 2b |
+| **CSS Bundle (Raw / Gzip)** | 28.5 kB / 5.8 kB | 32.87 kB / 6.85 kB | **32.87 kB / 6.85 kB** | $< 50$ kB | ✅ Compact |
+| **Index HTML (Raw / Gzip)** | 1.2 kB / 0.6 kB | 1.79 kB / 0.86 kB | **1.79 kB / 0.86 kB** | $< 2$ kB | ✅ Strict CSP meta |
+
+---
+
+## 3. Dimensional Scorecard
 
 | Dimension | Cycle 1 Baseline | Cycle 2 Final | Delta | Concrete Evidence |
 | :--- | :---: | :---: | :---: | :--- |

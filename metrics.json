@@ -1,38 +1,57 @@
 {
-  "timestamp": "2026-11-11T10:27:00.000Z",
-  "cycle": 1,
-  "commit": "be50b21",
+  "timestamp": "2026-11-13T05:10:00.000Z",
+  "release": "v0.3-batch-2a",
+  "commit": "db22f8f",
   "tests": {
-    "total": 40,
-    "passed": 40,
+    "total": 103,
+    "passed": 103,
     "failed": 0,
     "passRate": 1.0,
     "flaky": 0,
-    "testFiles": 5,
-    "durationMs": 2410
+    "testFiles": 18,
+    "durationMs": 5700
   },
-  "mutations": {
-    "tested": 5,
-    "killed": 5,
-    "survived": 0,
-    "survivalRate": 0.0
+  "coverage": {
+    "provider": "unknown (vitest/coverage-v8 not installed in baseline)",
+    "linesPct": null,
+    "statementsPct": null,
+    "branchesPct": null,
+    "functionsPct": null
   },
   "diagnostics": {
     "typeErrors": 0,
     "lintErrors": 0
   },
+  "a11y": {
+    "axeViolations": 0,
+    "contrastFloor": "5.9:1 (#8A8A93 on #0A0A0B)"
+  },
   "build": {
-    "durationMs": 4180,
-    "mainJsSizeKb": 89.44,
-    "mainJsGzipKb": 26.69,
+    "durationMs": 6710,
+    "indexJsKb": 187.49,
+    "indexJsGzipKb": 52.18,
+    "indexCssKb": 32.74,
+    "indexCssGzipKb": 6.82,
     "vendorReactKb": 134.67,
-    "vendorIconsKb": 20.05,
+    "vendorReactGzipKb": 43.22,
+    "vendorIconsKb": 26.37,
+    "vendorIconsGzipKb": 6.76,
+    "pdfEngineKb": 512.51,
+    "pdfEngineGzipKb": 155.91,
+    "pdfWorkerKb": 1298.21,
     "tokenizerTiktokenKb": 5603.11,
-    "totalGzipKb": 2648.27
+    "tokenizerTiktokenGzipKb": 2567.88,
+    "chunkingWorkerKb": 5613.94
+  },
+  "benchmarks": {
+    "small2kbMs": 373,
+    "medium50kbMs": 143,
+    "large5mbMs": 12800,
+    "xlarge20mbMs": 53998
   },
   "security": {
-    "vulnerabilities": 0,
-    "secretsFound": 0,
-    "untrustedNetworkCalls": 0
+    "untrustedNetworkCalls": 0,
+    "externalFontOrigins": [],
+    "secretsFound": 0
   }
 }

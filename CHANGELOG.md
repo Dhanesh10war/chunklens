@@ -9,14 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Interactive "How to Verify" privacy popover with DevTools audit steps, collapsing to icon + tooltip below 1200px (3.2).
+- Real `EmptyState` component with 10 MB limit dropzone, paste text mode, format guidance, and 6 sample benchmark cards (3.4).
+- Shared `useDocumentUpload` hook unifying file ingestion, format detection, and strict exception categorization across Sidebar and VisualCanvas (3.3).
+- Compact `UploadErrorBanner` with `role="alert"`, clear reason, retained document indicator, and copyable technical details (3.3).
 
 ### Changed
 - Self-hosted Inter and JetBrains Mono woff2 fonts; eliminated Google Fonts (3.1).
 - Implemented single-source strict Content Security Policy (`connect-src 'none'`) with zero network egress proof (3.1).
 - Reconciled Document vs Ingested token counts with tooltips and unit tests (3.5).
 - Replaced live-looking mock API key in `api-reference` sample corpus with placeholder `YOUR_API_KEY` (3.8).
+- Playwright E2E suite (`e2e/networkEgress.spec.ts`) is written, not yet run (Playwright runner is not installed in the sandboxed dev environment; zero egress verified live via Chrome DevTools Protocol in `scripts/test-egress.cjs`).
+
+### Fixed
+- Resolved detached `ArrayBuffer` crash in PDF parsing (`pdfParser.ts`) by isolating byte copies with `new Uint8Array(source.length)` and ensuring `loadingTask.destroy()` in `finally`.
 
 ## [0.2.0] - 2026-11-12
+Tagged at commit [`ffb2f16`](https://github.com/drago/chunklens/commit/ffb2f16).
 
 ### Added
 - Multi-model tokenizer comparison matrix and embedding cost analyzer across 6 frontier LLMs.

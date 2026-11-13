@@ -71,8 +71,8 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Document Name & Reset */}
           <div className="hidden sm:flex items-center space-x-1.5 min-w-0 max-w-[240px] md:max-w-xs">
-            <span className="text-xs text-text-secondary truncate font-mono" title={documentTitle}>
-              {documentTitle}
+            <span className="text-xs text-text-secondary truncate font-mono" title={documentTitle || 'No document loaded'}>
+              {documentTitle || <span className="text-text-tertiary italic">No document</span>}
             </span>
             {detectedFormat && (
               <Tooltip content={`Format: ${detectedFormat.label} · Recommended: ${detectedFormat.recommendedStrategy}`}>

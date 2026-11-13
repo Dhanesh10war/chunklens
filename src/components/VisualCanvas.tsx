@@ -5,7 +5,6 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
-  FileQuestion,
   Bookmark,
   Layers,
   LayoutList,
@@ -17,6 +16,9 @@ import { copyToClipboard } from '../utils/clipboard';
 import { SegmentedControl } from './ui/SegmentedControl';
 import { useToast } from './ui/Toast';
 import { DetectedFormatInfo } from '../utils/fileFormatDetector';
+import { UploadErrorInfo } from '../hooks/useDocumentUpload';
+import { UploadErrorBanner } from './UploadErrorBanner';
+import { EmptyState } from './EmptyState';
 
 interface VisualCanvasProps {
   chunks: ChunkMetadata[];
@@ -26,6 +28,11 @@ interface VisualCanvasProps {
   onLoadDefaultSample?: () => void;
   onUploadClick?: () => void;
   onDropFile?: (file: File) => void;
+  onSelectSample?: (sampleId: string) => void;
+  onPasteText?: (text: string, title?: string) => void;
+  uploadError?: UploadErrorInfo | null;
+  onDismissError?: () => void;
+  isExtractingPdf?: boolean;
 }
 
 export const VisualCanvas: React.FC<VisualCanvasProps> = ({
@@ -33,9 +40,12 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
   selectedChunkId,
   onSelectChunk,
   detectedFormat,
-  onLoadDefaultSample,
-  onUploadClick,
   onDropFile,
+  onSelectSample,
+  onPasteText,
+  uploadError,
+  onDismissError,
+  isExtractingPdf = false,
 }) => {
   const [viewMode, setViewMode] = useState<'stream' | 'cards'>('stream');
   const [isDragOver, setIsDragOver] = useState(false);
@@ -60,82 +70,55 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
         return;
       }
 
-      if (e.key === 'Escape' && selectedChunkId) {
-        e.preventDefault();
+      if (e.key === 'Escape') {
         onSelectChunk(null);
-      } else if (e.key === 'ArrowLeft' || e.key === 'k') {
-        const currentIdx = chunks.findIndex((c) => c.id === selectedChunkId);
-        if (currentIdx > 0) {
+      } else if (chunks.length > 0) {
+        if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'j') {
           e.preventDefault();
-          onSelectChunk(chunks[currentIdx - 1].id);
+          if (!selectedChunk) {
+            onSelectChunk(chunks[0].id);
+          } else if (selectedChunk.index < chunks.length - 1) {
+            onSelectChunk(chunks[selectedChunk.index + 1].id);
+          }
+        } else if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          if (!selectedChunk) {
+            onSelectChunk(chunks[chunks.length - 1].id);
+          } else if (selectedChunk.index > 0) {
+            onSelectChunk(chunks[selectedChunk.index - 1].id);
+          }
         }
-      } else if (e.key === 'ArrowRight' || e.key === 'j') {
-        const currentIdx = chunks.findIndex((c) => c.id === selectedChunkId);
-        if (currentIdx >= 0 && currentIdx < chunks.length - 1) {
-          e.preventDefault();
-          onSelectChunk(chunks[currentIdx + 1].id);
-        } else if (currentIdx === -1 && chunks.length > 0) {
-          e.preventDefault();
-          onSelectChunk(chunks[0].id);
-        }
-      } else if ((e.key === 'c' || e.key === 'C') && selectedChunk) {
-        e.preventDefault();
-        handleCopyChunk(selectedChunk.id, selectedChunk.text);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedChunkId, selectedChunk, chunks, onSelectChunk]);
+  }, [chunks, selectedChunk, onSelectChunk]);
 
-  const handlePrevChunk = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!selectedChunk) return;
-    const prevIdx = selectedChunk.index - 1;
-    if (prevIdx >= 0) {
-      onSelectChunk(chunks[prevIdx].id);
+  // Stepper handlers
+  const handlePrevChunk = () => {
+    if (selectedChunk && selectedChunk.index > 0) {
+      onSelectChunk(chunks[selectedChunk.index - 1].id);
     }
   };
 
-  const handleNextChunk = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!selectedChunk) return;
-    const nextIdx = selectedChunk.index + 1;
-    if (nextIdx < chunks.length) {
-      onSelectChunk(chunks[nextIdx].id);
+  const handleNextChunk = () => {
+    if (selectedChunk && selectedChunk.index < chunks.length - 1) {
+      onSelectChunk(chunks[selectedChunk.index + 1].id);
     }
   };
 
-  // Empty State with Recovery Actions
+  // Empty state rendering
   if (chunks.length === 0) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-bg-base select-none">
-        <div className="h-12 w-12 rounded-lg bg-elevated border border-border-default flex items-center justify-center text-text-tertiary mb-3">
-          <FileQuestion className="h-6 w-6" />
-        </div>
-        <h3 className="text-sm font-semibold text-text-primary">No document loaded</h3>
-        <p className="text-xs text-text-secondary max-w-sm mt-1 mb-5">
-          Load a sample corpus or upload a text, markdown, PDF, or CSV document to inspect chunking and token boundaries.
-        </p>
-        <div className="flex items-center space-x-2">
-          {onLoadDefaultSample && (
-            <button
-              onClick={onLoadDefaultSample}
-              className="h-8 px-3 rounded-md text-xs font-medium bg-surface hover:bg-elevated text-text-primary border border-border-default hover:border-border-hover transition-colors active-press focus-ring"
-            >
-              Load Sample Document
-            </button>
-          )}
-          {onUploadClick && (
-            <button
-              onClick={onUploadClick}
-              className="h-8 px-3 rounded-md text-xs font-medium bg-accent hover:bg-[var(--accent-hover)] text-white shadow-subtle transition-colors active-press focus-ring"
-            >
-              Upload Document
-            </button>
-          )}
-        </div>
-      </div>
+      <EmptyState
+        onSelectSample={onSelectSample || (() => {})}
+        onFileUpload={onDropFile || (() => {})}
+        onPasteText={onPasteText || (() => {})}
+        uploadError={uploadError || null}
+        onDismissError={onDismissError || (() => {})}
+        isExtractingPdf={isExtractingPdf}
+      />
     );
   }
 
@@ -146,7 +129,6 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
         setIsDragOver(true);
       }}
       onDragLeave={(e) => {
-        // Only reset if leaving canvas boundary
         if (!e.currentTarget.contains(e.relatedTarget as Node)) {
           setIsDragOver(false);
         }
@@ -230,6 +212,17 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
         />
       </div>
 
+      {/* Upload Error Banner (if file upload failed while canvas is populated) */}
+      {uploadError && (
+        <div className="px-4 sm:px-6 pt-3">
+          <UploadErrorBanner
+            error={uploadError}
+            onDismiss={onDismissError || (() => {})}
+            className="w-full"
+          />
+        </div>
+      )}
+
       {/* Main Canvas Scrollable Area */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-6" style={{ contentVisibility: 'auto' }}>
         {viewMode === 'stream' ? (
@@ -278,46 +271,43 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
                   >
                     {/* Gutter: Index & Token Count */}
                     <div className="w-14 shrink-0 flex flex-col items-start gap-0.5 text-text-tertiary select-none pt-0.5">
-                      <span
-                        className={cn(
-                          'text-[11px] font-semibold tabular-nums',
-                          isSelected ? 'text-accent' : 'text-text-secondary group-hover:text-text-primary'
-                        )}
-                      >
+                      <span className="font-semibold text-text-secondary tabular-nums text-[11px]">
                         #{String(chunk.index + 1).padStart(2, '0')}
                       </span>
-                      <span className="text-[10px] tabular-nums text-text-tertiary">
+                      <span className="text-[10px] tabular-nums font-mono">
                         {chunk.tokenCount} tok
                       </span>
-                    </div>
-
-                    {/* Chunk Text Content */}
-                    <div className="flex-1 min-w-0">
-                      {chunk.sectionHeader && (
-                        <div className="mb-1.5 flex items-center space-x-1 text-[11px] font-medium text-text-secondary">
-                          <Bookmark className="h-3 w-3 text-text-tertiary shrink-0" />
-                          <span className="truncate">{chunk.sectionHeader}</span>
-                        </div>
+                      {chunk.isOrphan && (
+                        <span
+                          className="text-[9px] text-status-warn font-sans font-medium px-1 rounded bg-status-warn/10 border border-status-warn/20"
+                          title="Mid-word or unclosed syntax cut"
+                        >
+                          Cut
+                        </span>
                       )}
-                      <p className="whitespace-pre-wrap leading-relaxed text-text-primary text-[13px] break-words">
-                        {chunk.text}
-                      </p>
                     </div>
 
-                    {/* Quick Copy Action */}
+                    {/* Chunk Text Body */}
+                    <div className="flex-1 min-w-0">
+                      <div className="whitespace-pre-wrap leading-relaxed text-text-primary text-[13px] break-words">
+                        {chunk.text}
+                      </div>
+                    </div>
+
+                    {/* Quick Copy Button */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleCopyChunk(chunk.id, chunk.text);
                       }}
-                      className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-surface text-text-tertiary hover:text-text-primary transition-opacity focus-ring"
-                      title="Copy chunk text (or C)"
+                      className="opacity-0 group-hover:opacity-100 h-6 w-6 rounded hover:bg-elevated text-text-tertiary hover:text-text-primary flex items-center justify-center transition-all focus-ring shrink-0"
+                      title="Copy chunk text"
                       aria-label={`Copy chunk ${chunk.index + 1}`}
                     >
                       {copiedId === chunk.id ? (
                         <Check className="h-3.5 w-3.5 text-status-success" />
                       ) : (
-                        <Copy className="h-3.5 w-3.5" />
+                        <Copy className="h-3 w-3" />
                       )}
                     </button>
                   </div>
@@ -326,8 +316,8 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
             })}
           </div>
         ) : (
-          /* SEPARATED CARDS VIEW */
-          <div className="max-w-4xl mx-auto flex flex-col gap-3 font-mono text-xs">
+          /* SEPARATED CARDS GRID */
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-6xl mx-auto font-mono text-xs">
             {chunks.map((chunk) => {
               const isSelected = chunk.id === selectedChunkId;
               const paletteIdx = chunk.index % 8;
@@ -337,14 +327,14 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
                   key={chunk.id}
                   onClick={() => onSelectChunk(isSelected ? null : chunk.id)}
                   className={cn(
-                    'p-3.5 rounded-md bg-surface border transition-all cursor-pointer shadow-subtle',
+                    'p-4 rounded-lg border transition-all cursor-pointer flex flex-col justify-between',
                     isSelected
-                      ? 'ring-2 ring-accent border-accent'
-                      : 'border-border-default hover:border-border-hover'
+                      ? 'ring-2 ring-accent border-accent shadow-elevated bg-elevated'
+                      : 'border-border-default hover:border-border-strong bg-surface'
                   )}
                   style={{
-                    borderLeftColor: `var(--chunk-${paletteIdx})`,
-                    borderLeftWidth: '3px',
+                    borderTopColor: `var(--chunk-${paletteIdx})`,
+                    borderTopWidth: '3px',
                   }}
                 >
                   {/* Card Header Bar */}

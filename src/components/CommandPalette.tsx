@@ -15,6 +15,7 @@ import {
   Grid3X3,
   Edit3,
   Check,
+  FilePlus,
 } from 'lucide-react';
 import { ChunkingStrategy } from '../engine/types';
 import { SAMPLE_DOCUMENTS } from '../data/samples';
@@ -27,6 +28,7 @@ export interface CommandPaletteProps {
   onSelectStrategy: (strategy: ChunkingStrategy) => void;
   currentStrategy: ChunkingStrategy;
   onSelectSample: (sampleId: string) => void;
+  onNewDocument?: () => void;
   onResetDocument: () => void;
   onToggleSidebar: () => void;
   onToggleInspector: () => void;
@@ -53,6 +55,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   onSelectStrategy,
   currentStrategy,
   onSelectSample,
+  onNewDocument,
   onResetDocument,
   onToggleSidebar,
   onToggleInspector,
@@ -155,6 +158,21 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     },
 
     // Documents
+    ...(onNewDocument
+      ? [
+          {
+            id: 'doc-new',
+            category: 'Documents' as const,
+            title: 'New Document (Clear Canvas)',
+            subtitle: 'Clear current document and open the file dropzone & sample picker',
+            icon: <FilePlus className="h-4 w-4" />,
+            action: () => {
+              onNewDocument();
+              onClose();
+            },
+          },
+        ]
+      : []),
     ...SAMPLE_DOCUMENTS.map((doc) => ({
       id: `doc-${doc.id}`,
       category: 'Documents' as const,
