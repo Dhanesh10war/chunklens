@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-14T05:12:34.059Z",
+  "timestamp": "2026-11-14T06:15:11.339Z",
   "screenshotsCount": 18,
   "overflowMeasurements": {
     "loaded": {
@@ -61,17 +61,17 @@
         "state": "loaded",
         "viewport": "768x1024",
         "viewportWidth": 768,
-        "docScrollWidth": 762,
+        "docScrollWidth": 768,
         "docNoOverflow": true,
         "header": {
-          "scrollWidth": 762,
-          "clientWidth": 762,
+          "scrollWidth": 768,
+          "clientWidth": 768,
           "noOverflow": true
         },
         "metrics": {
           "present": true,
-          "scrollWidth": 762,
-          "clientWidth": 762,
+          "scrollWidth": 768,
+          "clientWidth": 768,
           "noOverflow": true
         },
         "visibility": {
@@ -165,11 +165,11 @@
         "state": "empty",
         "viewport": "768x1024",
         "viewportWidth": 768,
-        "docScrollWidth": 762,
+        "docScrollWidth": 768,
         "docNoOverflow": true,
         "header": {
-          "scrollWidth": 762,
-          "clientWidth": 762,
+          "scrollWidth": 768,
+          "clientWidth": 768,
           "noOverflow": true
         },
         "metrics": {
@@ -263,11 +263,11 @@
         "state": "error",
         "viewport": "768x1024",
         "viewportWidth": 768,
-        "docScrollWidth": 762,
+        "docScrollWidth": 768,
         "docNoOverflow": true,
         "header": {
-          "scrollWidth": 762,
-          "clientWidth": 762,
+          "scrollWidth": 768,
+          "clientWidth": 768,
           "noOverflow": true
         },
         "metrics": {
@@ -384,6 +384,13 @@
     "bgLuminance": 0.11699725241042669,
     "contrastRatio": 6.29,
     "satisfiesWcagAA": true
+  },
+  "errorBannerContrastCheck": {
+    "iconColor": "rgb(237, 237, 239)",
+    "bannerBg": "rgba(0, 0, 0, 0)",
+    "borderLeft": "2px rgba(255, 255, 255, 0.1)",
+    "contrastRatio": 17.96,
+    "satisfies3to1": true
   },
   "overflowMenuCheck": {
     "triggerFound": true,

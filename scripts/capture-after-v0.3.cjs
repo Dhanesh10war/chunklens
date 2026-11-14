@@ -88,12 +88,43 @@ function createCdpClient(wsUrl) {
 }
 
 async function capture(client, filename, width, height) {
+  const isMobile = width <= 768;
   await client.send('Emulation.setDeviceMetricsOverride', {
     width,
     height,
     deviceScaleFactor: 1,
-    mobile: width < 768,
+    mobile: isMobile,
   });
+
+  if (isMobile) {
+    try {
+      await client.send('Emulation.setTouchEmulationEnabled', {
+        enabled: true,
+        maxTouchPoints: 5,
+      });
+    } catch (e) {}
+
+    try {
+      await client.send('Emulation.setEmulatedMedia', {
+        features: [{ name: 'pointer', value: 'coarse' }],
+      });
+    } catch (e) {}
+  } else {
+    try {
+      await client.send('Emulation.setTouchEmulationEnabled', { enabled: false });
+    } catch (e) {}
+    try {
+      await client.send('Emulation.setEmulatedMedia', { features: [] });
+    } catch (e) {}
+  }
+
+  // Evaluate and log pointer: coarse matching
+  const pointerCheck = await client.send('Runtime.evaluate', {
+    expression: `window.matchMedia('(pointer: coarse)').matches`,
+    returnByValue: true,
+  });
+  console.log(`[Emulation Check (${width}px)] matchMedia('(pointer: coarse)').matches = ${pointerCheck.result.value}`);
+
   await new Promise((r) => setTimeout(r, 600));
   const { data } = await client.send('Page.captureScreenshot', { format: 'png' });
   const filePath = path.join(OUT_DIR, filename);
@@ -343,6 +374,15 @@ async function run() {
     const emptyAudit_375 = await runAudit(client, 'empty', 375, 812);
     const emptyOverflow_375 = await measureOverflow(client, 'empty', 375, 812);
 
+    const dropzonePromptCheck = await client.send('Runtime.evaluate', {
+      expression: `(() => {
+        const p = document.querySelector('div[aria-label^="Upload document dropzone"] p');
+        return p ? p.innerText.trim() : '';
+      })()`,
+      returnByValue: true,
+    });
+    console.log(`[Dropzone Prompt Verification (375px)] Prompt text: "${dropzonePromptCheck.result.value}"`);
+
     await setDrawerState(client, true, 375);
     await capture(client, 'empty_375_open.png', 375, 812);
 
@@ -452,6 +492,54 @@ async function run() {
     });
     console.log('Export Button Contrast in Browser:', exportContrastCheck.result.value);
 
+    // Verify rendered Error Banner Icon and Edge Contrast in browser (Item V4)
+    const errorBannerContrastCheck = await client.send('Runtime.evaluate', {
+      expression: `(() => {
+        const banner = document.querySelector('div[role="alert"]');
+        if (!banner) return { error: 'Alert banner not found' };
+        const icon = banner.querySelector('svg');
+        if (!icon) return { error: 'Alert icon not found' };
+
+        const bannerCs = window.getComputedStyle(banner);
+        const iconCs = window.getComputedStyle(icon);
+        const iconColor = iconCs.color;
+        const bannerBg = bannerCs.backgroundColor;
+        const borderLeft = bannerCs.borderLeftWidth + ' ' + bannerCs.borderLeftColor;
+
+        function parseRgb(str) {
+          const m = str.match(/rgba?\\((\\d+),\\s*(\\d+),\\s*(\\d+)/);
+          return m ? [parseInt(m[1]), parseInt(m[2]), parseInt(m[3])] : [0, 0, 0];
+        }
+
+        function sRGBtoLin(val) {
+          const c = val / 255;
+          return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+        }
+
+        function lum(r, g, b) {
+          return 0.2126 * sRGBtoLin(r) + 0.7152 * sRGBtoLin(g) + 0.0722 * sRGBtoLin(b);
+        }
+
+        const [r1, g1, b1] = parseRgb(iconColor);
+        const [r2, g2, b2] = parseRgb(bannerBg);
+        const L1 = lum(r1, g1, b1);
+        const L2 = lum(r2, g2, b2);
+        const lighter = Math.max(L1, L2);
+        const darker = Math.min(L1, L2);
+        const ratio = (lighter + 0.05) / (darker + 0.05);
+
+        return {
+          iconColor,
+          bannerBg,
+          borderLeft,
+          contrastRatio: parseFloat(ratio.toFixed(2)),
+          satisfies3to1: ratio >= 3.0,
+        };
+      })()`,
+      returnByValue: true,
+    });
+    console.log('Error Banner Contrast in Browser (Item V4):', errorBannerContrastCheck.result.value);
+
     // Verify Overflow Menu Focus Return and Keyboard Navigation (Amendment E)
     const overflowMenuCheck = await client.send('Runtime.evaluate', {
       expression: `(async () => {
@@ -533,6 +621,7 @@ async function run() {
       errorAudit_375,
       keyboardCheck: keyboardCheck.result.value,
       exportContrastCheck: exportContrastCheck.result.value,
+      errorBannerContrastCheck: errorBannerContrastCheck.result.value,
       overflowMenuCheck: overflowMenuCheck.result.value,
     };
 
