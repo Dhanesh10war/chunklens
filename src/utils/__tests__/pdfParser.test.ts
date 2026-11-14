@@ -68,6 +68,7 @@ describe('extractTextFromPdf', () => {
     expect(result.text).toBe('');
   });
 
+  // --- REGRESSION TESTS FOR DETACHED ARRAYBUFFER FIX ---
   it('does not detach caller ArrayBuffer during PDF extraction', async () => {
     const pdfBytes = createSyntheticPdf('Cloned ArrayBuffer preservation check');
     const rawBuffer = pdfBytes.slice().buffer as ArrayBuffer;
@@ -78,5 +79,43 @@ describe('extractTextFromPdf', () => {
     // Verify rawBuffer was not detached by pdf.js worker transfer
     expect(rawBuffer.byteLength).toBeGreaterThan(0);
     expect(() => new Uint8Array(rawBuffer)).not.toThrow();
+  });
+
+  it('allows extracting text from the same ArrayBuffer instance multiple times sequentially', async () => {
+    const pdfBytes = createSyntheticPdf('Sequential extraction idempotency check');
+    const rawBuffer = pdfBytes.slice().buffer as ArrayBuffer;
+
+    // Run 1
+    const res1 = await extractTextFromPdf(rawBuffer);
+    expect(res1.text).toContain('Sequential extraction idempotency check');
+    expect(rawBuffer.byteLength).toBeGreaterThan(0);
+
+    // Run 2 on the SAME buffer - must not throw "Cannot perform Construct on a detached ArrayBuffer"
+    const res2 = await extractTextFromPdf(rawBuffer);
+    expect(res2.text).toContain('Sequential extraction idempotency check');
+    expect(rawBuffer.byteLength).toBeGreaterThan(0);
+  });
+
+  it('allows extracting text from the same Uint8Array instance multiple times', async () => {
+    const pdfBytes = createSyntheticPdf('Uint8Array reuse test');
+
+    const res1 = await extractTextFromPdf(pdfBytes);
+    expect(res1.text).toContain('Uint8Array reuse test');
+    expect(pdfBytes.buffer.byteLength).toBeGreaterThan(0);
+
+    const res2 = await extractTextFromPdf(pdfBytes);
+    expect(res2.text).toContain('Uint8Array reuse test');
+    expect(pdfBytes.buffer.byteLength).toBeGreaterThan(0);
+  });
+
+  // --- EXCEPTION CLASSIFICATION TESTS ---
+  it('classifies malformed PDF bytes as InvalidPDFException', async () => {
+    const malformedBytes = new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x34, 0x0a, 0x99, 0x88, 0x77]);
+    await expect(extractTextFromPdf(malformedBytes)).rejects.toThrow(/Invalid PDF/);
+  });
+
+  it('rejects 0-byte buffer with explicit empty error', async () => {
+    const emptyBuffer = new ArrayBuffer(0);
+    await expect(extractTextFromPdf(emptyBuffer)).rejects.toThrow(/empty \(0 bytes\)/);
   });
 });

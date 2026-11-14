@@ -3,7 +3,7 @@ import { cn } from '../../utils/cn';
 
 export interface SegmentedOption<T extends string> {
   value: T;
-  label: string;
+  label: React.ReactNode;
   icon?: React.ReactNode;
   badge?: string | number;
 }
@@ -52,7 +52,7 @@ export function SegmentedControl<T extends string>({
               {opt.icon && <span className="shrink-0">{opt.icon}</span>}
               <span>{opt.label}</span>
               {opt.badge !== undefined && (
-                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-elevated text-text-tertiary">
+                <span className="text-xs font-mono px-1.5 py-0.2 rounded bg-elevated text-text-tertiary">
                   {opt.badge}
                 </span>
               )}
@@ -85,7 +85,7 @@ export function SegmentedControl<T extends string>({
             aria-selected={isSelected}
             onClick={() => onChange(opt.value)}
             className={cn(
-              'flex items-center justify-center space-x-1.5 px-2.5 py-1 rounded-[5px] font-medium transition-all active-press focus-ring',
+              'flex items-center justify-center space-x-1.5 px-2.5 py-1 rounded-[5px] font-medium whitespace-nowrap transition-all active-press focus-ring',
               isSelected
                 ? 'bg-surface text-text-primary shadow-subtle border border-border-subtle'
                 : 'text-text-secondary hover:text-text-primary border border-transparent'
@@ -94,7 +94,7 @@ export function SegmentedControl<T extends string>({
             {opt.icon && <span className="shrink-0">{opt.icon}</span>}
             <span>{opt.label}</span>
             {opt.badge !== undefined && (
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-surface text-text-tertiary">
+              <span className="text-xs font-mono px-1.5 py-0.2 rounded bg-surface text-text-tertiary">
                 {opt.badge}
               </span>
             )}

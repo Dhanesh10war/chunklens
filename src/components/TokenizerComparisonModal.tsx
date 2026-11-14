@@ -150,7 +150,7 @@ export const TokenizerComparisonModal: React.FC<TokenizerComparisonModalProps> =
             <ShieldCheck className="h-4 w-4" />
             <span>Truncation Risk Guard</span>
             {comparison.truncationRisk.limit512Exceeded > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              <span className="px-1.5 py-0.2 rounded-full text-xs font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30">
                 {comparison.truncationRisk.limit512Exceeded}
               </span>
             )}
@@ -164,7 +164,7 @@ export const TokenizerComparisonModal: React.FC<TokenizerComparisonModalProps> =
               <div className="border border-border rounded-md overflow-hidden bg-surface">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="border-b border-border bg-subtle text-slate-400 font-mono text-[11px]">
+                    <tr className="border-b border-border bg-subtle text-slate-400 font-mono text-xs">
                       <th className="py-2.5 px-3 font-semibold">Model / Provider</th>
                       <th className="py-2.5 px-3 font-semibold">Tokenizer Profile</th>
                       <th className="py-2.5 px-3 font-semibold text-right">Doc Tokens</th>
@@ -192,11 +192,11 @@ export const TokenizerComparisonModal: React.FC<TokenizerComparisonModalProps> =
                             <div className="flex items-center space-x-2">
                               <span className="font-sans font-medium text-white">{model.name}</span>
                               {model.isExact ? (
-                                <span className="text-[10px] px-1 py-0.2 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+                                <span className="text-xs px-1 py-0.2 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
                                   Exact BPE
                                 </span>
                               ) : (
-                                <span className="text-[10px] px-1 py-0.2 rounded bg-slate-700/50 text-slate-400 border border-border font-mono">
+                                <span className="text-xs px-1 py-0.2 rounded bg-slate-700/50 text-slate-400 border border-border font-mono">
                                   Profile
                                 </span>
                               )}
@@ -214,7 +214,7 @@ export const TokenizerComparisonModal: React.FC<TokenizerComparisonModalProps> =
                           </td>
                           <td className="py-2.5 px-3 text-right">
                             {isBaseline ? (
-                              <span className="text-slate-400 text-[11px]">Baseline (0%)</span>
+                              <span className="text-slate-400 text-xs">Baseline (0%)</span>
                             ) : model.variancePercentVsBaseline > 0 ? (
                               <span className="inline-flex items-center space-x-0.5 text-amber-400 font-medium tabular-nums">
                                 <ArrowUpRight className="h-3 w-3" />
@@ -237,7 +237,7 @@ export const TokenizerComparisonModal: React.FC<TokenizerComparisonModalProps> =
                 </table>
               </div>
 
-              <div className="text-[11px] text-slate-400 bg-subtle p-3 rounded-md border border-border flex items-start space-x-2">
+              <div className="text-xs text-slate-400 bg-subtle p-3 rounded-md border border-border flex items-start space-x-2">
                 <Scale className="h-4 w-4 text-primary-400 shrink-0 mt-0.5" />
                 <div>
                   <strong className="text-slate-200">Architecture Insight:</strong> OpenAI’s{' '}
@@ -273,7 +273,7 @@ export const TokenizerComparisonModal: React.FC<TokenizerComparisonModalProps> =
               <div className="border border-border rounded-md overflow-hidden bg-surface">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="border-b border-border bg-subtle text-slate-400 font-mono text-[11px]">
+                    <tr className="border-b border-border bg-subtle text-slate-400 font-mono text-xs">
                       <th className="py-2.5 px-3 font-semibold">Provider</th>
                       <th className="py-2.5 px-3 font-semibold">Embedding Model</th>
                       <th className="py-2.5 px-3 font-semibold text-right">Rate / 1M Tokens</th>
@@ -306,7 +306,7 @@ export const TokenizerComparisonModal: React.FC<TokenizerComparisonModalProps> =
                 </table>
               </div>
 
-              <p className="text-[11px] text-slate-400">
+              <p className="text-xs text-slate-400">
                 * Note: Ingestion cost assumes total ingested chunk volume ({baselineChunkTokens.toLocaleString()} tokens) including
                 chunk overlaps. Self-hosted embedding models (e.g. BGE-M3, MiniLM) incur zero token API fees, only GPU compute costs.
               </p>
@@ -332,7 +332,7 @@ export const TokenizerComparisonModal: React.FC<TokenizerComparisonModalProps> =
                       <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                     )}
                   </div>
-                  <p className="text-slate-400 text-[11px] mt-1">
+                  <p className="text-slate-400 text-xs mt-1">
                     Applicable to: BERT, all-MiniLM-L6-v2, BGE-small, GTE-base
                   </p>
                   <div className="mt-3 font-mono">
@@ -362,7 +362,7 @@ export const TokenizerComparisonModal: React.FC<TokenizerComparisonModalProps> =
                       <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                     )}
                   </div>
-                  <p className="text-slate-400 text-[11px] mt-1">
+                  <p className="text-slate-400 text-xs mt-1">
                     Applicable to: Instructor-XL, Cohere Embed v2
                   </p>
                   <div className="mt-3 font-mono">
@@ -392,7 +392,7 @@ export const TokenizerComparisonModal: React.FC<TokenizerComparisonModalProps> =
                       <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                     )}
                   </div>
-                  <p className="text-slate-400 text-[11px] mt-1">
+                  <p className="text-slate-400 text-xs mt-1">
                     Applicable to: OpenAI text-embedding-3, Voyage-3
                   </p>
                   <div className="mt-3 font-mono">
@@ -413,7 +413,7 @@ export const TokenizerComparisonModal: React.FC<TokenizerComparisonModalProps> =
                     <AlertTriangle className="h-4 w-4" />
                     <span>Silent Downstream Truncation Warning</span>
                   </div>
-                  <p className="text-slate-300 text-[11px]">
+                  <p className="text-slate-300 text-xs">
                     The following chunk indices exceed 512 tokens:{' '}
                     <span className="font-mono text-amber-300 font-semibold">
                       {comparison.truncationRisk.exceededChunkIndices512.map((idx) => `#${idx}`).join(', ')}
@@ -429,7 +429,7 @@ export const TokenizerComparisonModal: React.FC<TokenizerComparisonModalProps> =
 
         {/* Footer */}
         <div className="px-6 py-3 border-t border-border bg-panel flex items-center justify-between text-xs">
-          <span className="text-slate-400 font-mono text-[11px]">
+          <span className="text-slate-400 font-mono text-xs">
             ChunkLens Multi-Model Engine • 100% Client-Side Ingestion Analysis
           </span>
           <button

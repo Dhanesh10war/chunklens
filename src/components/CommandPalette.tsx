@@ -15,6 +15,7 @@ import {
   Grid3X3,
   Edit3,
   Check,
+  FilePlus,
 } from 'lucide-react';
 import { ChunkingStrategy } from '../engine/types';
 import { SAMPLE_DOCUMENTS } from '../data/samples';
@@ -27,6 +28,7 @@ export interface CommandPaletteProps {
   onSelectStrategy: (strategy: ChunkingStrategy) => void;
   currentStrategy: ChunkingStrategy;
   onSelectSample: (sampleId: string) => void;
+  onNewDocument?: () => void;
   onResetDocument: () => void;
   onToggleSidebar: () => void;
   onToggleInspector: () => void;
@@ -53,6 +55,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   onSelectStrategy,
   currentStrategy,
   onSelectSample,
+  onNewDocument,
   onResetDocument,
   onToggleSidebar,
   onToggleInspector,
@@ -155,6 +158,21 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     },
 
     // Documents
+    ...(onNewDocument
+      ? [
+          {
+            id: 'doc-new',
+            category: 'Documents' as const,
+            title: 'New Document (Clear Canvas)',
+            subtitle: 'Clear current document and open the file dropzone & sample picker',
+            icon: <FilePlus className="h-4 w-4" />,
+            action: () => {
+              onNewDocument();
+              onClose();
+            },
+          },
+        ]
+      : []),
     ...SAMPLE_DOCUMENTS.map((doc) => ({
       id: `doc-${doc.id}`,
       category: 'Documents' as const,
@@ -334,7 +352,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             className="flex-1 bg-transparent border-0 text-xs text-text-primary placeholder:text-text-tertiary focus:outline-none"
             aria-label="Command search"
           />
-          <kbd className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-elevated border border-border-default text-text-tertiary">
+          <kbd className="text-xs font-mono px-1.5 py-0.5 rounded bg-elevated border border-border-default text-text-tertiary">
             ESC
           </kbd>
         </div>
@@ -372,7 +390,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                         )}
                       </div>
                       {cmd.subtitle && (
-                        <span className="text-[11px] text-text-tertiary truncate">
+                        <span className="text-xs text-text-tertiary truncate">
                           {cmd.subtitle}
                         </span>
                       )}
@@ -380,7 +398,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                   </div>
 
                   {cmd.shortcut && (
-                    <kbd className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface border border-border-default text-text-tertiary">
+                    <kbd className="text-xs font-mono px-1.5 py-0.5 rounded bg-surface border border-border-default text-text-tertiary">
                       {cmd.shortcut}
                     </kbd>
                   )}
@@ -391,7 +409,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         </div>
 
         {/* Footer Shortcut Legend */}
-        <div className="h-8 px-4 border-t border-border-default bg-elevated flex items-center justify-between text-[11px] font-mono text-text-tertiary select-none">
+        <div className="h-8 px-4 border-t border-border-default bg-elevated flex items-center justify-between text-xs font-mono text-text-tertiary select-none">
           <div className="flex items-center space-x-3">
             <span>↑↓ Navigate</span>
             <span>↵ Select</span>

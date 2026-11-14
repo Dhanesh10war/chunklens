@@ -8,6 +8,7 @@ export interface TooltipProps {
   position?: 'top' | 'bottom' | 'left' | 'right';
   delayMs?: number;
   className?: string;
+  wrapperClassName?: string;
 }
 
 export const Tooltip: React.FC<TooltipProps> = ({
@@ -17,13 +18,14 @@ export const Tooltip: React.FC<TooltipProps> = ({
   position = 'top',
   delayMs = 400,
   className,
+  wrapperClassName,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const timeoutRef = useRef<number | null>(null);
 
   const show = () => {
     timeoutRef.current = window.setTimeout(() => {
-      setIsVisible(true), delayMs;
+      setIsVisible(true);
     }, delayMs);
   };
 
@@ -50,7 +52,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
   return (
     <div
-      className="relative inline-flex items-center"
+      className={cn('relative inline-flex items-center', wrapperClassName)}
       onMouseEnter={show}
       onMouseLeave={hide}
       onFocus={show}
@@ -61,14 +63,14 @@ export const Tooltip: React.FC<TooltipProps> = ({
         <div
           role="tooltip"
           className={cn(
-            'absolute z-50 pointer-events-none whitespace-nowrap rounded px-2 py-1 text-[11px] font-medium bg-elevated text-text-primary border border-border-default shadow-elevated flex items-center space-x-1.5 animate-in fade-in duration-100',
+            'absolute z-50 pointer-events-none whitespace-nowrap rounded px-2 py-1 text-xs font-medium bg-elevated text-text-primary border border-border-default shadow-elevated flex items-center space-x-1.5 animate-in fade-in duration-100',
             positionClasses,
             className
           )}
         >
           <span>{content}</span>
           {shortcut && (
-            <kbd className="font-mono text-[10px] px-1 py-0.2 rounded bg-surface border border-border-subtle text-text-tertiary">
+            <kbd className="font-mono text-xs px-1 py-0.2 rounded bg-surface border border-border-subtle text-text-tertiary">
               {shortcut}
             </kbd>
           )}

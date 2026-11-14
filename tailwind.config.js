@@ -37,6 +37,9 @@ export default {
           hover: 'var(--accent-hover)',
           subtle: 'var(--accent-subtle)',
           ring: 'var(--accent-ring)',
+          solid: 'var(--accent-solid)',
+          'solid-hover': 'var(--accent-solid-hover)',
+          'on-solid': 'var(--on-accent)',
         },
 
         // Single primary accent mapping
@@ -51,6 +54,7 @@ export default {
 
         status: {
           error: 'var(--status-error)',
+          danger: 'var(--status-danger, var(--status-error))',
           warn: 'var(--status-warn)',
           success: 'var(--status-success)',
         },

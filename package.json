@@ -1,7 +1,7 @@
 {
   "name": "chunklens",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,8 +9,12 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:verbose": "vitest run --reporter=verbose",
+    "test:egress": "node --experimental-websocket scripts/test-egress.cjs",
+    "test:e2e": "playwright test",
     "typecheck": "tsc -b",
-    "lint": "tsc -b"
+    "lint": "tsc -b",
+    "sync:csp": "node scripts/sync-csp.cjs",
+    "check:bundle": "node scripts/check-bundle.cjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -22,6 +26,8 @@
     "tailwind-merge": "^2.5.5"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.1",
+    "@playwright/test": "^1.49.1",
     "@types/node": "^22.10.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",

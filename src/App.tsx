@@ -1,23 +1,39 @@
-import React, { useState, useMemo, useEffect, useDeferredValue } from 'react';
+import React, { useState, useMemo, useEffect, useDeferredValue, Suspense } from 'react';
 import { ChunkingConfig, ChunkingStrategy } from './engine/types';
 import { SAMPLE_DOCUMENTS } from './data/samples';
 import { useChunkingWorker } from './engine/worker/useChunkingWorker';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { MetricsBar } from './components/MetricsBar';
+import { EmptyState } from './components/EmptyState';
 import { VisualCanvas } from './components/VisualCanvas';
 import { ChunkInspector } from './components/ChunkInspector';
-import { CommandPalette } from './components/CommandPalette';
-import { ComparisonView } from './components/ComparisonView';
-import { ExportModal } from './components/ExportModal';
-import { SimilarityHeatmap } from './components/SimilarityHeatmap';
-import { TokenizerComparisonModal } from './components/TokenizerComparisonModal';
-import { ToastProvider } from './components/ui/Toast';
+import { ToastProvider, useToast } from './components/ui/Toast';
 import { SegmentedControl } from './components/ui/SegmentedControl';
 import { Layers, Grid3X3, Edit3 } from 'lucide-react';
 import { loadStoredSession, saveStoredSession, clearStoredSession, DEFAULT_SESSION } from './utils/storage';
-import { DetectedFormatInfo, detectFileFormat, isPdfBuffer } from './utils/fileFormatDetector';
-import { useToast } from './components/ui/Toast';
+import { DetectedFormatInfo, detectFileFormat } from './utils/fileFormatDetector';
+import { useDocumentUpload } from './hooks/useDocumentUpload';
+import { ChunkLoadErrorBoundary } from './components/ui/ChunkLoadErrorBoundary';
+import { ModalLoadingFallback } from './components/ui/ModalLoadingFallback';
+
+// Lazy-load heavy modals and auxiliary views to keep main bundle well below budget
+const prefetchCommandPalette = () =>
+  import('./components/CommandPalette').then((m) => ({ default: m.CommandPalette }));
+const prefetchComparisonView = () =>
+  import('./components/ComparisonView').then((m) => ({ default: m.ComparisonView }));
+const prefetchExportModal = () =>
+  import('./components/ExportModal').then((m) => ({ default: m.ExportModal }));
+const prefetchSimilarityHeatmap = () =>
+  import('./components/SimilarityHeatmap').then((m) => ({ default: m.SimilarityHeatmap }));
+const prefetchTokenizerModal = () =>
+  import('./components/TokenizerComparisonModal').then((m) => ({ default: m.TokenizerComparisonModal }));
+
+const CommandPalette = React.lazy(prefetchCommandPalette);
+const ComparisonView = React.lazy(prefetchComparisonView);
+const ExportModal = React.lazy(prefetchExportModal);
+const SimilarityHeatmap = React.lazy(prefetchSimilarityHeatmap);
+const TokenizerComparisonModal = React.lazy(prefetchTokenizerModal);
 
 export const AppContent: React.FC = () => {
   // Load restored session or default sample
@@ -44,7 +60,32 @@ export const AppContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'visualizer' | 'heatmap' | 'editor'>('visualizer');
   const { success } = useToast();
 
-  // Persist session changes to localStorage
+  // Idle prefetching for modal dialogs (Cmd+K and Export)
+  useEffect(() => {
+    const idlePrefetch = () => {
+      prefetchCommandPalette();
+      prefetchExportModal();
+    };
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      const handle = (
+        window as unknown as {
+          requestIdleCallback: (cb: () => void, opts: { timeout: number }) => number;
+        }
+      ).requestIdleCallback(idlePrefetch, { timeout: 3000 });
+      return () => {
+        if ('cancelIdleCallback' in window) {
+          (
+            window as unknown as { cancelIdleCallback: (id: number) => void }
+          ).cancelIdleCallback(handle);
+        }
+      };
+    } else {
+      const timer = setTimeout(idlePrefetch, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  // Save session changes to localStorage
   useEffect(() => {
     saveStoredSession({
       selectedSampleId,
@@ -120,36 +161,18 @@ export const AppContent: React.FC = () => {
     }
   };
 
-  const handleDropFile = async (file: File) => {
-    try {
-      const buffer = await file.arrayBuffer();
-      const isPdf = file.name.toLowerCase().endsWith('.pdf') || isPdfBuffer(buffer);
-      if (isPdf) {
-        const { extractTextFromPdf } = await import('./utils/pdfParser');
-        const result = await extractTextFromPdf(buffer.slice(0));
-        if (result.text.trim()) {
-          const formatInfo: DetectedFormatInfo = {
-            formatId: 'pdf',
-            label: 'PDF Document',
-            badge: 'PDF',
-            extension: file.name.match(/\.[0-9a-z]+$/i)?.[0] || '.pdf',
-            recommendedStrategy: 'recursive',
-            confidence: 'high',
-            description: `Extracted ${result.pageCount} pages with structural page markers.`,
-          };
-          handleFileUpload(result.text, file.name, formatInfo);
-        }
-      } else {
-        const content = new TextDecoder('utf-8').decode(buffer);
-        if (content.trim()) {
-          const formatInfo = detectFileFormat(file.name, content);
-          handleFileUpload(content, file.name, formatInfo);
-        }
-      }
-    } catch (err) {
-      console.error('Failed to process dropped file:', err);
-    }
-  };
+  // Shared Document Upload Hook (for Sidebar and Empty-State dropzone)
+  const {
+    uploadError,
+    clearError,
+    isExtractingPdf,
+    processFile: handleFileUploadProcess,
+  } = useDocumentUpload({
+    onSuccess: (content, filename, formatInfo) => {
+      handleFileUpload(content, filename, formatInfo);
+    },
+    currentDocumentTitle: documentTitle,
+  });
 
   const handleResetToDefaults = () => {
     clearStoredSession();
@@ -159,6 +182,16 @@ export const AppContent: React.FC = () => {
     setConfig(DEFAULT_SESSION.config);
     setDetectedFormat(DEFAULT_SESSION.detectedFormat || null);
     setSelectedChunkId(null);
+    clearError();
+  };
+
+  const handleNewDocument = () => {
+    setSelectedSampleId(null);
+    setDocumentTitle('');
+    setRawText('');
+    setDetectedFormat(null);
+    setSelectedChunkId(null);
+    clearError();
   };
 
   // Find inspected chunk and immediate neighbors
@@ -184,6 +217,9 @@ export const AppContent: React.FC = () => {
         isSidebarOpen={isSidebarOpen}
         onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        onPrefetchExport={prefetchExportModal}
+        onPrefetchCommandPalette={prefetchCommandPalette}
+        onPrefetchTokenizer={prefetchTokenizerModal}
       />
 
       {/* App Shell Layout: Collapsible Sidebar + Hero Main Canvas + Pro Inspector */}
@@ -194,143 +230,197 @@ export const AppContent: React.FC = () => {
           onChangeConfig={setConfig}
           selectedSampleId={selectedSampleId}
           onSelectSample={handleSelectSample}
-          onFileUpload={handleFileUpload}
+          onFileUpload={handleFileUploadProcess}
+          onNewDocument={handleNewDocument}
+          currentDocumentTitle={documentTitle}
           detectedFormat={detectedFormat}
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
+          uploadError={uploadError}
+          onDismissError={clearError}
+          isExtractingPdf={isExtractingPdf}
+          onOpenTokenizerModal={() => setIsTokenizerModalOpen(true)}
+          onPrefetchTokenizerModal={prefetchTokenizerModal}
         />
 
         {/* Hero Content Canvas */}
         <main className="flex-1 flex flex-col min-w-0 bg-bg-base overflow-hidden">
-          {/* Slim Summary Strip */}
-          <MetricsBar
-            result={chunkingResult}
-            isProcessing={isProcessing}
-            onOpenTokenizerModal={() => setIsTokenizerModalOpen(true)}
-          />
-
-          {/* Canvas Subnavigation Bar */}
-          <div className="px-4 sm:px-6 py-2 border-b border-border-default bg-surface/30 flex items-center justify-between">
-            <SegmentedControl
-              variant="underline"
-              options={[
-                { value: 'visualizer', label: 'Chunks', icon: <Layers className="h-3.5 w-3.5" /> },
-                { value: 'heatmap', label: 'Similarity Heatmap', icon: <Grid3X3 className="h-3.5 w-3.5" /> },
-                { value: 'editor', label: 'Edit Raw Text', icon: <Edit3 className="h-3.5 w-3.5" /> },
-              ]}
-              value={activeTab}
-              onChange={(val) => setActiveTab(val as 'visualizer' | 'heatmap' | 'editor')}
+          {!rawText.trim() ? (
+            <EmptyState
+              onSelectSample={handleSelectSample}
+              onFileUpload={handleFileUploadProcess}
+              onPasteText={(text, title) => {
+                const formatInfo = detectFileFormat(title || 'Pasted Snippet', text);
+                handleFileUpload(text, title || 'Pasted Snippet', formatInfo);
+              }}
+              uploadError={uploadError}
+              onDismissError={clearError}
+              isExtractingPdf={isExtractingPdf}
             />
-          </div>
+          ) : (
+            <>
+              {/* Slim Summary Strip */}
+              <MetricsBar
+                result={chunkingResult}
+                isProcessing={isProcessing}
+              />
 
-          {/* Main View Area */}
-          <div className="flex-1 overflow-hidden flex">
-            {activeTab === 'editor' ? (
-              <div className="flex-1 p-6 flex flex-col bg-bg-base">
-                <div className="flex items-center justify-between pb-2 text-xs">
-                  <span className="font-medium text-text-secondary">Raw Document Source</span>
-                  <span className="font-mono text-text-tertiary tabular-nums">
-                    {rawText.length.toLocaleString()} characters
-                  </span>
-                </div>
-                <textarea
-                  value={rawText}
-                  onChange={(e) => setRawText(e.target.value)}
-                  placeholder="Paste or write document text to chunk..."
-                  className="flex-1 w-full bg-surface border border-border-default rounded-md p-4 font-mono text-xs text-text-primary leading-relaxed resize-none focus-ring transition-colors"
-                  spellCheck="false"
-                  aria-label="Raw document editor"
+              {/* Canvas Subnavigation Bar */}
+              <div className="px-4 sm:px-6 py-2 border-b border-border-default bg-surface/30 flex items-center justify-between">
+                <SegmentedControl
+                  variant="underline"
+                  options={[
+                    { value: 'visualizer', label: 'Chunks', icon: <Layers className="h-3.5 w-3.5" /> },
+                    { value: 'heatmap', label: 'Similarity Heatmap', icon: <Grid3X3 className="h-3.5 w-3.5" /> },
+                    { value: 'editor', label: 'Edit Raw Text', icon: <Edit3 className="h-3.5 w-3.5" /> },
+                  ]}
+                  value={activeTab}
+                  onChange={(val) => setActiveTab(val as 'visualizer' | 'heatmap' | 'editor')}
                 />
               </div>
-            ) : activeTab === 'heatmap' ? (
-              <SimilarityHeatmap chunks={chunkingResult.chunks} />
-            ) : isCompareMode ? (
-              <ComparisonView
-                rawText={deferredText}
-                primaryConfig={config}
-                onApplyVariantB={(newConfig) => {
-                  setConfig(newConfig);
-                  setIsCompareMode(false);
-                }}
-              />
-            ) : (
-              <VisualCanvas
-                chunks={chunkingResult.chunks}
-                selectedChunkId={selectedChunkId}
-                onSelectChunk={(chunkId) => {
-                  setSelectedChunkId(chunkId);
-                  if (chunkId) setIsInspectorOpen(true);
-                }}
-                detectedFormat={detectedFormat}
-                onDropFile={handleDropFile}
-                onLoadDefaultSample={() => handleSelectSample('attention-paper')}
-                onUploadClick={() => setIsSidebarOpen(true)}
-              />
-            )}
 
-            {/* Right Inspector Drawer (Collapsible, appears on chunk selection) */}
-            {activeTab === 'visualizer' && !isCompareMode && selectedChunk && isInspectorOpen && (
-              <ChunkInspector
-                chunk={selectedChunk}
-                totalChunks={chunkingResult.chunks.length}
-                prevChunk={prevChunk}
-                nextChunk={nextChunk}
-                detectedFormat={detectedFormat}
-                onSelectPrev={() => {
-                  if (selectedChunkIdx > 0) {
-                    setSelectedChunkId(chunkingResult.chunks[selectedChunkIdx - 1].id);
-                  }
-                }}
-                onSelectNext={() => {
-                  if (selectedChunkIdx < chunkingResult.chunks.length - 1) {
-                    setSelectedChunkId(chunkingResult.chunks[selectedChunkIdx + 1].id);
-                  }
-                }}
-                onClose={() => setIsInspectorOpen(false)}
-              />
-            )}
-          </div>
+              {/* Main View Area */}
+              <div className="flex-1 overflow-hidden flex">
+                {activeTab === 'editor' ? (
+                  <div className="flex-1 p-6 flex flex-col bg-bg-base">
+                    <div className="flex items-center justify-between pb-2 text-xs">
+                      <span className="font-medium text-text-secondary">Raw Document Source</span>
+                      <span className="font-mono text-text-tertiary tabular-nums">
+                        {rawText.length.toLocaleString()} characters
+                      </span>
+                    </div>
+                    <textarea
+                      value={rawText}
+                      onChange={(e) => setRawText(e.target.value)}
+                      placeholder="Paste or write document text to chunk..."
+                      className="flex-1 w-full bg-surface border border-border-default rounded-md p-4 font-mono text-xs text-text-primary leading-relaxed resize-none focus-ring transition-colors"
+                      spellCheck="false"
+                      aria-label="Raw document editor"
+                    />
+                  </div>
+                ) : activeTab === 'heatmap' ? (
+                  <ChunkLoadErrorBoundary fallbackTitle="Failed to load Similarity Heatmap">
+                    <Suspense fallback={<div className="p-8 text-center text-xs text-text-tertiary">Loading heatmap...</div>}>
+                      <SimilarityHeatmap chunks={chunkingResult.chunks} />
+                    </Suspense>
+                  </ChunkLoadErrorBoundary>
+                ) : isCompareMode ? (
+                  <ChunkLoadErrorBoundary fallbackTitle="Failed to load Comparison View">
+                    <Suspense fallback={<div className="p-8 text-center text-xs text-text-tertiary">Loading comparison...</div>}>
+                      <ComparisonView
+                        rawText={deferredText}
+                        primaryConfig={config}
+                        onApplyVariantB={(newConfig) => {
+                          setConfig(newConfig);
+                          setIsCompareMode(false);
+                        }}
+                      />
+                    </Suspense>
+                  </ChunkLoadErrorBoundary>
+                ) : (
+                  <VisualCanvas
+                    chunks={chunkingResult.chunks}
+                    selectedChunkId={selectedChunkId}
+                    onSelectChunk={(chunkId) => {
+                      setSelectedChunkId(chunkId);
+                      if (chunkId) setIsInspectorOpen(true);
+                    }}
+                    onDropFile={handleFileUploadProcess}
+                    onSelectSample={handleSelectSample}
+                    onPasteText={(text, title) => {
+                      const formatInfo = detectFileFormat(title || 'Pasted Snippet', text);
+                      handleFileUpload(text, title || 'Pasted Snippet', formatInfo);
+                    }}
+                    uploadError={uploadError}
+                    onDismissError={clearError}
+                    isExtractingPdf={isExtractingPdf}
+                  />
+                )}
+
+                {/* Right Inspector Drawer (Collapsible, appears on chunk selection) */}
+                {activeTab === 'visualizer' && !isCompareMode && selectedChunk && isInspectorOpen && (
+                  <ChunkInspector
+                    chunk={selectedChunk}
+                    totalChunks={chunkingResult.chunks.length}
+                    prevChunk={prevChunk}
+                    nextChunk={nextChunk}
+                    detectedFormat={detectedFormat}
+                    onSelectPrev={() => {
+                      if (selectedChunkIdx > 0) {
+                        setSelectedChunkId(chunkingResult.chunks[selectedChunkIdx - 1].id);
+                      }
+                    }}
+                    onSelectNext={() => {
+                      if (selectedChunkIdx < chunkingResult.chunks.length - 1) {
+                        setSelectedChunkId(chunkingResult.chunks[selectedChunkIdx + 1].id);
+                      }
+                    }}
+                    onClose={() => setIsInspectorOpen(false)}
+                  />
+                )}
+              </div>
+            </>
+          )}
         </main>
       </div>
 
       {/* Command Palette Modal (Cmd+K) */}
-      <CommandPalette
-        isOpen={isCommandPaletteOpen}
-        onClose={() => setIsCommandPaletteOpen(false)}
-        onSelectStrategy={(strategy: ChunkingStrategy) => setConfig({ ...config, strategy })}
-        currentStrategy={config.strategy}
-        onSelectSample={handleSelectSample}
-        onResetDocument={handleResetToDefaults}
-        onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
-        onToggleInspector={() => {
-          if (!isInspectorOpen && !selectedChunkId && chunkingResult.chunks.length > 0) {
-            setSelectedChunkId(chunkingResult.chunks[0].id);
-          }
-          setIsInspectorOpen((prev) => !prev);
-        }}
-        onOpenExport={() => setIsExportModalOpen(true)}
-        onOpenTokenizer={() => setIsTokenizerModalOpen(true)}
-        onSelectTab={(tab) => setActiveTab(tab)}
-        onToggleCompare={() => setIsCompareMode((prev) => !prev)}
-      />
+      <ChunkLoadErrorBoundary fallbackTitle="Failed to load Command Palette">
+        <Suspense fallback={isCommandPaletteOpen ? <ModalLoadingFallback label="Loading command palette..." /> : null}>
+          {isCommandPaletteOpen && (
+            <CommandPalette
+              isOpen={isCommandPaletteOpen}
+              onClose={() => setIsCommandPaletteOpen(false)}
+              onSelectStrategy={(strategy: ChunkingStrategy) => setConfig({ ...config, strategy })}
+              currentStrategy={config.strategy}
+              onSelectSample={handleSelectSample}
+              onNewDocument={handleNewDocument}
+              onResetDocument={handleResetToDefaults}
+              onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
+              onToggleInspector={() => {
+                if (!isInspectorOpen && !selectedChunkId && chunkingResult.chunks.length > 0) {
+                  setSelectedChunkId(chunkingResult.chunks[0].id);
+                }
+                setIsInspectorOpen((prev) => !prev);
+              }}
+              onOpenExport={() => setIsExportModalOpen(true)}
+              onOpenTokenizer={() => setIsTokenizerModalOpen(true)}
+              onSelectTab={setActiveTab}
+              onToggleCompare={() => setIsCompareMode(!isCompareMode)}
+            />
+          )}
+        </Suspense>
+      </ChunkLoadErrorBoundary>
 
-      {/* Export Code & Dataset Modal */}
-      <ExportModal
-        isOpen={isExportModalOpen}
-        onClose={() => setIsExportModalOpen(false)}
-        config={config}
-        chunks={chunkingResult.chunks}
-        docTitle={documentTitle}
-      />
+      {/* Code & Data Export Modal */}
+      <ChunkLoadErrorBoundary fallbackTitle="Failed to load Export options">
+        <Suspense fallback={isExportModalOpen ? <ModalLoadingFallback label="Loading export options..." /> : null}>
+          {isExportModalOpen && (
+            <ExportModal
+              isOpen={isExportModalOpen}
+              onClose={() => setIsExportModalOpen(false)}
+              config={config}
+              chunks={chunkingResult.chunks}
+              docTitle={documentTitle}
+            />
+          )}
+        </Suspense>
+      </ChunkLoadErrorBoundary>
 
-      {/* Multi-Model Tokenizer Comparison Matrix Modal */}
-      <TokenizerComparisonModal
-        isOpen={isTokenizerModalOpen}
-        onClose={() => setIsTokenizerModalOpen(false)}
-        rawText={deferredText}
-        chunks={chunkingResult.chunks}
-        baselineEncoding={config.encoding}
-      />
+      {/* Tokenizer Comparison & Cost Analyzer Modal */}
+      <ChunkLoadErrorBoundary fallbackTitle="Failed to load Tokenizer comparison">
+        <Suspense fallback={isTokenizerModalOpen ? <ModalLoadingFallback label="Loading tokenizer comparison..." /> : null}>
+          {isTokenizerModalOpen && (
+            <TokenizerComparisonModal
+              isOpen={isTokenizerModalOpen}
+              onClose={() => setIsTokenizerModalOpen(false)}
+              rawText={rawText}
+              chunks={chunkingResult.chunks}
+              baselineEncoding={config.encoding}
+            />
+          )}
+        </Suspense>
+      </ChunkLoadErrorBoundary>
     </div>
   );
 };

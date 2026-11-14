@@ -142,7 +142,7 @@ export const ChunkInspector: React.FC<ChunkInspectorProps> = ({
           <span className="font-semibold text-text-primary text-xs">
             Chunk #{chunk.index + 1}
           </span>
-          <span className="text-text-tertiary font-mono text-[11px] tabular-nums">
+          <span className="text-text-tertiary font-mono text-xs tabular-nums">
             of {totalChunks}
           </span>
         </div>
@@ -186,31 +186,31 @@ export const ChunkInspector: React.FC<ChunkInspectorProps> = ({
       <div className="flex-1 overflow-y-auto p-3.5 space-y-4 text-xs">
         {/* Token & Character Metrics */}
         <div>
-          <span className="text-[10px] uppercase font-mono tracking-wider text-text-tertiary font-semibold block mb-2">
-            Metrics & Sizing
+          <span className="text-xs font-sans text-text-secondary font-medium block mb-2">
+            Metrics & sizing
           </span>
           <div className="grid grid-cols-2 gap-2">
             <div className="p-2.5 rounded-md bg-elevated border border-border-subtle">
-              <span className="text-[10px] text-text-tertiary block">Tokens</span>
+              <span className="text-xs text-text-tertiary block">Tokens</span>
               <span className="text-sm font-semibold text-text-primary font-mono tabular-nums">
                 {chunk.tokenCount.toLocaleString()}
               </span>
             </div>
             <div className="p-2.5 rounded-md bg-elevated border border-border-subtle">
-              <span className="text-[10px] text-text-tertiary block">Characters</span>
+              <span className="text-xs text-text-tertiary block">Characters</span>
               <span className="text-sm font-semibold text-text-primary font-mono tabular-nums">
                 {chunk.charCount.toLocaleString()}
               </span>
             </div>
           </div>
-          <div className="mt-2 flex items-center justify-between px-2 py-1.5 rounded bg-surface border border-border-subtle text-[11px] font-mono text-text-secondary">
+          <div className="mt-2 flex items-center justify-between px-2 py-1.5 rounded bg-surface border border-border-subtle text-xs font-mono text-text-secondary">
             <span>Density Ratio</span>
             <span className="tabular-nums font-semibold text-text-primary">
               {charsPerToken} ch/tok
             </span>
           </div>
           {detectedFormat && (
-            <div className="mt-1.5 flex items-center justify-between px-2 py-1.5 rounded bg-surface border border-border-subtle text-[11px] font-mono text-text-secondary">
+            <div className="mt-1.5 flex items-center justify-between px-2 py-1.5 rounded bg-surface border border-border-subtle text-xs font-mono text-text-secondary">
               <span>File Format</span>
               <span className="font-semibold text-accent">
                 {detectedFormat.badge} ({detectedFormat.label})
@@ -221,8 +221,8 @@ export const ChunkInspector: React.FC<ChunkInspectorProps> = ({
 
         {/* Boundary Diagnostics */}
         <div>
-          <span className="text-[10px] uppercase font-mono tracking-wider text-text-tertiary font-semibold block mb-2">
-            Boundary Diagnostics
+          <span className="text-xs font-sans text-text-secondary font-medium block mb-2">
+            Boundary diagnostics
           </span>
           <div className="p-2.5 rounded-md bg-elevated border border-border-subtle space-y-2">
             <div className="flex items-start justify-between gap-2">
@@ -237,12 +237,12 @@ export const ChunkInspector: React.FC<ChunkInspectorProps> = ({
                 <span>{boundary.label}</span>
               </div>
             </div>
-            <p className="text-[11px] text-text-secondary leading-snug">
+            <p className="text-xs text-text-secondary leading-snug">
               {boundary.detail}
             </p>
 
             {chunk.isOrphan && (
-              <div className="p-2 rounded bg-status-warn/10 border border-status-warn/25 text-[11px] text-status-warn leading-tight">
+              <div className="p-2 rounded bg-status-warn/10 border border-status-warn/25 text-xs text-status-warn leading-tight">
                 Truncated mid-word. Consider increasing target chunk size or lowering overlap.
               </div>
             )}
@@ -251,10 +251,10 @@ export const ChunkInspector: React.FC<ChunkInspectorProps> = ({
 
         {/* Neighbor Overlap */}
         <div>
-          <span className="text-[10px] uppercase font-mono tracking-wider text-text-tertiary font-semibold block mb-2">
-            Overlap & Context Window
+          <span className="text-xs font-sans text-text-secondary font-medium block mb-2">
+            Overlap & context window
           </span>
-          <div className="space-y-1.5 font-mono text-[11px]">
+          <div className="space-y-1.5 font-mono text-xs">
             <div className="p-2 rounded bg-elevated border border-border-subtle flex items-center justify-between">
               <span className="text-text-secondary">
                 {prevChunk ? `Overlap with #${prevChunk.index + 1}:` : 'Overlap Previous:'}
@@ -285,10 +285,10 @@ export const ChunkInspector: React.FC<ChunkInspectorProps> = ({
         {/* Section Header Metadata */}
         {chunk.sectionHeader && (
           <div>
-            <span className="text-[10px] uppercase font-mono tracking-wider text-text-tertiary font-semibold block mb-2">
-              Structural Section
+            <span className="text-xs font-sans text-text-secondary font-medium block mb-2">
+              Structural section
             </span>
-            <div className="p-2 rounded bg-elevated border border-border-subtle flex items-center space-x-2 text-text-secondary text-[11px]">
+            <div className="p-2 rounded bg-elevated border border-border-subtle flex items-center space-x-2 text-text-secondary text-xs">
               <Bookmark className="h-3.5 w-3.5 text-accent shrink-0" />
               <span className="truncate">{chunk.sectionHeader}</span>
             </div>
@@ -298,12 +298,12 @@ export const ChunkInspector: React.FC<ChunkInspectorProps> = ({
         {/* Chunk Content Preview */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] uppercase font-mono tracking-wider text-text-tertiary font-semibold">
-              Content Preview
+            <span className="text-xs font-sans text-text-secondary font-medium">
+              Content preview
             </span>
             <button
               onClick={handleCopy}
-              className="h-6 px-2 rounded bg-elevated hover:bg-surface border border-border-default hover:border-border-hover text-text-secondary hover:text-text-primary flex items-center space-x-1 font-mono text-[10px] transition-colors active-press focus-ring"
+              className="h-6 px-2 rounded bg-elevated hover:bg-surface border border-border-default hover:border-border-hover text-text-secondary hover:text-text-primary flex items-center space-x-1 font-mono text-xs transition-colors active-press focus-ring"
               title="Copy chunk text (or C)"
             >
               {hasCopied ? (
@@ -315,7 +315,7 @@ export const ChunkInspector: React.FC<ChunkInspectorProps> = ({
                 <>
                   <Copy className="h-3 w-3" />
                   <span>Copy</span>
-                  <kbd className="text-[9px] px-1 py-0.2 rounded bg-surface border border-border-subtle">
+                  <kbd className="text-xs px-1 py-0.2 rounded bg-surface border border-border-subtle">
                     C
                   </kbd>
                 </>

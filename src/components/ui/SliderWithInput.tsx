@@ -59,7 +59,7 @@ export const SliderWithInput: React.FC<SliderWithInputProps> = ({
             className="h-6 w-16 text-right font-mono text-xs tabular-nums bg-surface border border-border-default hover:border-border-hover rounded px-1.5 text-text-primary focus-ring"
           />
           {unitLabel && (
-            <span className="text-[11px] text-text-tertiary font-mono select-none">
+            <span className="text-xs text-text-tertiary font-mono select-none">
               {unitLabel}
             </span>
           )}
@@ -82,7 +82,7 @@ export const SliderWithInput: React.FC<SliderWithInputProps> = ({
       </div>
 
       {/* Min / Max Range Indicators */}
-      <div className="flex justify-between text-[10px] text-text-tertiary font-mono tabular-nums select-none -mt-1">
+      <div className="flex justify-between text-xs text-text-tertiary font-mono tabular-nums select-none -mt-1">
         <span>{min}</span>
         <span>{max}</span>
       </div>

@@ -14,7 +14,7 @@ Welcome to the Vector Search Engine API. This document explains index creation, 
 All requests must include a Bearer token in the \`Authorization\` header:
 \`\`\`bash
 curl -X POST https://api.vectorsearch.io/v1/collections \\
-  -H "Authorization: Bearer vsec_live_994827104" \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json"
 \`\`\`
 

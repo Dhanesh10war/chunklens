@@ -1,0 +1,410 @@
+{
+  "timestamp": "2026-11-14T07:35:52.043Z",
+  "screenshotsCount": 18,
+  "overflowMeasurements": {
+    "loaded": {
+      "w1440": {
+        "state": "loaded",
+        "viewport": "1440x900",
+        "viewportWidth": 1440,
+        "docScrollWidth": 1434,
+        "docNoOverflow": true,
+        "header": {
+          "scrollWidth": 1434,
+          "clientWidth": 1434,
+          "noOverflow": true
+        },
+        "metrics": {
+          "present": true,
+          "scrollWidth": 1114,
+          "clientWidth": 1114,
+          "noOverflow": true
+        },
+        "visibility": {
+          "exportVisible": true,
+          "privacyVisible": true,
+          "privacyTargetSize": {
+            "width": 310,
+            "height": 28
+          },
+          "privacyTargetSizeAdequate": true
+        }
+      },
+      "w1024": {
+        "state": "loaded",
+        "viewport": "1024x768",
+        "viewportWidth": 1024,
+        "docScrollWidth": 1018,
+        "docNoOverflow": true,
+        "header": {
+          "scrollWidth": 1018,
+          "clientWidth": 1018,
+          "noOverflow": true
+        },
+        "metrics": {
+          "present": true,
+          "scrollWidth": 698,
+          "clientWidth": 698,
+          "noOverflow": true
+        },
+        "visibility": {
+          "exportVisible": true,
+          "privacyVisible": true,
+          "privacyTargetSize": {
+            "width": 30,
+            "height": 28
+          },
+          "privacyTargetSizeAdequate": true
+        }
+      },
+      "w768": {
+        "state": "loaded",
+        "viewport": "768x1024",
+        "viewportWidth": 768,
+        "docScrollWidth": 768,
+        "docNoOverflow": true,
+        "header": {
+          "scrollWidth": 768,
+          "clientWidth": 768,
+          "noOverflow": true
+        },
+        "metrics": {
+          "present": true,
+          "scrollWidth": 768,
+          "clientWidth": 768,
+          "noOverflow": true
+        },
+        "visibility": {
+          "exportVisible": true,
+          "privacyVisible": true,
+          "privacyTargetSize": {
+            "width": 30,
+            "height": 28
+          },
+          "privacyTargetSizeAdequate": true
+        }
+      },
+      "w375": {
+        "state": "loaded",
+        "viewport": "375x812",
+        "viewportWidth": 375,
+        "docScrollWidth": 375,
+        "docNoOverflow": true,
+        "header": {
+          "scrollWidth": 375,
+          "clientWidth": 375,
+          "noOverflow": true
+        },
+        "metrics": {
+          "present": true,
+          "scrollWidth": 375,
+          "clientWidth": 375,
+          "noOverflow": true
+        },
+        "visibility": {
+          "exportVisible": true,
+          "privacyVisible": true,
+          "privacyTargetSize": {
+            "width": 30,
+            "height": 28
+          },
+          "privacyTargetSizeAdequate": true
+        }
+      }
+    },
+    "empty": {
+      "w1440": {
+        "state": "empty",
+        "viewport": "1440x900",
+        "viewportWidth": 1440,
+        "docScrollWidth": 1434,
+        "docNoOverflow": true,
+        "header": {
+          "scrollWidth": 1434,
+          "clientWidth": 1434,
+          "noOverflow": true
+        },
+        "metrics": {
+          "present": false
+        },
+        "visibility": {
+          "exportVisible": true,
+          "privacyVisible": true,
+          "privacyTargetSize": {
+            "width": 310,
+            "height": 28
+          },
+          "privacyTargetSizeAdequate": true
+        }
+      },
+      "w1024": {
+        "state": "empty",
+        "viewport": "1024x768",
+        "viewportWidth": 1024,
+        "docScrollWidth": 1018,
+        "docNoOverflow": true,
+        "header": {
+          "scrollWidth": 1018,
+          "clientWidth": 1018,
+          "noOverflow": true
+        },
+        "metrics": {
+          "present": false
+        },
+        "visibility": {
+          "exportVisible": true,
+          "privacyVisible": true,
+          "privacyTargetSize": {
+            "width": 30,
+            "height": 28
+          },
+          "privacyTargetSizeAdequate": true
+        }
+      },
+      "w768": {
+        "state": "empty",
+        "viewport": "768x1024",
+        "viewportWidth": 768,
+        "docScrollWidth": 768,
+        "docNoOverflow": true,
+        "header": {
+          "scrollWidth": 768,
+          "clientWidth": 768,
+          "noOverflow": true
+        },
+        "metrics": {
+          "present": false
+        },
+        "visibility": {
+          "exportVisible": true,
+          "privacyVisible": true,
+          "privacyTargetSize": {
+            "width": 30,
+            "height": 28
+          },
+          "privacyTargetSizeAdequate": true
+        }
+      },
+      "w375": {
+        "state": "empty",
+        "viewport": "375x812",
+        "viewportWidth": 375,
+        "docScrollWidth": 375,
+        "docNoOverflow": true,
+        "header": {
+          "scrollWidth": 375,
+          "clientWidth": 375,
+          "noOverflow": true
+        },
+        "metrics": {
+          "present": false
+        },
+        "visibility": {
+          "exportVisible": true,
+          "privacyVisible": true,
+          "privacyTargetSize": {
+            "width": 30,
+            "height": 28
+          },
+          "privacyTargetSizeAdequate": true
+        }
+      }
+    },
+    "error": {
+      "w1440": {
+        "state": "error",
+        "viewport": "1440x900",
+        "viewportWidth": 1440,
+        "docScrollWidth": 1434,
+        "docNoOverflow": true,
+        "header": {
+          "scrollWidth": 1434,
+          "clientWidth": 1434,
+          "noOverflow": true
+        },
+        "metrics": {
+          "present": false
+        },
+        "visibility": {
+          "exportVisible": true,
+          "privacyVisible": true,
+          "privacyTargetSize": {
+            "width": 310,
+            "height": 28
+          },
+          "privacyTargetSizeAdequate": true
+        }
+      },
+      "w1024": {
+        "state": "error",
+        "viewport": "1024x768",
+        "viewportWidth": 1024,
+        "docScrollWidth": 1018,
+        "docNoOverflow": true,
+        "header": {
+          "scrollWidth": 1018,
+          "clientWidth": 1018,
+          "noOverflow": true
+        },
+        "metrics": {
+          "present": false
+        },
+        "visibility": {
+          "exportVisible": true,
+          "privacyVisible": true,
+          "privacyTargetSize": {
+            "width": 30,
+            "height": 28
+          },
+          "privacyTargetSizeAdequate": true
+        }
+      },
+      "w768": {
+        "state": "error",
+        "viewport": "768x1024",
+        "viewportWidth": 768,
+        "docScrollWidth": 768,
+        "docNoOverflow": true,
+        "header": {
+          "scrollWidth": 768,
+          "clientWidth": 768,
+          "noOverflow": true
+        },
+        "metrics": {
+          "present": false
+        },
+        "visibility": {
+          "exportVisible": true,
+          "privacyVisible": true,
+          "privacyTargetSize": {
+            "width": 30,
+            "height": 28
+          },
+          "privacyTargetSizeAdequate": true
+        }
+      },
+      "w375": {
+        "state": "error",
+        "viewport": "375x812",
+        "viewportWidth": 375,
+        "docScrollWidth": 375,
+        "docNoOverflow": true,
+        "header": {
+          "scrollWidth": 375,
+          "clientWidth": 375,
+          "noOverflow": true
+        },
+        "metrics": {
+          "present": false
+        },
+        "visibility": {
+          "exportVisible": true,
+          "privacyVisible": true,
+          "privacyTargetSize": {
+            "width": 30,
+            "height": 28
+          },
+          "privacyTargetSizeAdequate": true
+        }
+      }
+    }
+  },
+  "loadedAudit_1440": {
+    "state": "loaded",
+    "viewport": "1440x900",
+    "totalDomNodes": 428,
+    "customDomA11yViolationsCount": 0,
+    "customDomA11yViolations": [],
+    "sub12Count": 0,
+    "sub12Elements": [],
+    "hasAlertRole": false
+  },
+  "loadedAudit_375": {
+    "state": "loaded",
+    "viewport": "375x812",
+    "totalDomNodes": 263,
+    "customDomA11yViolationsCount": 0,
+    "customDomA11yViolations": [],
+    "sub12Count": 0,
+    "sub12Elements": [],
+    "hasAlertRole": false
+  },
+  "emptyAudit_1440": {
+    "state": "empty",
+    "viewport": "1440x900",
+    "totalDomNodes": 397,
+    "customDomA11yViolationsCount": 0,
+    "customDomA11yViolations": [],
+    "sub12Count": 0,
+    "sub12Elements": [],
+    "hasAlertRole": false
+  },
+  "emptyAudit_375": {
+    "state": "empty",
+    "viewport": "375x812",
+    "totalDomNodes": 234,
+    "customDomA11yViolationsCount": 0,
+    "customDomA11yViolations": [],
+    "sub12Count": 0,
+    "sub12Elements": [],
+    "hasAlertRole": false
+  },
+  "errorAudit_1440": {
+    "state": "error",
+    "viewport": "1440x900",
+    "totalDomNodes": 434,
+    "customDomA11yViolationsCount": 0,
+    "customDomA11yViolations": [],
+    "sub12Count": 0,
+    "sub12Elements": [],
+    "hasAlertRole": true
+  },
+  "errorAudit_375": {
+    "state": "error",
+    "viewport": "375x812",
+    "totalDomNodes": 253,
+    "customDomA11yViolationsCount": 0,
+    "customDomA11yViolations": [],
+    "sub12Count": 0,
+    "sub12Elements": [],
+    "hasAlertRole": true
+  },
+  "keyboardCheck": {
+    "dropzoneAccessible": true,
+    "dropzoneLabel": "Upload document dropzone: drop files or click to browse",
+    "cardsCount": 6,
+    "allCardsFocusable": true,
+    "hasAlertBanner": true,
+    "alertText": "Failed to process “corrupt.pdf”Invalid PDF format: File structure is malformed.Choose another file"
+  },
+  "exportContrastCheck": {
+    "textColor": "rgb(255, 255, 255)",
+    "backgroundColor": "rgb(79, 70, 229)",
+    "textLuminance": 1,
+    "bgLuminance": 0.11699725241042669,
+    "contrastRatio": 6.29,
+    "satisfiesWcagAA": true
+  },
+  "errorBannerContrastCheck": {
+    "dangerTokenColor": "oklch(0.65 0.15 25)",
+    "iconColor": "oklch(0.65 0.15 25)",
+    "iconMatchesDangerToken": true,
+    "borderLeftWidth": "2px",
+    "borderLeftColor": "oklch(0.65 0.15 25)",
+    "borderLeftMatchesDangerToken": true,
+    "bannerBgRaw": "rgba(0, 0, 0, 0)",
+    "effectiveParentBg": "rgb(17, 17, 19)",
+    "compositedBannerBg": "rgb(17, 17, 19)",
+    "contrastRatio": 5.45,
+    "satisfies3to1": true
+  },
+  "overflowMenuCheck": {
+    "triggerFound": true,
+    "menuRenderedOnOpen": true,
+    "itemsCount": 6,
+    "firstItemFocusedOnOpen": true,
+    "secondItemFocusedOnArrowDown": true,
+    "menuClosedAfterEscape": true,
+    "focusReturnedToTrigger": true
+  }
+}

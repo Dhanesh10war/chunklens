@@ -68,7 +68,7 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ primaryConfig, r
             <button
               onClick={() => handleUnitToggle('tokens')}
               className={cn(
-                'px-2 text-[11px] rounded active-press focus-ring transition-colors',
+                'px-2 text-xs rounded active-press focus-ring transition-colors',
                 secondaryConfig.unit === 'tokens' ? 'bg-primary-600/30 text-primary-200 font-semibold border border-primary-500/30' : 'text-slate-400'
               )}
             >
@@ -77,7 +77,7 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ primaryConfig, r
             <button
               onClick={() => handleUnitToggle('characters')}
               className={cn(
-                'px-2 text-[11px] rounded active-press focus-ring transition-colors',
+                'px-2 text-xs rounded active-press focus-ring transition-colors',
                 secondaryConfig.unit === 'characters' ? 'bg-primary-600/30 text-primary-200 font-semibold border border-primary-500/30' : 'text-slate-400'
               )}
             >
@@ -123,7 +123,7 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ primaryConfig, r
                 encoding: e.target.value as TokenizerEncoding,
               })
             }
-            className="h-7 bg-canvas border border-border rounded px-1.5 text-slate-200 text-[11px] focus-ring hover:border-border-hover"
+            className="h-7 bg-canvas border border-border rounded px-1.5 text-slate-200 text-xs focus-ring hover:border-border-hover"
           >
             <option value="o200k_base">o200k</option>
             <option value="cl100k_base">cl100k</option>
@@ -136,7 +136,7 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ primaryConfig, r
         {/* Panel A */}
         <div className="flex flex-col h-full overflow-hidden">
           <div className="p-3 bg-panel border-b border-border flex items-center justify-between text-xs font-mono">
-            <span className="font-semibold text-primary-400 uppercase tracking-wide">
+            <span className="font-semibold text-primary-400">
               Variant A: {primaryConfig.strategy} ({primaryConfig.chunkSize} {primaryConfig.unit})
             </span>
             <div className="flex items-center space-x-3 text-slate-400 tabular-nums">
@@ -151,7 +151,7 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ primaryConfig, r
                 key={c.id}
                 className="p-3.5 rounded-lg border border-border bg-surface hover:border-border-hover transition-colors shadow-subtle"
               >
-                <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 mb-1.5 pb-1 border-b border-white/5">
+                <div className="flex items-center justify-between text-xs font-mono text-slate-400 mb-1.5 pb-1 border-b border-white/5">
                   <span className="text-primary-300 font-bold tabular-nums">#{c.index + 1}</span>
                   {c.sectionHeader && <span className="text-slate-300 truncate max-w-[140px]">[{c.sectionHeader}]</span>}
                   <span className="tabular-nums">{c.tokenCount} tokens ({c.charCount} chars)</span>
@@ -165,7 +165,7 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ primaryConfig, r
         {/* Panel B */}
         <div className="flex flex-col h-full overflow-hidden">
           <div className="p-3 bg-panel border-b border-border flex items-center justify-between text-xs font-mono">
-            <span className="font-semibold text-accent-cyan uppercase tracking-wide">
+            <span className="font-semibold text-accent-cyan">
               Variant B: {secondaryConfig.strategy} ({secondaryConfig.chunkSize} {secondaryConfig.unit})
             </span>
             <div className="flex items-center space-x-2 text-slate-400 tabular-nums">
@@ -190,7 +190,7 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ primaryConfig, r
                 key={c.id}
                 className="p-3.5 rounded-lg border border-border bg-surface hover:border-border-hover transition-colors shadow-subtle"
               >
-                <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 mb-1.5 pb-1 border-b border-white/5">
+                <div className="flex items-center justify-between text-xs font-mono text-slate-400 mb-1.5 pb-1 border-b border-white/5">
                   <span className="text-accent-cyan font-bold tabular-nums">#{c.index + 1}</span>
                   {c.sectionHeader && <span className="text-slate-300 truncate max-w-[140px]">[{c.sectionHeader}]</span>}
                   <span className="tabular-nums">{c.tokenCount} tokens ({c.charCount} chars)</span>
