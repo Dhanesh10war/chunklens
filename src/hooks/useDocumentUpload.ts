@@ -62,7 +62,7 @@ export async function validateAndProcessDocumentFile(
   options: ProcessDocumentOptions
 ): Promise<boolean> {
   const filename = file.name;
-  const retainedTitle = options.currentDocumentTitle || 'current document';
+  const retainedTitle = options.currentDocumentTitle?.trim() ? options.currentDocumentTitle.trim() : undefined;
 
   // 1. Check for 0-byte file
   if (file.size === 0) {

@@ -169,4 +169,38 @@ describe('validateAndProcessDocumentFile', () => {
       expect(err.category).not.toBe('corrupt');
     }
   });
+
+  it('omits retainedDocTitle when no current document exists', async () => {
+    let capturedError: UploadErrorInfo | undefined = undefined;
+    const zeroByteFile = new File([], 'empty.txt', { type: 'text/plain' });
+
+    const ok = await validateAndProcessDocumentFile(zeroByteFile, {
+      currentDocumentTitle: undefined,
+      onSuccess: vi.fn(),
+      onError: (err) => {
+        capturedError = err;
+      },
+    });
+
+    expect(ok).toBe(false);
+    expect(capturedError).toBeDefined();
+    expect(capturedError?.retainedDocTitle).toBeUndefined();
+  });
+
+  it('preserves exact current document title when one exists', async () => {
+    let capturedError: UploadErrorInfo | undefined = undefined;
+    const zeroByteFile = new File([], 'empty.txt', { type: 'text/plain' });
+
+    const ok = await validateAndProcessDocumentFile(zeroByteFile, {
+      currentDocumentTitle: 'Attention & Retrieval in Transformer Models',
+      onSuccess: vi.fn(),
+      onError: (err) => {
+        capturedError = err;
+      },
+    });
+
+    expect(ok).toBe(false);
+    expect(capturedError).toBeDefined();
+    expect(capturedError?.retainedDocTitle).toBe('Attention & Retrieval in Transformer Models');
+  });
 });

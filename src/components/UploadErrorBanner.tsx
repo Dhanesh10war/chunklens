@@ -76,14 +76,14 @@ export const UploadErrorBanner: React.FC<UploadErrorBannerProps> = ({
           onClick={onDismiss}
           className="text-text-tertiary hover:text-text-primary p-0.5 rounded hover:bg-surface focus-ring transition-colors shrink-0"
           title="Dismiss alert"
-          aria-label="Dismiss error"
+          aria-label="Dismiss"
         >
           <X className="h-3.5 w-3.5" />
         </button>
       </div>
 
-      <div className="flex items-center gap-2 pt-1 border-t border-status-danger/20">
-        {onChooseAnotherFile && (
+      {onChooseAnotherFile && (
+        <div className="flex items-center gap-2 pt-1 border-t border-status-danger/20">
           <button
             onClick={onChooseAnotherFile}
             className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium rounded bg-status-danger/20 hover:bg-status-danger/30 text-text-primary transition-colors focus-ring"
@@ -91,14 +91,8 @@ export const UploadErrorBanner: React.FC<UploadErrorBannerProps> = ({
             <FolderOpen className="h-3 w-3" />
             <span>Choose another file</span>
           </button>
-        )}
-        <button
-          onClick={onDismiss}
-          className="px-2 py-1 text-xs text-text-secondary hover:text-text-primary rounded hover:bg-surface transition-colors focus-ring"
-        >
-          Dismiss
-        </button>
-      </div>
+        </div>
+      )}
     </div>
   );
 };
