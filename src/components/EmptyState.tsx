@@ -68,7 +68,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono bg-accent-subtle text-accent border border-accent/20 select-none">
             <ShieldCheck className="h-3.5 w-3.5" />
-            <span>100% Client-Side · Zero Network Egress</span>
+            <span>100% client-side · zero network egress</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-text-primary">
             Document Chunking &amp; RAG Cost Workbench
@@ -126,22 +126,36 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 
             <div className="space-y-1">
               <p className="text-sm font-semibold text-text-primary">
-                {isExtractingPdf ? 'Extracting text from PDF in browser...' : 'Drop your document here, or click to browse'}
+                {isExtractingPdf ? (
+                  'Extracting text from PDF in browser...'
+                ) : (
+                  <>
+                    <span className="hidden [@media(pointer:coarse)]:inline">Tap to choose a file</span>
+                    <span className="inline [@media(pointer:coarse)]:hidden">Drop your document here, or click to browse</span>
+                  </>
+                )}
               </p>
               <p className="text-xs text-text-secondary">
                 Supported formats: <span className="font-mono text-text-primary">.pdf, .md, .csv, .json, .txt, .py, .ts, .js</span>
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-text-tertiary font-mono pt-1">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                fileInputRef.current?.click();
+              }}
+              className="text-xs mt-1"
+            >
+              Choose file
+            </Button>
+
+            <div className="flex flex-col items-center gap-0.5 text-xs text-text-tertiary font-mono pt-1">
               <span>Limit: 10 MB</span>
-              <span>·</span>
               <span>Automatic format recognition</span>
-              <span>·</span>
-              <span className="text-status-success flex items-center gap-1">
-                <Check className="h-3 w-3" />
-                Files never leave your browser
-              </span>
             </div>
           </div>
         </div>
