@@ -165,7 +165,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 text-xs text-text-secondary min-w-0">
                 <ClipboardPaste className="h-4 w-4 text-text-tertiary shrink-0" />
-                <span className="truncate">Need to inspect a quick snippet or raw prompt?</span>
+                <span className="whitespace-nowrap">Have a snippet?</span>
               </div>
               <Button
                 variant="secondary"

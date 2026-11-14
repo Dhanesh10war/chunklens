@@ -44,7 +44,7 @@ describe('EmptyState', () => {
     expect(html).toContain('6 bundled benchmarks');
   });
 
-  it('renders paste text option', () => {
+  it('renders paste text option with concise untruncated prompt', () => {
     const html = renderToString(
       <EmptyState
         onSelectSample={vi.fn()}
@@ -56,5 +56,6 @@ describe('EmptyState', () => {
     );
 
     expect(html).toContain('Paste text');
+    expect(html).toContain('Have a snippet?');
   });
 });
