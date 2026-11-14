@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-14T06:55:46.824Z",
+  "timestamp": "2026-11-14T07:26:09.965Z",
   "screenshotsCount": 18,
   "overflowMeasurements": {
     "loaded": {
@@ -312,7 +312,7 @@
   "loadedAudit_1440": {
     "state": "loaded",
     "viewport": "1440x900",
-    "totalDomNodes": 413,
+    "totalDomNodes": 414,
     "customDomA11yViolationsCount": 0,
     "customDomA11yViolations": [],
     "sub12Count": 0,
@@ -322,7 +322,7 @@
   "loadedAudit_375": {
     "state": "loaded",
     "viewport": "375x812",
-    "totalDomNodes": 248,
+    "totalDomNodes": 249,
     "customDomA11yViolationsCount": 0,
     "customDomA11yViolations": [],
     "sub12Count": 0,

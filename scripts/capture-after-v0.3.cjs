@@ -320,6 +320,45 @@ async function run() {
     await capture(client, 'loaded_1024.png', 1024, 768);
     const loadedOverflow_1024 = await measureOverflow(client, 'loaded', 1024, 768);
 
+    // Verify V6 (no bordered description) and V7 (compact left-aligned metrics rows with hairline dividers) at 1024px
+    const v6v7Check_1024 = await client.send('Runtime.evaluate', {
+      expression: `(() => {
+        // V6: Algorithm description styling in sidebar
+        const algoDesc = Array.from(document.querySelectorAll('div')).find(d => 
+          d.textContent.includes('Recursively tries separators') && d.children.length === 0
+        );
+        const algoCs = algoDesc ? window.getComputedStyle(algoDesc) : null;
+        const algoBorder = algoCs ? algoCs.borderTopWidth : null;
+        const algoHasCardClasses = algoDesc ? (algoDesc.className.includes('bg-elevated') || algoDesc.className.includes('border-border-subtle')) : false;
+
+        // V7: Metrics bar below xl (at 1024px)
+        const metricsContainer = document.querySelector('.xl\\\\:hidden[class*="flex-wrap"]') || document.querySelector('[data-testid="mobile-metric-tokens"]')?.parentElement;
+        const metricsCs = metricsContainer ? window.getComputedStyle(metricsContainer) : null;
+        const dividers = Array.from(document.querySelectorAll('.xl\\\\:hidden span[aria-hidden="true"]'));
+        const hasPipeChars = metricsContainer ? metricsContainer.textContent.includes('|') : false;
+
+        return {
+          v6: {
+            found: !!algoDesc,
+            hasBorderBox: algoHasCardClasses,
+            computedBorderWidth: algoBorder,
+            className: algoDesc ? algoDesc.className : null,
+            isSecondaryText: algoDesc ? algoDesc.className.includes('text-text-secondary') : false,
+          },
+          v7: {
+            found: !!metricsContainer,
+            display: metricsCs ? metricsCs.display : null,
+            flexWrap: metricsCs ? metricsCs.flexWrap : null,
+            justifyContent: metricsCs ? metricsCs.justifyContent : null,
+            hairlineDividersCount: dividers.length,
+            hasPipeCharacters: hasPipeChars,
+          }
+        };
+      })()`,
+      returnByValue: true,
+    });
+    console.log('\\n[1024px V6 / V7 Verification]:', JSON.stringify(v6v7Check_1024.result.value, null, 2));
+
     // Tablet 768 (closed and open)
     await setDrawerState(client, false, 768);
     await capture(client, 'loaded_768_closed.png', 768, 1024);
