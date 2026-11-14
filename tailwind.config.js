@@ -54,6 +54,7 @@ export default {
 
         status: {
           error: 'var(--status-error)',
+          danger: 'var(--status-danger, var(--status-error))',
           warn: 'var(--status-warn)',
           success: 'var(--status-success)',
         },

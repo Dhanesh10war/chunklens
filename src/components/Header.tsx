@@ -175,15 +175,15 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Right: Actions */}
-        <div className="flex items-center space-x-1.5 shrink-0 relative">
+        <div className="flex items-center gap-1.5 shrink-0 relative">
           {/* Quick Actions (Command Palette Trigger) - Visible at >= 1200px */}
           {onOpenCommandPalette && (
-            <Tooltip content="Open command palette" shortcut="⌘K">
+            <Tooltip content="Open command palette" shortcut="⌘K" wrapperClassName="hidden xl:inline-flex">
               <button
                 onClick={onOpenCommandPalette}
                 onMouseEnter={onPrefetchCommandPalette}
                 onFocus={onPrefetchCommandPalette}
-                className="hidden xl:flex items-center space-x-1.5 h-7 px-2 rounded-md bg-elevated border border-border-default text-text-tertiary hover:text-text-primary hover:border-border-hover text-xs font-mono transition-colors active-press focus-ring"
+                className="flex items-center space-x-1.5 h-7 px-2 rounded-md bg-elevated border border-border-default text-text-tertiary hover:text-text-primary hover:border-border-hover text-xs font-mono transition-colors active-press focus-ring"
                 aria-label="Open command palette"
               >
                 <span>Quick Actions</span>
@@ -196,7 +196,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Tokenizers Comparison - Visible at >= 1200px */}
           {onTokenizerClick && (
-            <Tooltip content="Compare multi-model token variance and embedding costs">
+            <Tooltip content="Compare multi-model token variance and embedding costs" wrapperClassName="hidden xl:inline-flex">
               <Button
                 variant="secondary"
                 size="sm"
@@ -205,7 +205,6 @@ export const Header: React.FC<HeaderProps> = ({
                 onMouseEnter={onPrefetchTokenizer}
                 onFocus={onPrefetchTokenizer}
                 aria-label="Compare tokenizers and embedding costs"
-                className="hidden xl:inline-flex"
               >
                 <span>Tokenizers</span>
               </Button>
@@ -213,14 +212,14 @@ export const Header: React.FC<HeaderProps> = ({
           )}
 
           {/* Compare Benchmark Mode - Visible at >= 768px */}
-          <Tooltip content="Side-by-side benchmark comparison">
+          <Tooltip content="Side-by-side benchmark comparison" wrapperClassName="hidden md:inline-flex">
             <Button
               variant={isCompareMode ? 'secondary' : 'ghost'}
               size="sm"
               icon={<SplitSquareVertical className="h-3.5 w-3.5 text-text-secondary" />}
               onClick={onToggleCompare}
               aria-label="Toggle side-by-side comparison"
-              className={`hidden md:inline-flex ${isCompareMode ? 'border-accent text-text-primary bg-accent-subtle' : ''}`}
+              className={isCompareMode ? 'border-accent text-text-primary bg-accent-subtle' : ''}
             >
               <span className="hidden lg:inline">Compare</span>
             </Button>
@@ -242,10 +241,10 @@ export const Header: React.FC<HeaderProps> = ({
           </Tooltip>
 
           {/* Theme Toggle: Kept visible at >= 768px (Amendment E) */}
-          <Tooltip content={isDark ? 'Switch to light mode' : 'Switch to dark mode'}>
+          <Tooltip content={isDark ? 'Switch to light mode' : 'Switch to dark mode'} wrapperClassName="hidden md:inline-flex">
             <button
               onClick={toggleTheme}
-              className="hidden md:flex h-7 w-7 rounded-md items-center justify-center text-text-secondary hover:text-text-primary hover:bg-elevated transition-colors active-press focus-ring"
+              className="h-7 w-7 rounded-md flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-elevated transition-colors active-press focus-ring"
               aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
@@ -253,12 +252,12 @@ export const Header: React.FC<HeaderProps> = ({
           </Tooltip>
 
           {/* GitHub Source Link - Visible at >= 1200px */}
-          <Tooltip content="GitHub repository">
+          <Tooltip content="GitHub repository" wrapperClassName="hidden xl:inline-flex">
             <a
               href="https://github.com/Dhanesh10war/chunklens"
               target="_blank"
               rel="noreferrer"
-              className="hidden xl:flex h-7 w-7 rounded-md items-center justify-center text-text-secondary hover:text-text-primary hover:bg-elevated transition-colors active-press focus-ring"
+              className="h-7 w-7 rounded-md flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-elevated transition-colors active-press focus-ring"
               aria-label="View on GitHub"
             >
               <Github className="h-3.5 w-3.5" />

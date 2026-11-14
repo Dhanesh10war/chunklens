@@ -75,13 +75,24 @@ describe('UploadErrorBanner', () => {
     expect(html).not.toContain('Retry');
   });
 
-  it('renders a 2px danger left edge and danger-colored icon (Item V4)', () => {
+  it('renders a 2px danger left edge and danger-colored icon with verified CSS tokens (Item V4)', () => {
     const html = renderToString(
       <UploadErrorBanner error={sampleError} onDismiss={vi.fn()} />
     );
 
+    // Verify structural elements and semantic alert role
+    expect(html).toContain('role="alert"');
     expect(html).toContain('border-l-2');
     expect(html).toContain('border-l-status-danger');
     expect(html).toContain('text-status-danger');
+
+    // Verify token definition in src/index.css and tailwind.config.js (not passing on class names alone)
+    const fs = require('fs');
+    const path = require('path');
+    const cssContent = fs.readFileSync(path.resolve(__dirname, '../../index.css'), 'utf8');
+    const tailwindConfig = fs.readFileSync(path.resolve(__dirname, '../../../tailwind.config.js'), 'utf8');
+
+    expect(cssContent).toContain('--status-danger: var(--status-error);');
+    expect(tailwindConfig).toContain("danger: 'var(--status-danger");
   });
 });

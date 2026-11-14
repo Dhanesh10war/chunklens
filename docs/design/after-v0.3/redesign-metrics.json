@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-14T06:15:11.339Z",
+  "timestamp": "2026-11-14T06:55:46.824Z",
   "screenshotsCount": 18,
   "overflowMeasurements": {
     "loaded": {
@@ -386,10 +386,16 @@
     "satisfiesWcagAA": true
   },
   "errorBannerContrastCheck": {
-    "iconColor": "rgb(237, 237, 239)",
-    "bannerBg": "rgba(0, 0, 0, 0)",
-    "borderLeft": "2px rgba(255, 255, 255, 0.1)",
-    "contrastRatio": 17.96,
+    "dangerTokenColor": "oklch(0.65 0.15 25)",
+    "iconColor": "oklch(0.65 0.15 25)",
+    "iconMatchesDangerToken": true,
+    "borderLeftWidth": "2px",
+    "borderLeftColor": "oklch(0.65 0.15 25)",
+    "borderLeftMatchesDangerToken": true,
+    "bannerBgRaw": "rgba(0, 0, 0, 0)",
+    "effectiveParentBg": "rgb(17, 17, 19)",
+    "compositedBannerBg": "rgb(17, 17, 19)",
+    "contrastRatio": 5.45,
     "satisfies3to1": true
   },
   "overflowMenuCheck": {

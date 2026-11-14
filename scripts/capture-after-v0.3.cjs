@@ -500,16 +500,55 @@ async function run() {
         const icon = banner.querySelector('svg');
         if (!icon) return { error: 'Alert icon not found' };
 
+        // Measure danger token value
+        const probe = document.createElement('div');
+        probe.style.color = 'var(--status-danger, var(--status-error))';
+        document.body.appendChild(probe);
+        const dangerTokenColor = window.getComputedStyle(probe).color;
+        probe.remove();
+
         const bannerCs = window.getComputedStyle(banner);
         const iconCs = window.getComputedStyle(icon);
         const iconColor = iconCs.color;
         const bannerBg = bannerCs.backgroundColor;
-        const borderLeft = bannerCs.borderLeftWidth + ' ' + bannerCs.borderLeftColor;
+        const borderLeftColor = bannerCs.borderLeftColor;
+        const borderLeftWidth = bannerCs.borderLeftWidth;
 
-        function parseRgb(str) {
-          const m = str.match(/rgba?\\((\\d+),\\s*(\\d+),\\s*(\\d+)/);
-          return m ? [parseInt(m[1]), parseInt(m[2]), parseInt(m[3])] : [0, 0, 0];
+        // Get effective background of parent / canvas
+        let parent = banner.parentElement;
+        let parentBg = 'rgb(11, 15, 25)'; // fallback dark canvas
+        while (parent && parent !== document.body) {
+          const pBg = window.getComputedStyle(parent).backgroundColor;
+          if (pBg && pBg !== 'rgba(0, 0, 0, 0)' && pBg !== 'transparent') {
+            parentBg = pBg;
+            break;
+          }
+          parent = parent.parentElement;
         }
+
+        function resolveColorToRgb(colorStr) {
+          try {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1; canvas.height = 1;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = colorStr;
+            ctx.fillRect(0, 0, 1, 1);
+            const d = ctx.getImageData(0, 0, 1, 1).data;
+            return { r: d[0], g: d[1], b: d[2], a: d[3] / 255 };
+          } catch (e) {
+            const m = colorStr.match(/rgba?\\((\\d+),\\s*(\\d+),\\s*(\\d+)(?:,\\s*([\\d.]+))?/);
+            return m ? { r: parseInt(m[1]), g: parseInt(m[2]), b: parseInt(m[3]), a: m[4] !== undefined ? parseFloat(m[4]) : 1 } : { r: 238, g: 77, b: 85, a: 1 };
+          }
+        }
+
+        const bColor = resolveColorToRgb(bannerBg);
+        const pColor = resolveColorToRgb(parentBg);
+
+        // Alpha composite bannerBg over parentBg
+        const effR = Math.round(bColor.r * bColor.a + pColor.r * (1 - bColor.a));
+        const effG = Math.round(bColor.g * bColor.a + pColor.g * (1 - bColor.a));
+        const effB = Math.round(bColor.b * bColor.a + pColor.b * (1 - bColor.a));
+        const effectiveBgRgb = 'rgb(' + effR + ', ' + effG + ', ' + effB + ')';
 
         function sRGBtoLin(val) {
           const c = val / 255;
@@ -520,25 +559,30 @@ async function run() {
           return 0.2126 * sRGBtoLin(r) + 0.7152 * sRGBtoLin(g) + 0.0722 * sRGBtoLin(b);
         }
 
-        const [r1, g1, b1] = parseRgb(iconColor);
-        const [r2, g2, b2] = parseRgb(bannerBg);
-        const L1 = lum(r1, g1, b1);
-        const L2 = lum(r2, g2, b2);
+        const iColor = resolveColorToRgb(iconColor);
+        const L1 = lum(iColor.r, iColor.g, iColor.b);
+        const L2 = lum(effR, effG, effB);
         const lighter = Math.max(L1, L2);
         const darker = Math.min(L1, L2);
         const ratio = (lighter + 0.05) / (darker + 0.05);
 
         return {
+          dangerTokenColor,
           iconColor,
-          bannerBg,
-          borderLeft,
+          iconMatchesDangerToken: iconColor === dangerTokenColor,
+          borderLeftWidth,
+          borderLeftColor,
+          borderLeftMatchesDangerToken: borderLeftColor === dangerTokenColor,
+          bannerBgRaw: bannerBg,
+          effectiveParentBg: parentBg,
+          compositedBannerBg: effectiveBgRgb,
           contrastRatio: parseFloat(ratio.toFixed(2)),
           satisfies3to1: ratio >= 3.0,
         };
       })()`,
       returnByValue: true,
     });
-    console.log('Error Banner Contrast in Browser (Item V4):', errorBannerContrastCheck.result.value);
+    console.log('Error Banner Computed Styles & Contrast Check (Item V4):', errorBannerContrastCheck.result.value);
 
     // Verify Overflow Menu Focus Return and Keyboard Navigation (Amendment E)
     const overflowMenuCheck = await client.send('Runtime.evaluate', {

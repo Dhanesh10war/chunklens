@@ -8,6 +8,7 @@ export interface TooltipProps {
   position?: 'top' | 'bottom' | 'left' | 'right';
   delayMs?: number;
   className?: string;
+  wrapperClassName?: string;
 }
 
 export const Tooltip: React.FC<TooltipProps> = ({
@@ -17,6 +18,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
   position = 'top',
   delayMs = 400,
   className,
+  wrapperClassName,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const timeoutRef = useRef<number | null>(null);
@@ -50,7 +52,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
   return (
     <div
-      className="relative inline-flex items-center"
+      className={cn('relative inline-flex items-center', wrapperClassName)}
       onMouseEnter={show}
       onMouseLeave={hide}
       onFocus={show}
