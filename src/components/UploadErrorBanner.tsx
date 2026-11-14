@@ -34,7 +34,7 @@ export const UploadErrorBanner: React.FC<UploadErrorBannerProps> = ({
       role="alert"
       aria-live="assertive"
       className={cn(
-        'p-3 rounded-md bg-status-danger/10 border border-status-danger/30 text-text-primary text-xs flex flex-col gap-2 font-sans',
+        'p-3 rounded-md bg-status-danger/10 border border-status-danger/30 border-l-2 border-l-status-danger text-text-primary text-xs flex flex-col gap-2 font-sans',
         className
       )}
     >

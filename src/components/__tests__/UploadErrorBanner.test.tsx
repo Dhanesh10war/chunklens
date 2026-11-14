@@ -74,4 +74,14 @@ describe('UploadErrorBanner', () => {
 
     expect(html).not.toContain('Retry');
   });
+
+  it('renders a 2px danger left edge and danger-colored icon (Item V4)', () => {
+    const html = renderToString(
+      <UploadErrorBanner error={sampleError} onDismiss={vi.fn()} />
+    );
+
+    expect(html).toContain('border-l-2');
+    expect(html).toContain('border-l-status-danger');
+    expect(html).toContain('text-status-danger');
+  });
 });
