@@ -114,7 +114,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="flex flex-col flex-1 pb-8">
         {/* Mobile Header / Close Bar */}
         <div className="flex items-center justify-between p-3 border-b border-border-subtle lg:hidden">
-          <span className="font-semibold text-xs text-text-primary uppercase tracking-wider">
+          <span className="font-semibold text-xs text-text-primary">
             Configuration
           </span>
           <button

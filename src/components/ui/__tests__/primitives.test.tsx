@@ -218,5 +218,46 @@ describe('UI Primitives (SSR markup & accessibility)', () => {
 
       expect(violations).toEqual([]);
     });
+
+    it('enforces elimination of uppercase and tracking-wider classes across src/ (excluding kbd elements) (Visual Fix 4)', () => {
+      const fs = require('fs');
+      const path = require('path');
+
+      function walk(dir: string): string[] {
+        let results: string[] = [];
+        const list = fs.readdirSync(dir);
+        list.forEach((file: string) => {
+          const full = path.join(dir, file);
+          const stat = fs.statSync(full);
+          if (stat && stat.isDirectory()) {
+            if (file !== 'node_modules' && file !== 'dist' && file !== '.git') {
+              results = results.concat(walk(full));
+            }
+          } else if (file.endsWith('.tsx') || (file.endsWith('.ts') && !file.includes('.test.'))) {
+            results.push(full);
+          }
+        });
+        return results;
+      }
+
+      const srcDir = path.resolve(__dirname, '../../../');
+      const allFiles = walk(srcDir);
+      const violations: string[] = [];
+
+      allFiles.forEach((file) => {
+        if (file.endsWith('primitives.test.tsx')) return;
+        const lines = fs.readFileSync(file, 'utf8').split('\n');
+        lines.forEach((line: string, idx: number) => {
+          // Exclude lines with <kbd or kbd elements
+          if (line.includes('<kbd') || line.includes('</kbd>')) return;
+          // Check for className with uppercase or tracking-wide
+          if (/\b(uppercase|tracking-wider|tracking-wide|tracking-widest)\b/.test(line)) {
+            violations.push(`${path.relative(srcDir, file)}:${idx + 1}: ${line.trim()}`);
+          }
+        });
+      });
+
+      expect(violations).toEqual([]);
+    });
   });
 });

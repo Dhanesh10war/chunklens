@@ -136,7 +136,7 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ primaryConfig, r
         {/* Panel A */}
         <div className="flex flex-col h-full overflow-hidden">
           <div className="p-3 bg-panel border-b border-border flex items-center justify-between text-xs font-mono">
-            <span className="font-semibold text-primary-400 uppercase tracking-wide">
+            <span className="font-semibold text-primary-400">
               Variant A: {primaryConfig.strategy} ({primaryConfig.chunkSize} {primaryConfig.unit})
             </span>
             <div className="flex items-center space-x-3 text-slate-400 tabular-nums">
@@ -165,7 +165,7 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ primaryConfig, r
         {/* Panel B */}
         <div className="flex flex-col h-full overflow-hidden">
           <div className="p-3 bg-panel border-b border-border flex items-center justify-between text-xs font-mono">
-            <span className="font-semibold text-accent-cyan uppercase tracking-wide">
+            <span className="font-semibold text-accent-cyan">
               Variant B: {secondaryConfig.strategy} ({secondaryConfig.chunkSize} {secondaryConfig.unit})
             </span>
             <div className="flex items-center space-x-2 text-slate-400 tabular-nums">

@@ -207,8 +207,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         {/* Sample Corpora Cards */}
         <div className="space-y-3 pt-2">
           <div className="flex items-center justify-between">
-            <h2 className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
-              Or Start With a Sample Corpus
+            <h2 className="text-xs font-semibold text-text-primary">
+              Or start with a sample corpus
             </h2>
             <span className="text-xs text-text-tertiary font-mono">
               6 bundled benchmarks

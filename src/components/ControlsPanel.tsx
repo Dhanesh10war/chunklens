@@ -131,7 +131,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
       {/* Sample Pills & Upload */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center space-x-2">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+          <span className="text-xs font-semibold text-slate-400 flex items-center gap-1.5">
             <BookOpen className="h-3.5 w-3.5 text-primary-400" />
             Corpus:
           </span>
