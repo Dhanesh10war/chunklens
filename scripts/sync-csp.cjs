@@ -74,7 +74,7 @@ const vercelConfig = {
       headers: [
         {
           key: 'Cache-Control',
-          value: 'public, max-age=31536000, immutable',
+          value: 'public, max-age=604800',
         },
       ],
     },
@@ -97,7 +97,7 @@ const cloudflareHeaders = `/*
   Cache-Control: public, max-age=31536000, immutable
 
 /fonts/*
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=604800
 `;
 
 const publicHeadersPath = path.resolve(__dirname, '../public/_headers');

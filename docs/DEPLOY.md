@@ -30,7 +30,7 @@ Cloudflare Pages provides global edge hosting with native support for Vite singl
 ### Routing & Headers
 
 - Cloudflare Pages automatically serves `index.html` for client-side SPA route navigation.
-- The repository automatically synchronizes `public/_headers` into `dist/_headers` during build, applying strict Content Security Policy (`connect-src 'none'`), `frame-ancestors 'none'`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, and immutable asset caching for `/assets/*` and `/fonts/*`.
+- The repository automatically synchronizes `public/_headers` into `dist/_headers` during build, applying strict Content Security Policy (`connect-src 'none'`), `frame-ancestors 'none'`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, immutable asset caching for content-hashed `/assets/*`, and 1-week caching (`max-age=604800`) for non-hashed `/fonts/*`.
 
 ---
 
@@ -60,7 +60,7 @@ Vercel provides edge deployment configured via `vercel.json`.
 
 - `vercel.json` in the root repository defines the security headers for all routes, matching `public/_headers`.
 - `index.html` receives `Cache-Control: no-cache` to ensure instant updates upon new deployments.
-- Static bundles in `/assets/*` and self-hosted fonts in `/fonts/*` receive `Cache-Control: public, max-age=31536000, immutable`.
+- Static bundles in `/assets/*` receive `Cache-Control: public, max-age=31536000, immutable`, while non-content-hashed self-hosted fonts in `/fonts/*` receive `Cache-Control: public, max-age=604800`.
 
 ---
 

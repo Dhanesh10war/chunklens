@@ -33,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Resolved detached `ArrayBuffer` crash in PDF parsing (`pdfParser.ts`) by isolating byte copies with `new Uint8Array(source.length)` and ensuring `loadingTask.destroy()` in `finally`.
 
 ## [0.2.0] - 2026-11-12
-Tagged at commit [`ffb2f16`](https://github.com/drago/chunklens/commit/ffb2f16).
+Tagged at commit `ffb2f16`.
 
 ### Added
 - Multi-model tokenizer comparison matrix and embedding cost analyzer across 6 frontier LLMs.
