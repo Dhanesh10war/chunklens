@@ -1,115 +1,74 @@
 # Quality State & Continuous Improvement Tracking
-**Project:** ChunkLens — Visual Document Chunking & Token Optimization Workbench for RAG Pipelines  
-**Current Iteration:** Release v0.3 (Batch 2b Complete)  
-**Date:** November 13, 2026  
+**Project:** ChunkLens — Client-side document chunking and token cost workbench for RAG  
+**Current Release:** v0.3.0  
+**Date:** November 14, 2026  
 **Branch:** `agent/release-v0.3`  
 
 ---
 
 ## 1. Executive Status
-- **Health:** Production Grade (v0.3-rc)
+- **Health:** Production Grade (v0.3.0 Release)
 - **TypeScript:** Strict type-checking passed (`npm run typecheck`, 0 diagnostic errors)
-- **Unit & Integration Tests:** 115 tests passing across 19 test suites (`npm run test`, 100% pass, 0 flaky)
+- **Linting:** Defined in `package.json` as `"tsc -b"`; duplicate of typecheck, marked `UNMEASURED` and omitted from CI.
+- **Unit & Integration Tests:** 124 tests passing across 20 test suites (`npm test`, 100% pass, 0 flaky)
 - **Custom DOM A11y Checks:** 0 violations across loaded, empty, and error states at 1440px and 375px viewports (button names, form labels, duplicate IDs, ARIA roles, tabindex verified).
-- **Axe-Core E2E Status:** `@axe-core/playwright` and `e2e/networkEgress.spec.ts` are written and staged; awaiting user execution of `npm install` and `playwright install`.
+- **Axe-Core & Playwright E2E Status:** Staged and configured (`e2e/networkEgress.spec.ts`, `e2e/accessibility.spec.ts`); marked written, not yet run locally (runs in GitHub Actions CI via `npx playwright install --with-deps chromium`).
 - **Zero Network Egress:** Strict CSP (`connect-src 'none'`) verified live via Chrome DevTools Protocol (`scripts/test-egress.cjs`).
 - **Export Button Contrast:** Measured 6.29:1 rendered contrast in Chrome browser (`#FFFFFF` on `#4F46E5`), satisfying WCAG 2.2 AA $\ge 4.5:1$. Split tokens guarantee 7.90:1 in light mode (`#4338CA`) and 6.29:1 in dark mode (`#4F46E5`).
 - **Typography Floor & Labels:** Strict 12px text floor verified by automated code grep rule and browser computed-style audit (0 sub-12px elements). Real UI labels verified: Algorithm, Separators hierarchy, Measurement unit, Tokenizer encoding, and Size & overlap.
-- **Bundle Architecture:** Code-split with heavy modals (`TokenizerComparisonModal`, `ExportModal`, `CommandPalette`, `ComparisonView`, `SimilarityHeatmap`) lazy-loaded via `React.lazy`, bringing `index.js` down to **134.76 kB raw** / **40.15 kB gzip** (well below the 185 kB limit).
+- **Bundle Architecture:** Code-split with heavy modals (`TokenizerComparisonModal`, `ExportModal`, `CommandPalette`, `ComparisonView`, `SimilarityHeatmap`) lazy-loaded via `React.lazy`, bringing `index.js` down to **132.99 kB raw** (40.33 kB gzip), well below the 185 kB budget limit. CSS is **33.17 kB raw** (7.11 kB gzip), well below the 45 kB budget limit.
 
 ---
 
 ## 2. Release Ratchet Table
 
-| Metric | v0.2.0 Baseline (`ffb2f16`) | Current v0.3 Release Candidate | Target v0.8 | Status |
-| :--- | :---: | :---: | :---: | :--- |
-| **Unit / Integration Tests** | 86 (12 suites) | **122 (20 suites)** | $\ge 120$ | ✅ Ratcheted (+36) |
-| **TypeScript Diagnostics** | 0 errors | **0 errors** | 0 | ✅ Clean (`tsc -b`) |
-| **Custom DOM A11y Violations (1440 & 375)** | 0 | **0 (Loaded, Empty, Error)** | 0 | ✅ Zero violations |
-| **Axe-Core / Playwright E2E Status** | UNMEASURED | **Written, awaiting user install** | 0 violations | 🔄 Pending `playwright install` |
-| **External Network Requests** | Google Fonts | **0 (Strict CSP `connect-src 'none'`)** | 0 | ✅ Verified zero egress |
-| **Main JS Bundle (`index.js` Raw / Gzip)** | 172.06 kB / 48.33 kB | **134.76 kB / 40.15 kB** | $< 185$ kB | ✅ 50.24 kB under budget |
-| **React Vendor Bundle (Raw / Gzip)** | 134.67 kB / 43.22 kB | **134.67 kB / 43.22 kB** | $< 150$ kB | ✅ Stable |
-| **Lucide Icons Chunk (Raw / Gzip)** | 23.89 kB / 6.10 kB | **27.28 kB / 6.90 kB** | $< 35$ kB | ✅ Stable |
-| **PDF Engine (`pdfjs-dist` Raw / Gzip)** | 512.51 kB / 155.91 kB | **512.51 kB / 155.91 kB** | Isolated chunk | ✅ Split |
-| **PDF Worker Chunk (Raw)** | 1,298.21 kB | **1,298.21 kB** | Dedicated worker | ✅ Split |
-| **Tiktoken Tokenizer Chunk (Raw / Gzip)**| 5,603.11 kB / 2,567.88 kB | **5,603.11 kB / 2,567.88 kB**| Shared chunk | 🔄 Consolidating in v0.4 |
-| **Chunking Worker Chunk (Raw)** | 5,613.94 kB | **5,613.94 kB** | Dedicated worker | 🔄 Shared rank table in v0.4 |
-| **CSS Bundle (Raw / Gzip)** | 28.50 kB / 5.80 kB | **33.54 kB / 7.02 kB** | $< 50$ kB | ✅ Compact |
-| **Index HTML (Raw / Gzip)** | 1.20 kB / 0.60 kB | **1.79 kB / 0.86 kB** | $< 2$ kB | ✅ Strict CSP |
-| **Export Button Contrast (WCAG 2.2 AA)** | UNMEASURED | **6.29:1 (browser) / 7.90:1 (CSS)** | $\ge 4.5:1$ | ✅ 100% WCAG AA |
-| **Typography Text Floor** | 10px | **12px (0 sub-12px elements)**| $\ge 12$px | ✅ Enforced |
-| **Overflow Menu Keyboard Navigation** | N/A | **Focus return + arrow keys verified**| Accessible | ✅ Verified |
-| **Horizontal Page & Strip Overflow** | UNMEASURED | **scrollWidth $\le$ clientWidth across 1440/1024/768/375** | Zero overflow | ✅ Verified |
+| Metric | v0.2.0 Baseline (`ffb2f16`) | Current v0.3.0 Release | Status |
+| :--- | :---: | :---: | :--- |
+| **Unit / Integration Tests** | 86 (12 suites) | **124 (20 suites)** | ✅ Ratcheted (+38) |
+| **TypeScript Diagnostics** | 0 errors (`tsc -b`) | **0 errors (`tsc -b`)** | ✅ Clean |
+| **Linting** | UNMEASURED (`tsc -b` duplicate) | **UNMEASURED (`tsc -b` duplicate)** | ℹ️ Duplicate of typecheck |
+| **Custom DOM A11y Violations (1440 & 375)** | 0 | **0 (Loaded, Empty, Error)** | ✅ Zero violations |
+| **Axe-Core / Playwright E2E Status** | UNMEASURED | **Written, runs in CI** | 🔄 GitHub Actions gate |
+| **External Network Requests** | Google Fonts | **0 (Strict CSP `connect-src 'none'`)** | ✅ Verified zero egress |
+| **Main JS Bundle (`index.js` Raw / Gzip)** | 172.06 kB / 48.33 kB | **132.99 kB / 40.33 kB** | ✅ 52.01 kB under budget |
+| **React Vendor Bundle (Raw / Gzip)** | 134.67 kB / 43.22 kB | **134.67 kB / 43.22 kB** | ✅ Stable |
+| **Lucide Icons Chunk (Raw / Gzip)** | 23.89 kB / 6.10 kB | **27.28 kB / 6.90 kB** | ✅ Compact |
+| **PDF Engine (`pdfjs-dist` Raw / Gzip)** | 512.51 kB / 155.91 kB | **512.51 kB / 155.91 kB** | ✅ Isolated chunk |
+| **PDF Worker Chunk (Raw)** | 1,298.21 kB | **1,298.21 kB** | ✅ Dedicated worker |
+| **Tiktoken Tokenizer Chunk (Raw / Gzip)** | 5,603.11 kB / 2,567.88 kB | **5,603.11 kB / 2,567.88 kB** | ✅ Lazy vendor chunk |
+| **Chunking Worker Chunk (Raw)** | 5,613.94 kB | **5,613.94 kB** | ✅ Dedicated worker |
+| **CSS Bundle (Raw / Gzip)** | 28.50 kB / 5.80 kB | **33.17 kB / 7.11 kB** | ✅ 11.83 kB under budget |
+| **Index HTML (Raw / Gzip)** | 1.20 kB / 0.60 kB | **1.79 kB / 0.86 kB** | ✅ Strict CSP headers |
+| **Export Button Contrast (WCAG 2.2 AA)** | UNMEASURED | **6.29:1 (dark) / 7.90:1 (light)** | ✅ $\ge 4.5:1$ passed |
+| **Typography Text Floor** | 10px | **12px (0 sub-12px elements)** | ✅ Strict floor enforced |
+| **Shield vs Version Bounding Box Gap (375px)** | UNMEASURED | **14.1px** | ✅ $\ge 6$px enforced |
+| **Horizontal Page & Strip Overflow** | UNMEASURED | **0 (scrollWidth $\le$ clientWidth across 1440/1024/768/375)** | ✅ Zero overflow |
 
 ---
 
-## 3. Dimensional Scorecard
-
-| Dimension | Cycle 1 Baseline | Cycle 2 Final | Delta | Concrete Evidence |
-| :--- | :---: | :---: | :---: | :--- |
-| **Requirement Coverage** | 10 / 10 | **10 / 10** | = | 5 chunking algorithms (including Tabular CSV/JSON), dual units, code & dataset exports, side-by-side benchmark with variant promotion, PDF ingestion, cosine similarity heatmap, background Web Worker offload, and multi-model tokenizer matrix. |
-| **Architecture & Modularity** | 10 / 10 | **10 / 10** | = | Fully decoupled engine modules (`vectorizer`, `multiModel`, `tabularChunker`, `chunking.worker`), clean exporters, persistent storage, and fallback clipboard. |
-| **Code Quality** | 10 / 10 | **10 / 10** | = | Strict TypeScript passing, unified `cn()` utility, zero dead code, optimized single-pass BPE token caching. |
-| **Test Quality** | 10 / 10 | **10 / 10** | = | 66 tests across 10 suites; 100% passing across algorithms, parsers, workers, vectorizers, and tokenizers. |
-| **Security** | 10 / 10 | **10 / 10** | = | 100% client-side execution, 10MB upload ceiling, secure/insecure clipboard fallback, zero external network calls. |
-| **Reliability** | 10 / 10 | **10 / 10** | = | `localStorage` persistence, error-guarded PDF and file readers, empty/whitespace file rejection guard, resilient Web Worker fallback. |
-| **Performance & Scalability** | 10 / 10 | **10 / 10** | = | Dedicated background Web Worker decouples tokenization from main UI thread; guaranteed 60fps during slider manipulation. |
-| **Data Integrity** | 10 / 10 | **10 / 10** | = | Schema retention across tabular chunks, accurate token variance and cost calculations, 512/2048/8192 boundary truncation risk detector. |
-| **UX / DX** | 10 / 10 | **10 / 10** | = | Precision Obsidian Slate palette, tactile active press states, tabular numerals, 100% focus rings, multi-tab canvas and interactive tokenizer comparison modal. |
-| **Operability** | 10 / 10 | **10 / 10** | = | GitHub Actions CI workflow, clean dev/test/test:verbose/lint/build scripts, zero build warnings. |
-| **Comprehensibility** | 10 / 10 | **10 / 10** | = | Maintained `AGENTS.md` map with golden commands, architecture pointers, traps, and constraints. |
-| **OVERALL** | **10.0 / 10** | **10.0 / 10** | = | **All 5 roadmap enhancements shipped and verified; production v0.2.0 ready.** |
-
----
-
-## 3. Issue Backlog
+## 3. Issue Backlog (v0.3.0 Releases)
 
 | ID | Severity | Impact | Priority | Effort | Score | Evidence | Proposed Fix | Status |
 | :---: | :--- | :---: | :---: | :---: | :---: | :--- | :--- | :---: |
-| **ISS-13** | Low | 3 | Should (2) | S (1) | 6.0 | Session state lost on page refresh. | Implemented `storage.ts` with `loadStoredSession`, `saveStoredSession`, `clearStoredSession`. | ✅ FIXED (`adfaf9d`) |
-| **ISS-14** | Low | 3 | Should (2) | S (1) | 6.0 | Missing custom delimiters control in Recursive Chunker UI. | Added customizable delimiter input in `ControlsPanel.tsx` with reset and unescaping. | ✅ FIXED (`d5e1169`) |
-| **ISS-15** | Low | 3 | Should (2) | S (1) | 6.0 | Missing chunk dataset export (JSON/CSV). | Implemented `dataExporters.ts` with RFC 4180 CSV & JSON formatting, wired to `ExportModal.tsx`. | ✅ FIXED (`0a494f3`) |
-| **ISS-16** | Low | 2 | Should (2) | S (1) | 4.0 | Synchronous re-chunking during rapid slider dragging. | Wrapped inputs with `useDeferredValue` in `App.tsx` for concurrent low-priority chunking. | ✅ FIXED (`adfaf9d`) |
-| **ISS-17** | Low | 3 | Should (2) | S (1) | 6.0 | Comparison View lacks direct promotion of Variant B to active config. | Added `onApplyVariantB` handler & button in `ComparisonView.tsx` and wired in `App.tsx`. | ✅ FIXED (`bf09b70`) |
-| **ISS-18** | Low | 2 | Should (2) | S (1) | 4.0 | `navigator.clipboard.writeText` fails in non-HTTPS / headless contexts. | Added `copyToClipboard` in `src/utils/clipboard.ts` with `execCommand` fallback & tests. | ✅ FIXED (`bf09b70`) |
-| **ISS-19** | Low | 2 | Could (1) | S (1) | 2.0 | Stepping through chunks in visualizer requires scrolling back and forth. | Added `[← Prev]` and `[Next →]` navigation steppers to chunk inspector in `VisualCanvas.tsx`. | ✅ FIXED (`bf09b70`) |
-| **ISS-20** | Low | 2 | Could (1) | S (1) | 2.0 | Samples lacked realistic multi-component source code and ORM definitions. | Added Python Backend Service (FastAPI & SQLAlchemy) sample in `src/data/samples.ts`. | ✅ FIXED (`bf09b70`) |
-| **ISS-21** | High | 4 | Must (3) | S (1) | 12.0 | 40% mutation survival rate; `detectOrphan` & `estimatedCostUsd` unasserted. | Added explicit tests in `chunkers.test.ts` asserting mid-word `isOrphan` and aggregator metrics. | ✅ FIXED (`061833a`) |
-| **ISS-22** | Med | 2 | Should (2) | S (1) | 4.0 | Missing `lint` and `test:verbose` scripts in `package.json`. | Added `"lint": "tsc -b"` and `"test:verbose": "vitest run --reporter=verbose"` to `package.json`. | ✅ FIXED (`be50b21`) |
-| **ISS-23** | Med | 3 | Should (2) | S (1) | 6.0 | Uploading 0-byte or whitespace-only file silently clears state with no user feedback. | Added guard in `ControlsPanel.tsx` checking `!text.trim()` with user alert. | ✅ FIXED (`cf6ec90`) |
-| **ISS-24** | Low | 2 | Could (1) | S (1) | 2.0 | Chunk inspector modal lacked keyboard stepping shortcuts. | Added `ArrowLeft`, `ArrowRight`, and `Escape` keyboard shortcuts in `VisualCanvas.tsx`. | ✅ FIXED (`e6a232e`) |
-| **ISS-25** | High | 4 | Must (3) | S (1) | 12.0 | `GlobalWorkerOptions.workerSrc` threw in PDF parser due to environment differences. | Added environment-aware worker source initialization with local Vite bundle and CDN fallback. | ✅ FIXED (`e43a54b`) |
+| **ISS-26** | High | 4 | Must (3) | S (1) | 12.0 | Detached ArrayBuffer on re-reading identical PDF bytes. | Isolating byte copies via `new Uint8Array(source.length)` and ensuring `destroy()` in `finally`. | ✅ FIXED (`3.3`) |
+| **ISS-27** | High | 4 | Must (3) | S (1) | 12.0 | Google Fonts dependency causes external network egress. | Downloaded and self-hosted WOFF2 fonts with `connect-src 'none'` CSP. | ✅ FIXED (`3.1`) |
+| **ISS-28** | Med | 3 | Should (2) | S (1) | 6.0 | Raw `index.js` bundle breached 185 kB threshold (188.65 kB). | Lazy-loaded heavy modal dialogs via `React.lazy`, dropping bundle to 132.99 kB. | ✅ FIXED (`2b`) |
+| **ISS-29** | Med | 3 | Should (2) | S (1) | 6.0 | Export button failed WCAG AA contrast (3.63:1). | Split accent tokens into `--accent-solid` and `--on-accent` yielding 6.29:1 / 7.90:1. | ✅ FIXED (`3.7`) |
+| **ISS-30** | Med | 2 | Should (2) | S (1) | 4.0 | Multiple sub-12px font definitions in UI. | Replaced with strict `text-xs` (12px) floor and verified via computed style checks. | ✅ FIXED (`3.7`) |
+| **ISS-31** | Low | 2 | Should (2) | S (1) | 4.0 | Header shield touched version badge at 375px. | Fixed spacing and layout to ensure $\ge 6$px bounding box gap (14.1px measured). | ✅ FIXED (`V2`) |
+| **ISS-32** | Low | 2 | Should (2) | S (1) | 4.0 | Error banner lacked danger color tokens. | Defined `--status-danger` tokens with verified $\ge 3:1$ icon contrast and 5.45:1 text contrast. | ✅ FIXED (`V4`) |
+| **ISS-33** | Low | 2 | Could (1) | S (1) | 2.0 | Metrics strip used pipe characters and overflowed horizontally. | Converted to compact wrapped rows with CSS hairline dividers below `xl`. | ✅ FIXED (`V7`) |
+| **ISS-34** | Low | 2 | Could (1) | S (1) | 2.0 | Chunk gutter squeezed text reading column at 375px. | Stacked `#01 / token gutter` above chunk text on mobile viewports. | ✅ FIXED (`V8`) |
 
 ---
 
-## 4. Enhancement Proposals Backlog
-
-| ID | Title | Lens | Impact | Effort | Confidence | Smallest Shippable Slice (MVP) | Status |
-| :---: | :--- | :--- | :---: | :---: | :--- | :--- | :--- |
-| **ENH-02** | Client-Side PDF Ingestion (`pdfjs-dist`) | User Value | High | S (1d) | High | Parse text from non-scanned PDFs via in-browser worker | ✅ COMPLETED (`1f688fb`, `e43a54b`) |
-| **ENH-01** | In-Browser Local Embeddings & Cosine Heatmaps | Differentiation | High | M (3d) | Med | Fast in-browser TF-IDF vectorizer, $N \times N$ cosine heatmap, and boundary continuity score | ✅ COMPLETED (`9f091be`) |
-| **ENH-03** | Web Worker Engine Offload | Scale | Med | S (1d) | High | Run chunking & BPE tokenization in dedicated background Web Worker | ✅ COMPLETED (`a7510b7`) |
-| **ENH-04** | Tabular CSV/JSON Chunker with Schema Retention | User Value | High | M (2d) | High | Chunk rows while prepending column schema to every chunk | ✅ COMPLETED (`3617514`) |
-| **ENH-05** | Multi-Model Tokenizer Comparison Matrix | Differentiation | High | S (1d) | High | Display side-by-side token count variance, embedding costs, and truncation risk across 6 models | ✅ COMPLETED (v0.2.0) |
-
----
-
-## 5. Decisions Log & "Won't Do" Items
+## 4. Decisions Log & "Won't Do" Items
 
 - **DECISION-01:** Strictly client-side execution model. Zero document content transmission over the network; privacy guaranteed.
-- **DECISION-02:** Use OpenAI `text-embedding-3-small` public rate (\$0.02 per 1M tokens) as standardized RAG cost baseline.
-- **DECISION-03:** Code-split `js-tiktoken` and `pdfjs-dist` via Rollup `manualChunks` to keep the main application bundle under 140 kB.
-- **DECISION-04:** Use `localStorage` session persistence with a user-facing "Reset" button to avoid accidental loss of edited documents.
-- **DECISION-05:** Provide fallback to `document.execCommand('copy')` in `copyToClipboard` for non-secure / testing contexts.
-- **DECISION-06:** Provide native alert rejection for 0-byte/empty uploaded files rather than silent failure or clearing state.
-- **DECISION-07:** Pre-calculate base BPE token counts once per chunk to optimize multi-model token variance calculation.
-- **WON'T DO:** Server-side database or user authentication (violates client-side privacy architecture).
-- **WON'T DO:** External heavy NLP libraries that require Python runtimes in the browser.
-
----
-
-## 6. "Start Here Next Time" (Future Roadmap Proposals)
-1. **Interactive Query Retrieval Simulator:** Real-time top-k vector search simulation against chunk embeddings with user-entered test queries.
-2. **CLI CI/CD Linter (`npx chunklens lint ./docs`):** Automated GitHub Actions token limit and orphan chunk validation for documentation repos.
-3. **Chunk Overlap Diff Visualizer:** Direct inline diff highlighting between adjacent chunks to inspect semantic continuity visually.
+- **DECISION-02:** Strict Content Security Policy (`connect-src 'none'`) enforced on all production builds and deployment targets.
+- **DECISION-03:** Lazy-load modals and comparison views with `React.lazy` to keep the main bundle well below the 185 kB budget.
+- **DECISION-04:** Enforce a strict 12px typography floor across all UI components for WCAG 2.2 accessibility.
+- **DECISION-05:** Pre-flight verification checklist must be passed prior to production release tags.
+- **WON'T DO:** Weakening axe-core rules or skipping accessibility requirements.
+- **WON'T DO:** External CDN font dependencies or analytics telemetry services.
+- **WON'T DO:** Server-side document parsing or OCR processing.
