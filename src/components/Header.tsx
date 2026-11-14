@@ -169,8 +169,8 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Center: Privacy Indicator & How to Verify Popover */}
-        <div className="flex items-center shrink-0 ml-2.5 sm:ml-0">
+        {/* Privacy Indicator & How to Verify Popover: Centered on desktop (>=1200px), docked next to right actions at <1200px (Item V9) */}
+        <div className="flex items-center shrink-0 ml-auto min-[1200px]:mx-auto">
           <PrivacyPopover />
         </div>
 

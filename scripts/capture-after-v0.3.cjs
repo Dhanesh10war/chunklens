@@ -337,6 +337,16 @@ async function run() {
         const dividers = Array.from(document.querySelectorAll('.xl\\\\:hidden span[aria-hidden="true"]'));
         const hasPipeChars = metricsContainer ? metricsContainer.textContent.includes('|') : false;
 
+        // V9: Privacy shield position at 1024px
+        const shield = document.querySelector('button[aria-label*="Privacy verification"]');
+        const compare = document.querySelector('button[aria-label="Toggle side-by-side comparison"]');
+        const exportBtn = document.querySelector('button[aria-label="Export code and chunks"]');
+        const shieldRect = shield ? shield.getBoundingClientRect() : null;
+        const compareRect = compare ? compare.getBoundingClientRect() : null;
+        const exportRect = exportBtn ? exportBtn.getBoundingClientRect() : null;
+        const nextActionLeft = compareRect ? compareRect.left : (exportRect ? exportRect.left : 0);
+        const gapToRightActions = shieldRect ? (nextActionLeft - shieldRect.right) : null;
+
         return {
           v6: {
             found: !!algoDesc,
@@ -352,6 +362,15 @@ async function run() {
             justifyContent: metricsCs ? metricsCs.justifyContent : null,
             hairlineDividersCount: dividers.length,
             hasPipeCharacters: hasPipeChars,
+          },
+          v9: {
+            shieldFound: !!shield,
+            shieldLeft: shieldRect ? Math.round(shieldRect.left) : null,
+            shieldRight: shieldRect ? Math.round(shieldRect.right) : null,
+            nextActionLeft: Math.round(nextActionLeft),
+            gapToRightActions: gapToRightActions !== null ? Math.round(gapToRightActions) : null,
+            isNextToRightActions: gapToRightActions !== null && gapToRightActions <= 24,
+            notFloatingMidHeader: shieldRect ? shieldRect.right >= (window.innerWidth * 0.65) : false,
           }
         };
       })()`,
