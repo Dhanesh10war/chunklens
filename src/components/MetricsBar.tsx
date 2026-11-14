@@ -60,8 +60,8 @@ export const MetricsBar: React.FC<MetricsBarProps> = ({
           : undefined
       }
     >
-      {/* Desktop / Tablet View (>=768px): Single Horizontal Strip */}
-      <div className="hidden md:flex h-9 px-4 sm:px-6 items-center justify-between overflow-x-auto">
+      {/* Desktop View (>=1280px): Single Horizontal Strip */}
+      <div className="hidden xl:flex h-9 px-4 sm:px-6 items-center justify-between overflow-x-auto">
         <div className="flex items-center space-x-3 sm:space-x-4 text-text-secondary whitespace-nowrap">
           {/* Metric 1: Chunks */}
           <div className="flex items-center space-x-1.5 shrink-0">
@@ -140,8 +140,8 @@ export const MetricsBar: React.FC<MetricsBarProps> = ({
         </div>
       </div>
 
-      {/* Mobile View (<768px): Wrapped Two-Row Layout (Amendment C) */}
-      <div className="md:hidden px-3 py-1.5 flex flex-col gap-1 overflow-x-auto">
+      {/* Responsive View (<1280px): Wrapped Two-Row Layout */}
+      <div className="xl:hidden px-3 sm:px-4 py-1.5 flex flex-col gap-1 overflow-x-auto">
         {/* Row 1: Document & Ingestion Counts */}
         <div className="flex items-center justify-between text-xs text-text-secondary">
           <div className="flex items-center space-x-1.5">
