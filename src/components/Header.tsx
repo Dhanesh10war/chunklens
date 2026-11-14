@@ -130,7 +130,7 @@ export const Header: React.FC<HeaderProps> = ({
               <Layers className="h-3.5 w-3.5" />
             </div>
             <span className="font-semibold text-xs tracking-tight text-text-primary">ChunkLens</span>
-            <span className="text-xs font-mono text-text-tertiary">v0.2.0</span>
+            <span className="text-xs font-mono text-text-tertiary mr-1.5 sm:mr-0">v0.2.0</span>
           </div>
 
           <span className="text-border-default hidden sm:inline">/</span>
@@ -164,7 +164,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Center: Privacy Indicator & How to Verify Popover */}
-        <div className="flex items-center shrink-0">
+        <div className="flex items-center shrink-0 ml-1.5 sm:ml-0">
           <PrivacyPopover />
         </div>
 
@@ -353,7 +353,7 @@ export const Header: React.FC<HeaderProps> = ({
                   className="sm:hidden w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text-primary hover:bg-elevated flex items-center space-x-2 transition-colors focus:bg-elevated focus:outline-none"
                 >
                   <RotateCcw className="h-3.5 w-3.5 text-status-warn" />
-                  <span>Reset Document & Defaults</span>
+                  <span>Reset to defaults</span>
                 </button>
 
                 <div className="my-1 border-t border-border-subtle" />

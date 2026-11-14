@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ShieldCheck, X, Check, Copy } from 'lucide-react';
+import { Tooltip } from './ui/Tooltip';
 import { cn } from '../utils/cn';
 
 interface PrivacyPopoverProps {
@@ -51,17 +52,19 @@ export const PrivacyPopover: React.FC<PrivacyPopoverProps> = ({ className }) => 
 
   return (
     <div className={cn('relative inline-flex items-center', className)} ref={popoverRef}>
-      {/* Trigger Button: Full text >= 1200px, Icon-only < 1200px */}
-      <button
-        onClick={() => setIsOpen((prev) => !prev)}
-        aria-expanded={isOpen}
-        aria-haspopup="dialog"
-        title="100% client-side · zero network egress (Click for verification guide)"
-        className="flex items-center space-x-1.5 h-7 px-2 rounded-md hover:bg-elevated text-text-tertiary hover:text-text-primary text-xs font-mono transition-colors active-press focus-ring"
-      >
-        <ShieldCheck className="h-3.5 w-3.5 text-status-success shrink-0" />
-        <span className="hidden min-[1200px]:inline">100% client-side · zero network egress</span>
-      </button>
+      {/* Trigger Button: Full text >= 1200px, Icon + Tooltip < 1200px */}
+      <Tooltip content="Zero network egress · 100% client-side (Click for audit steps)">
+        <button
+          onClick={() => setIsOpen((prev) => !prev)}
+          aria-expanded={isOpen}
+          aria-haspopup="dialog"
+          aria-label="Privacy verification: 100% client-side with zero network egress"
+          className="flex items-center justify-center space-x-1.5 min-h-[28px] min-w-[28px] px-2 rounded-md hover:bg-elevated text-text-tertiary hover:text-text-primary text-xs font-mono transition-colors active-press focus-ring"
+        >
+          <ShieldCheck className="h-3.5 w-3.5 text-status-success shrink-0" />
+          <span className="hidden min-[1200px]:inline">100% client-side · zero network egress</span>
+        </button>
+      </Tooltip>
 
       {/* Popover Card */}
       {isOpen && (
