@@ -71,7 +71,7 @@ export const MetricsBar: React.FC<MetricsBarProps> = ({
             <span className="text-text-primary font-medium tabular-nums">{chunks.length}</span>
           </div>
 
-          <span className="text-border-default shrink-0">|</span>
+          <span className="border-l border-border-subtle h-3.5 shrink-0" aria-hidden="true" />
 
           {/* Metric 2: Ingested Tokens vs Document Tokens */}
           <div className="flex items-center space-x-1.5 shrink-0" data-testid="metric-tokens">
@@ -100,7 +100,7 @@ export const MetricsBar: React.FC<MetricsBarProps> = ({
             </span>
           </div>
 
-          <span className="text-border-default shrink-0">|</span>
+          <span className="border-l border-border-subtle h-3.5 shrink-0" aria-hidden="true" />
 
           {/* Metric 3: Avg per Chunk */}
           <div className="flex items-center space-x-1.5 shrink-0">
@@ -113,7 +113,7 @@ export const MetricsBar: React.FC<MetricsBarProps> = ({
             </span>
           </div>
 
-          <span className="text-border-default shrink-0">|</span>
+          <span className="border-l border-border-subtle h-3.5 shrink-0" aria-hidden="true" />
 
           {/* Metric 4: Est. Vector Cost */}
           <div className="flex items-center space-x-1.5 shrink-0">
@@ -123,7 +123,7 @@ export const MetricsBar: React.FC<MetricsBarProps> = ({
             <span className="text-text-primary font-medium tabular-nums">{costFormatted}</span>
           </div>
 
-          <span className="text-border-default shrink-0">|</span>
+          <span className="border-l border-border-subtle h-3.5 shrink-0" aria-hidden="true" />
 
           {/* Metric 5: Execution Latency */}
           <div className="flex items-center space-x-1.5 shrink-0">
@@ -140,44 +140,50 @@ export const MetricsBar: React.FC<MetricsBarProps> = ({
         </div>
       </div>
 
-      {/* Responsive View (<1280px): Wrapped Two-Row Layout */}
-      <div className="xl:hidden px-3 sm:px-4 py-1.5 flex flex-col gap-1 overflow-x-auto">
-        {/* Row 1: Document & Ingestion Counts */}
-        <div className="flex items-center justify-between text-xs text-text-secondary">
-          <div className="flex items-center space-x-1.5">
-            <span className="text-text-tertiary">Chunks</span>
-            <span className="text-text-primary font-medium tabular-nums">{chunks.length}</span>
-          </div>
-
-          <div className="flex items-center space-x-1.5" data-testid="mobile-metric-tokens">
-            <span className="text-text-tertiary">Ingested</span>
-            <span className="text-text-primary font-medium tabular-nums">
-              {totalChunkTokens.toLocaleString()} tok
-            </span>
-            <span className="text-text-tertiary text-xs">
-              ({totalTokens.toLocaleString()} doc)
-            </span>
-          </div>
+      {/* Responsive View (<1280px): Compact Left-Aligned Wrapped Rows */}
+      <div className="xl:hidden px-3 sm:px-4 py-1.5 flex flex-wrap items-center justify-start gap-x-3 gap-y-1 text-xs text-text-secondary">
+        {/* Metric 1: Chunks */}
+        <div className="flex items-center space-x-1.5 shrink-0">
+          <span className="text-text-tertiary">Chunks</span>
+          <span className="text-text-primary font-medium tabular-nums">{chunks.length}</span>
         </div>
 
-        {/* Row 2: Distribution, Cost & Latency */}
-        <div className="flex items-center justify-between text-xs text-text-secondary pt-0.5 border-t border-border-subtle/50">
-          <div className="flex items-center space-x-1.5">
-            <span className="text-text-tertiary">Avg</span>
-            <span className="text-text-primary font-medium tabular-nums">{avgTokensPerChunk}</span>
-            <span className="text-text-tertiary text-xs">[{minTokensPerChunk}–{maxTokensPerChunk}]</span>
-          </div>
+        <span className="border-l border-border-subtle h-3.5 shrink-0" aria-hidden="true" />
 
-          <div className="flex items-center space-x-2">
-            <div className="flex items-center space-x-1">
-              <span className="text-text-tertiary">Cost</span>
-              <span className="text-text-primary font-medium tabular-nums">{costFormatted}</span>
-            </div>
-            <span className="text-border-default">·</span>
-            <div className="flex items-center space-x-1">
-              <span className="text-text-primary font-medium tabular-nums">{executionTimeMs} ms</span>
-            </div>
-          </div>
+        {/* Metric 2: Ingested & Doc Tokens */}
+        <div className="flex items-center space-x-1.5 shrink-0" data-testid="mobile-metric-tokens">
+          <span className="text-text-tertiary">Ingested</span>
+          <span className="text-text-primary font-medium tabular-nums">
+            {totalChunkTokens.toLocaleString()} tok
+          </span>
+          <span className="text-text-tertiary text-xs">
+            ({totalTokens.toLocaleString()} doc)
+          </span>
+        </div>
+
+        <span className="border-l border-border-subtle h-3.5 shrink-0" aria-hidden="true" />
+
+        {/* Metric 3: Avg per Chunk */}
+        <div className="flex items-center space-x-1.5 shrink-0">
+          <span className="text-text-tertiary">Avg</span>
+          <span className="text-text-primary font-medium tabular-nums">{avgTokensPerChunk}</span>
+          <span className="text-text-tertiary text-xs tabular-nums">[{minTokensPerChunk}–{maxTokensPerChunk}]</span>
+        </div>
+
+        <span className="border-l border-border-subtle h-3.5 shrink-0" aria-hidden="true" />
+
+        {/* Metric 4: Cost */}
+        <div className="flex items-center space-x-1 shrink-0">
+          <span className="text-text-tertiary">Cost</span>
+          <span className="text-text-primary font-medium tabular-nums">{costFormatted}</span>
+        </div>
+
+        <span className="border-l border-border-subtle h-3.5 shrink-0" aria-hidden="true" />
+
+        {/* Metric 5: Latency */}
+        <div className="flex items-center space-x-1 shrink-0">
+          <span className="text-text-tertiary">Compute</span>
+          <span className="text-text-primary font-medium tabular-nums">{executionTimeMs} ms</span>
         </div>
       </div>
     </div>
