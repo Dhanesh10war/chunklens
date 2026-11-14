@@ -130,7 +130,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* SECTION 1: SOURCE */}
           <div className="flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-sans font-medium text-text-secondary">
+              <span className="text-[13px] font-semibold text-text-primary">
                 Document source
               </span>
               {onNewDocument && (
@@ -240,7 +240,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {/* SECTION 2: CHUNKING STRATEGY */}
           <div className="flex flex-col gap-3">
-            <span className="text-xs font-sans font-medium text-text-secondary">
+            <span className="text-[13px] font-semibold text-text-primary">
               Chunking strategy
             </span>
 
@@ -276,7 +276,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {config.strategy === 'recursive' && (
               <div className="space-y-1.5">
                 <Input
-                  label="Separators Hierarchy"
+                  label="Separators hierarchy"
                   value={separatorsText}
                   onChange={(e) => handleSeparatorsChange(e.target.value)}
                   placeholder='e.g. "\n\n", "\n", " ", ""'
@@ -299,12 +299,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {/* SECTION 3: UNIT & TOKENIZER */}
           <div className="flex flex-col gap-3">
-            <span className="text-xs font-sans font-medium text-text-secondary">
+            <span className="text-[13px] font-semibold text-text-primary">
               Unit &amp; tokenizer
             </span>
 
             <div className="space-y-1">
-              <label className="text-xs font-medium text-text-secondary">Measurement Unit</label>
+              <label className="text-xs font-medium text-text-secondary">Measurement unit</label>
               <SegmentedControl
                 options={[
                   { value: 'tokens', label: 'Tokens (BPE)' },
@@ -317,7 +317,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
 
             <Select
-              label="Tokenizer Encoding"
+              label="Tokenizer encoding"
               value={config.encoding}
               onChange={(e) =>
                 onChangeConfig({ ...config, encoding: e.target.value as TokenizerEncoding })
@@ -349,12 +349,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {/* SECTION 4: SIZE & OVERLAP */}
           <div className="flex flex-col gap-4">
-            <span className="text-xs font-sans font-medium text-text-secondary">
+            <span className="text-[13px] font-semibold text-text-primary">
               Size &amp; overlap
             </span>
 
             <SliderWithInput
-              label="Target Chunk Size"
+              label="Target chunk size"
               value={config.chunkSize}
               min={sizeMin}
               max={sizeMax}
@@ -364,7 +364,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             />
 
             <SliderWithInput
-              label="Overlap Window"
+              label="Overlap window"
               value={config.chunkOverlap}
               min={overlapMin}
               max={overlapMax}
