@@ -15,15 +15,17 @@ const CSP_DIRECTIVES = {
   'frame-ancestors': ["'none'"],
 };
 
-function buildCspString() {
+function buildCspString({ isMeta = false } = {}) {
   return Object.entries(CSP_DIRECTIVES)
+    .filter(([directive]) => !(isMeta && directive === 'frame-ancestors'))
     .map(([directive, sources]) => `${directive} ${sources.join(' ')}`)
     .join('; ');
 }
 
-const cspString = buildCspString();
+const headerCsp = buildCspString({ isMeta: false });
+const metaCsp = buildCspString({ isMeta: true });
 
-// Generate / update vercel.json
+// 1. Generate / update vercel.json
 const vercelConfig = {
   framework: 'vite',
   buildCommand: 'npm run build',
@@ -34,7 +36,7 @@ const vercelConfig = {
       headers: [
         {
           key: 'Content-Security-Policy',
-          value: cspString,
+          value: headerCsp,
         },
         {
           key: 'X-Content-Type-Options',
@@ -46,7 +48,24 @@ const vercelConfig = {
         },
         {
           key: 'Referrer-Policy',
-          value: 'no-referrer',
+          value: 'strict-origin-when-cross-origin',
+        },
+        {
+          key: 'Permissions-Policy',
+          value: 'camera=(), microphone=(), geolocation=()',
+        },
+        {
+          key: 'Cache-Control',
+          value: 'no-cache',
+        },
+      ],
+    },
+    {
+      source: '/assets/(.*)',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=31536000, immutable',
         },
       ],
     },
@@ -64,6 +83,28 @@ const vercelConfig = {
 
 const vercelPath = path.resolve(__dirname, '../vercel.json');
 fs.writeFileSync(vercelPath, JSON.stringify(vercelConfig, null, 2) + '\n', 'utf8');
-console.log('[CSP Sync] vercel.json synchronized successfully.');
 
-module.exports = { CSP_DIRECTIVES, buildCspString };
+// 2. Generate / update public/_headers (Cloudflare Pages)
+const cloudflareHeaders = `/*
+  Content-Security-Policy: ${headerCsp}
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Cache-Control: no-cache
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+`;
+
+const publicHeadersPath = path.resolve(__dirname, '../public/_headers');
+fs.writeFileSync(publicHeadersPath, cloudflareHeaders, 'utf8');
+
+console.log('[CSP Sync] vercel.json and public/_headers synchronized successfully.');
+console.log('  Header CSP length:', headerCsp.length);
+console.log('  Meta CSP length:  ', metaCsp.length, '(omits frame-ancestors)');
+
+module.exports = { CSP_DIRECTIVES, buildCspString, headerCsp, metaCsp };

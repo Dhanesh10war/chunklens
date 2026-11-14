@@ -9,7 +9,7 @@ const pkg = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
   const isBuild = command === 'build';
-  const cspContent = buildCspString();
+  const cspContent = buildCspString({ isMeta: true });
 
   return {
     define: {

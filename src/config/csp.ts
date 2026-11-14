@@ -17,10 +17,18 @@ export const CSP_DIRECTIVES: Record<string, string[]> = {
   'frame-ancestors': ["'none'"],
 };
 
-export function buildCspString(): string {
+export function buildCspString(options: { isMeta?: boolean } = {}): string {
   return Object.entries(CSP_DIRECTIVES)
+    .filter(([directive]) => {
+      // <meta http-equiv="Content-Security-Policy"> ignores frame-ancestors and logs a console error
+      if (options.isMeta && directive === 'frame-ancestors') {
+        return false;
+      }
+      return true;
+    })
     .map(([directive, sources]) => `${directive} ${sources.join(' ')}`)
     .join('; ');
 }
 
-export const STRICT_CSP_HEADER = buildCspString();
+export const STRICT_CSP_HEADER = buildCspString({ isMeta: false });
+export const STRICT_CSP_META = buildCspString({ isMeta: true });

@@ -12,7 +12,8 @@
     "test:egress": "node --experimental-websocket scripts/test-egress.cjs",
     "test:e2e": "playwright test",
     "typecheck": "tsc -b",
-    "lint": "tsc -b"
+    "lint": "tsc -b",
+    "sync:csp": "node scripts/sync-csp.cjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",
