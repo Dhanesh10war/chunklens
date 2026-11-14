@@ -21,24 +21,26 @@
 
 ## 2. Release Ratchet Table
 
-| Metric | v0.2.0 Baseline (`ffb2f16`) | v0.3 Batch 1 | v0.3 Batch 2a | v0.3 Batch 2b (Current) | Target v0.8 | Status |
-| :--- | :---: | :---: | :---: | :---: | :---: | :--- |
-| **Unit / Integration Tests** | 86 (12 suites) | 86 (12 suites) | 108 (18 suites) | **115 (19 suites)** | $\ge 120$ | ✅ Ratcheted (+29) |
-| **TypeScript Diagnostics** | 0 errors | 0 errors | 0 errors | **0 errors** | 0 | ✅ Clean |
-| **Custom DOM A11y Violations (1440 & 375)** | 0 | 0 | 0 | **0 (Loaded, Empty, Error)** | 0 | ✅ Zero violations |
-| **External Network Requests** | Google Fonts | 0 (Strict CSP) | 0 (Strict CSP) | **0 (Strict CSP)** | 0 | ✅ Verified zero egress |
-| **Main JS Bundle (`index.js` Raw / Gzip)** | 172.06 kB / 48.33 kB | 187.94 kB / 52.20 kB | 188.65 kB / 52.43 kB | **131.77 kB / 39.23 kB** | $< 185$ kB | ✅ 53 kB under budget |
-| **React Vendor Bundle (Raw / Gzip)** | 134.67 kB / 43.22 kB | 134.67 kB / 43.22 kB | 134.67 kB / 43.22 kB | **134.67 kB / 43.22 kB** | $< 150$ kB | ✅ Stable |
-| **Lucide Icons Chunk (Raw / Gzip)** | 23.89 kB / 6.10 kB | 26.37 kB / 6.76 kB | 26.37 kB / 6.76 kB | **27.02 kB / 6.86 kB** | $< 35$ kB | ✅ Stable |
-| **PDF Engine (`pdfjs-dist` Raw / Gzip)** | 512.51 kB / 155.91 kB | 512.51 kB / 155.91 kB | 512.51 kB / 155.91 kB | **512.51 kB / 155.91 kB** | Isolated chunk | ✅ Split |
-| **PDF Worker Chunk (Raw)** | 1,298.21 kB | 1,298.21 kB | 1,298.21 kB | **1,298.21 kB** | Dedicated worker | ✅ Split |
-| **Tiktoken Tokenizer Chunk (Raw / Gzip)**| 5,603.11 kB / 2,567.88 kB | 5,603.11 kB / 2,567.88 kB | 5,603.11 kB / 2,567.88 kB | **5,603.11 kB / 2,567.88 kB**| Shared chunk | 🔄 Consolidating in v0.4 |
-| **Chunking Worker Chunk (Raw)** | 5,613.94 kB | 5,613.94 kB | 5,613.94 kB | **5,613.94 kB** | Dedicated worker | 🔄 Shared rank table in v0.4 |
-| **CSS Bundle (Raw / Gzip)** | 28.50 kB / 5.80 kB | 32.87 kB / 6.85 kB | 32.87 kB / 6.85 kB | **33.37 kB / 6.98 kB** | $< 50$ kB | ✅ Compact |
-| **Index HTML (Raw / Gzip)** | 1.20 kB / 0.60 kB | 1.79 kB / 0.86 kB | 1.79 kB / 0.86 kB | **1.79 kB / 0.87 kB** | $< 2$ kB | ✅ Strict CSP |
-| **Export Button Contrast** | UNMEASURED | UNMEASURED | UNMEASURED | **6.29:1 (browser) / 7.90:1 (CSS)** | $\ge 4.5:1$ | ✅ 100% WCAG AA |
-| **Text Floor Minimum** | 10px | 10px | 10px | **12px (0 sub-12px elements)**| $\ge 12$px | ✅ Enforced |
-| **Overflow Menu Keyboard Navigation** | N/A | N/A | N/A | **Focus return + arrow keys verified**| Accessible | ✅ Verified |
+| Metric | v0.2.0 Baseline (`ffb2f16`) | Current v0.3 Release Candidate | Target v0.8 | Status |
+| :--- | :---: | :---: | :---: | :--- |
+| **Unit / Integration Tests** | 86 (12 suites) | **122 (20 suites)** | $\ge 120$ | ✅ Ratcheted (+36) |
+| **TypeScript Diagnostics** | 0 errors | **0 errors** | 0 | ✅ Clean (`tsc -b`) |
+| **Custom DOM A11y Violations (1440 & 375)** | 0 | **0 (Loaded, Empty, Error)** | 0 | ✅ Zero violations |
+| **Axe-Core / Playwright E2E Status** | UNMEASURED | **Written, awaiting user install** | 0 violations | 🔄 Pending `playwright install` |
+| **External Network Requests** | Google Fonts | **0 (Strict CSP `connect-src 'none'`)** | 0 | ✅ Verified zero egress |
+| **Main JS Bundle (`index.js` Raw / Gzip)** | 172.06 kB / 48.33 kB | **134.76 kB / 40.15 kB** | $< 185$ kB | ✅ 50.24 kB under budget |
+| **React Vendor Bundle (Raw / Gzip)** | 134.67 kB / 43.22 kB | **134.67 kB / 43.22 kB** | $< 150$ kB | ✅ Stable |
+| **Lucide Icons Chunk (Raw / Gzip)** | 23.89 kB / 6.10 kB | **27.28 kB / 6.90 kB** | $< 35$ kB | ✅ Stable |
+| **PDF Engine (`pdfjs-dist` Raw / Gzip)** | 512.51 kB / 155.91 kB | **512.51 kB / 155.91 kB** | Isolated chunk | ✅ Split |
+| **PDF Worker Chunk (Raw)** | 1,298.21 kB | **1,298.21 kB** | Dedicated worker | ✅ Split |
+| **Tiktoken Tokenizer Chunk (Raw / Gzip)**| 5,603.11 kB / 2,567.88 kB | **5,603.11 kB / 2,567.88 kB**| Shared chunk | 🔄 Consolidating in v0.4 |
+| **Chunking Worker Chunk (Raw)** | 5,613.94 kB | **5,613.94 kB** | Dedicated worker | 🔄 Shared rank table in v0.4 |
+| **CSS Bundle (Raw / Gzip)** | 28.50 kB / 5.80 kB | **33.54 kB / 7.02 kB** | $< 50$ kB | ✅ Compact |
+| **Index HTML (Raw / Gzip)** | 1.20 kB / 0.60 kB | **1.79 kB / 0.86 kB** | $< 2$ kB | ✅ Strict CSP |
+| **Export Button Contrast (WCAG 2.2 AA)** | UNMEASURED | **6.29:1 (browser) / 7.90:1 (CSS)** | $\ge 4.5:1$ | ✅ 100% WCAG AA |
+| **Typography Text Floor** | 10px | **12px (0 sub-12px elements)**| $\ge 12$px | ✅ Enforced |
+| **Overflow Menu Keyboard Navigation** | N/A | **Focus return + arrow keys verified**| Accessible | ✅ Verified |
+| **Horizontal Page & Strip Overflow** | UNMEASURED | **scrollWidth $\le$ clientWidth across 1440/1024/768/375** | Zero overflow | ✅ Verified |
 
 ---
 

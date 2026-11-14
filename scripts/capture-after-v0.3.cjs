@@ -179,6 +179,61 @@ async function runAudit(client, stateLabel, width, height) {
   return auditRes.result.value;
 }
 
+async function measureOverflow(client, state, width, height) {
+  const res = await client.send('Runtime.evaluate', {
+    expression: `(() => {
+      const header = document.querySelector('header');
+      const metrics = document.querySelector('[data-testid="metric-tokens"]')?.closest('div.border-b') ||
+                    document.querySelector('[data-testid="mobile-metric-tokens"]')?.closest('div.border-b');
+      
+      const headerScrollWidth = header ? header.scrollWidth : 0;
+      const headerClientWidth = header ? header.clientWidth : 0;
+      const metricsScrollWidth = metrics ? metrics.scrollWidth : 0;
+      const metricsClientWidth = metrics ? metrics.clientWidth : 0;
+      const docScrollWidth = document.documentElement.scrollWidth;
+      const viewportWidth = window.innerWidth;
+
+      const exportBtn = document.querySelector('button[aria-label="Export code and chunks"]');
+      const exportStyle = exportBtn ? window.getComputedStyle(exportBtn) : null;
+      const isExportVisible = exportBtn ? (exportStyle.display !== 'none' && exportStyle.visibility !== 'hidden' && exportBtn.offsetParent !== null) : false;
+
+      const privacyBtn = document.querySelector('button[aria-label*="Privacy"]') || document.querySelector('button[aria-label*="privacy"]');
+      const privacyStyle = privacyBtn ? window.getComputedStyle(privacyBtn) : null;
+      const isPrivacyVisible = privacyBtn ? (privacyStyle.display !== 'none' && privacyStyle.visibility !== 'hidden' && privacyBtn.offsetParent !== null) : false;
+      const privacyRect = privacyBtn ? privacyBtn.getBoundingClientRect() : null;
+
+      return {
+        state: '${state}',
+        viewport: '${width}x${height}',
+        viewportWidth,
+        docScrollWidth,
+        docNoOverflow: docScrollWidth <= viewportWidth,
+        header: {
+          scrollWidth: headerScrollWidth,
+          clientWidth: headerClientWidth,
+          noOverflow: headerScrollWidth <= headerClientWidth + 1
+        },
+        metrics: metrics ? {
+          present: true,
+          scrollWidth: metricsScrollWidth,
+          clientWidth: metricsClientWidth,
+          noOverflow: metricsScrollWidth <= metricsClientWidth + 1
+        } : {
+          present: false
+        },
+        visibility: {
+          exportVisible: isExportVisible,
+          privacyVisible: isPrivacyVisible,
+          privacyTargetSize: privacyRect ? { width: Math.round(privacyRect.width), height: Math.round(privacyRect.height) } : null,
+          privacyTargetSizeAdequate: privacyRect ? (privacyRect.width >= 24 && privacyRect.height >= 24) : false
+        }
+      };
+    })()`,
+    returnByValue: true,
+  });
+  return res.result.value;
+}
+
 async function setDrawerState(client, open, width) {
   if (width >= 1024) return; // Docked at desktop
   await client.send('Runtime.evaluate', {
@@ -229,12 +284,15 @@ async function run() {
     // Desktop >=1024 (docked)
     await capture(client, 'loaded_1440.png', 1440, 900);
     const loadedAudit_1440 = await runAudit(client, 'loaded', 1440, 900);
+    const loadedOverflow_1440 = await measureOverflow(client, 'loaded', 1440, 900);
 
     await capture(client, 'loaded_1024.png', 1024, 768);
+    const loadedOverflow_1024 = await measureOverflow(client, 'loaded', 1024, 768);
 
     // Tablet 768 (closed and open)
     await setDrawerState(client, false, 768);
     await capture(client, 'loaded_768_closed.png', 768, 1024);
+    const loadedOverflow_768 = await measureOverflow(client, 'loaded', 768, 1024);
     await setDrawerState(client, true, 768);
     await capture(client, 'loaded_768_open.png', 768, 1024);
 
@@ -242,6 +300,7 @@ async function run() {
     await setDrawerState(client, false, 375);
     await capture(client, 'loaded_375_closed.png', 375, 812);
     const loadedAudit_375 = await runAudit(client, 'loaded', 375, 812);
+    const loadedOverflow_375 = await measureOverflow(client, 'loaded', 375, 812);
 
     await setDrawerState(client, true, 375);
     await capture(client, 'loaded_375_open.png', 375, 812);
@@ -266,12 +325,15 @@ async function run() {
     // Desktop >=1024 (docked)
     await capture(client, 'empty_1440.png', 1440, 900);
     const emptyAudit_1440 = await runAudit(client, 'empty', 1440, 900);
+    const emptyOverflow_1440 = await measureOverflow(client, 'empty', 1440, 900);
 
     await capture(client, 'empty_1024.png', 1024, 768);
+    const emptyOverflow_1024 = await measureOverflow(client, 'empty', 1024, 768);
 
     // Tablet 768 (closed and open)
     await setDrawerState(client, false, 768);
     await capture(client, 'empty_768_closed.png', 768, 1024);
+    const emptyOverflow_768 = await measureOverflow(client, 'empty', 768, 1024);
     await setDrawerState(client, true, 768);
     await capture(client, 'empty_768_open.png', 768, 1024);
 
@@ -279,6 +341,7 @@ async function run() {
     await setDrawerState(client, false, 375);
     await capture(client, 'empty_375_closed.png', 375, 812);
     const emptyAudit_375 = await runAudit(client, 'empty', 375, 812);
+    const emptyOverflow_375 = await measureOverflow(client, 'empty', 375, 812);
 
     await setDrawerState(client, true, 375);
     await capture(client, 'empty_375_open.png', 375, 812);
@@ -303,12 +366,15 @@ async function run() {
     // Desktop >=1024 (docked)
     await capture(client, 'error_1440.png', 1440, 900);
     const errorAudit_1440 = await runAudit(client, 'error', 1440, 900);
+    const errorOverflow_1440 = await measureOverflow(client, 'error', 1440, 900);
 
     await capture(client, 'error_1024.png', 1024, 768);
+    const errorOverflow_1024 = await measureOverflow(client, 'error', 1024, 768);
 
     // Tablet 768 (closed and open)
     await setDrawerState(client, false, 768);
     await capture(client, 'error_768_closed.png', 768, 1024);
+    const errorOverflow_768 = await measureOverflow(client, 'error', 768, 1024);
     await setDrawerState(client, true, 768);
     await capture(client, 'error_768_open.png', 768, 1024);
 
@@ -316,6 +382,7 @@ async function run() {
     await setDrawerState(client, false, 375);
     await capture(client, 'error_375_closed.png', 375, 812);
     const errorAudit_375 = await runAudit(client, 'error', 375, 812);
+    const errorOverflow_375 = await measureOverflow(client, 'error', 375, 812);
 
     await setDrawerState(client, true, 375);
     await capture(client, 'error_375_open.png', 375, 812);
@@ -431,9 +498,33 @@ async function run() {
     });
     console.log('Overflow Menu Focus Return & Keyboard Check:', overflowMenuCheck.result.value);
 
+    const overflowMeasurements = {
+      loaded: {
+        w1440: loadedOverflow_1440,
+        w1024: loadedOverflow_1024,
+        w768: loadedOverflow_768,
+        w375: loadedOverflow_375,
+      },
+      empty: {
+        w1440: emptyOverflow_1440,
+        w1024: emptyOverflow_1024,
+        w768: emptyOverflow_768,
+        w375: emptyOverflow_375,
+      },
+      error: {
+        w1440: errorOverflow_1440,
+        w1024: errorOverflow_1024,
+        w768: errorOverflow_768,
+        w375: errorOverflow_375,
+      },
+    };
+    console.log('\n--- 5. OVERFLOW & COMPUTED VISIBILITY MEASUREMENTS ---');
+    console.log(JSON.stringify(overflowMeasurements, null, 2));
+
     const fullReport = {
       timestamp: new Date().toISOString(),
       screenshotsCount: 18,
+      overflowMeasurements,
       loadedAudit_1440,
       loadedAudit_375,
       emptyAudit_1440,

@@ -171,36 +171,38 @@ describe('validateAndProcessDocumentFile', () => {
   });
 
   it('omits retainedDocTitle when no current document exists', async () => {
-    let capturedError: UploadErrorInfo | undefined = undefined;
+    let capturedError: UploadErrorInfo | null = null;
     const zeroByteFile = new File([], 'empty.txt', { type: 'text/plain' });
 
     const ok = await validateAndProcessDocumentFile(zeroByteFile, {
       currentDocumentTitle: undefined,
       onSuccess: vi.fn(),
-      onError: (err) => {
+      onError: (err: UploadErrorInfo) => {
         capturedError = err;
       },
     });
 
     expect(ok).toBe(false);
-    expect(capturedError).toBeDefined();
-    expect(capturedError?.retainedDocTitle).toBeUndefined();
+    expect(capturedError).not.toBeNull();
+    const err = capturedError as unknown as UploadErrorInfo;
+    expect(err.retainedDocTitle).toBeUndefined();
   });
 
   it('preserves exact current document title when one exists', async () => {
-    let capturedError: UploadErrorInfo | undefined = undefined;
+    let capturedError: UploadErrorInfo | null = null;
     const zeroByteFile = new File([], 'empty.txt', { type: 'text/plain' });
 
     const ok = await validateAndProcessDocumentFile(zeroByteFile, {
       currentDocumentTitle: 'Attention & Retrieval in Transformer Models',
       onSuccess: vi.fn(),
-      onError: (err) => {
+      onError: (err: UploadErrorInfo) => {
         capturedError = err;
       },
     });
 
     expect(ok).toBe(false);
-    expect(capturedError).toBeDefined();
-    expect(capturedError?.retainedDocTitle).toBe('Attention & Retrieval in Transformer Models');
+    expect(capturedError).not.toBeNull();
+    const err = capturedError as unknown as UploadErrorInfo;
+    expect(err.retainedDocTitle).toBe('Attention & Retrieval in Transformer Models');
   });
 });
