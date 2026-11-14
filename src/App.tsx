@@ -5,6 +5,7 @@ import { useChunkingWorker } from './engine/worker/useChunkingWorker';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { MetricsBar } from './components/MetricsBar';
+import { EmptyState } from './components/EmptyState';
 import { VisualCanvas } from './components/VisualCanvas';
 import { ChunkInspector } from './components/ChunkInspector';
 import { ToastProvider, useToast } from './components/ui/Toast';
@@ -212,103 +213,119 @@ export const AppContent: React.FC = () => {
 
         {/* Hero Content Canvas */}
         <main className="flex-1 flex flex-col min-w-0 bg-bg-base overflow-hidden">
-          {/* Slim Summary Strip */}
-          <MetricsBar
-            result={chunkingResult}
-            isProcessing={isProcessing}
-          />
-
-          {/* Canvas Subnavigation Bar */}
-          <div className="px-4 sm:px-6 py-2 border-b border-border-default bg-surface/30 flex items-center justify-between">
-            <SegmentedControl
-              variant="underline"
-              options={[
-                { value: 'visualizer', label: 'Chunks', icon: <Layers className="h-3.5 w-3.5" /> },
-                { value: 'heatmap', label: 'Similarity Heatmap', icon: <Grid3X3 className="h-3.5 w-3.5" /> },
-                { value: 'editor', label: 'Edit Raw Text', icon: <Edit3 className="h-3.5 w-3.5" /> },
-              ]}
-              value={activeTab}
-              onChange={(val) => setActiveTab(val as 'visualizer' | 'heatmap' | 'editor')}
+          {!rawText.trim() ? (
+            <EmptyState
+              onSelectSample={handleSelectSample}
+              onFileUpload={handleFileUploadProcess}
+              onPasteText={(text, title) => {
+                const formatInfo = detectFileFormat(title || 'Pasted Snippet', text);
+                handleFileUpload(text, title || 'Pasted Snippet', formatInfo);
+              }}
+              uploadError={uploadError}
+              onDismissError={clearError}
+              isExtractingPdf={isExtractingPdf}
             />
-          </div>
+          ) : (
+            <>
+              {/* Slim Summary Strip */}
+              <MetricsBar
+                result={chunkingResult}
+                isProcessing={isProcessing}
+              />
 
-          {/* Main View Area */}
-          <div className="flex-1 overflow-hidden flex">
-            {activeTab === 'editor' ? (
-              <div className="flex-1 p-6 flex flex-col bg-bg-base">
-                <div className="flex items-center justify-between pb-2 text-xs">
-                  <span className="font-medium text-text-secondary">Raw Document Source</span>
-                  <span className="font-mono text-text-tertiary tabular-nums">
-                    {rawText.length.toLocaleString()} characters
-                  </span>
-                </div>
-                <textarea
-                  value={rawText}
-                  onChange={(e) => setRawText(e.target.value)}
-                  placeholder="Paste or write document text to chunk..."
-                  className="flex-1 w-full bg-surface border border-border-default rounded-md p-4 font-mono text-xs text-text-primary leading-relaxed resize-none focus-ring transition-colors"
-                  spellCheck="false"
-                  aria-label="Raw document editor"
+              {/* Canvas Subnavigation Bar */}
+              <div className="px-4 sm:px-6 py-2 border-b border-border-default bg-surface/30 flex items-center justify-between">
+                <SegmentedControl
+                  variant="underline"
+                  options={[
+                    { value: 'visualizer', label: 'Chunks', icon: <Layers className="h-3.5 w-3.5" /> },
+                    { value: 'heatmap', label: 'Similarity Heatmap', icon: <Grid3X3 className="h-3.5 w-3.5" /> },
+                    { value: 'editor', label: 'Edit Raw Text', icon: <Edit3 className="h-3.5 w-3.5" /> },
+                  ]}
+                  value={activeTab}
+                  onChange={(val) => setActiveTab(val as 'visualizer' | 'heatmap' | 'editor')}
                 />
               </div>
-            ) : activeTab === 'heatmap' ? (
-              <Suspense fallback={<div className="p-8 text-center text-xs text-text-tertiary">Loading heatmap...</div>}>
-                <SimilarityHeatmap chunks={chunkingResult.chunks} />
-              </Suspense>
-            ) : isCompareMode ? (
-              <Suspense fallback={<div className="p-8 text-center text-xs text-text-tertiary">Loading comparison...</div>}>
-                <ComparisonView
-                  rawText={deferredText}
-                  primaryConfig={config}
-                  onApplyVariantB={(newConfig) => {
-                    setConfig(newConfig);
-                    setIsCompareMode(false);
-                  }}
-                />
-              </Suspense>
-            ) : (
-              <VisualCanvas
-                chunks={chunkingResult.chunks}
-                selectedChunkId={selectedChunkId}
-                onSelectChunk={(chunkId) => {
-                  setSelectedChunkId(chunkId);
-                  if (chunkId) setIsInspectorOpen(true);
-                }}
-                detectedFormat={detectedFormat}
-                onDropFile={handleFileUploadProcess}
-                onSelectSample={handleSelectSample}
-                onPasteText={(text, title) => {
-                  const formatInfo = detectFileFormat(title || 'Pasted Snippet', text);
-                  handleFileUpload(text, title || 'Pasted Snippet', formatInfo);
-                }}
-                uploadError={uploadError}
-                onDismissError={clearError}
-                isExtractingPdf={isExtractingPdf}
-              />
-            )}
 
-            {/* Right Inspector Drawer (Collapsible, appears on chunk selection) */}
-            {activeTab === 'visualizer' && !isCompareMode && selectedChunk && isInspectorOpen && (
-              <ChunkInspector
-                chunk={selectedChunk}
-                totalChunks={chunkingResult.chunks.length}
-                prevChunk={prevChunk}
-                nextChunk={nextChunk}
-                detectedFormat={detectedFormat}
-                onSelectPrev={() => {
-                  if (selectedChunkIdx > 0) {
-                    setSelectedChunkId(chunkingResult.chunks[selectedChunkIdx - 1].id);
-                  }
-                }}
-                onSelectNext={() => {
-                  if (selectedChunkIdx < chunkingResult.chunks.length - 1) {
-                    setSelectedChunkId(chunkingResult.chunks[selectedChunkIdx + 1].id);
-                  }
-                }}
-                onClose={() => setIsInspectorOpen(false)}
-              />
-            )}
-          </div>
+              {/* Main View Area */}
+              <div className="flex-1 overflow-hidden flex">
+                {activeTab === 'editor' ? (
+                  <div className="flex-1 p-6 flex flex-col bg-bg-base">
+                    <div className="flex items-center justify-between pb-2 text-xs">
+                      <span className="font-medium text-text-secondary">Raw Document Source</span>
+                      <span className="font-mono text-text-tertiary tabular-nums">
+                        {rawText.length.toLocaleString()} characters
+                      </span>
+                    </div>
+                    <textarea
+                      value={rawText}
+                      onChange={(e) => setRawText(e.target.value)}
+                      placeholder="Paste or write document text to chunk..."
+                      className="flex-1 w-full bg-surface border border-border-default rounded-md p-4 font-mono text-xs text-text-primary leading-relaxed resize-none focus-ring transition-colors"
+                      spellCheck="false"
+                      aria-label="Raw document editor"
+                    />
+                  </div>
+                ) : activeTab === 'heatmap' ? (
+                  <Suspense fallback={<div className="p-8 text-center text-xs text-text-tertiary">Loading heatmap...</div>}>
+                    <SimilarityHeatmap chunks={chunkingResult.chunks} />
+                  </Suspense>
+                ) : isCompareMode ? (
+                  <Suspense fallback={<div className="p-8 text-center text-xs text-text-tertiary">Loading comparison...</div>}>
+                    <ComparisonView
+                      rawText={deferredText}
+                      primaryConfig={config}
+                      onApplyVariantB={(newConfig) => {
+                        setConfig(newConfig);
+                        setIsCompareMode(false);
+                      }}
+                    />
+                  </Suspense>
+                ) : (
+                  <VisualCanvas
+                    chunks={chunkingResult.chunks}
+                    selectedChunkId={selectedChunkId}
+                    onSelectChunk={(chunkId) => {
+                      setSelectedChunkId(chunkId);
+                      if (chunkId) setIsInspectorOpen(true);
+                    }}
+                    detectedFormat={detectedFormat}
+                    onDropFile={handleFileUploadProcess}
+                    onSelectSample={handleSelectSample}
+                    onPasteText={(text, title) => {
+                      const formatInfo = detectFileFormat(title || 'Pasted Snippet', text);
+                      handleFileUpload(text, title || 'Pasted Snippet', formatInfo);
+                    }}
+                    uploadError={uploadError}
+                    onDismissError={clearError}
+                    isExtractingPdf={isExtractingPdf}
+                  />
+                )}
+
+                {/* Right Inspector Drawer (Collapsible, appears on chunk selection) */}
+                {activeTab === 'visualizer' && !isCompareMode && selectedChunk && isInspectorOpen && (
+                  <ChunkInspector
+                    chunk={selectedChunk}
+                    totalChunks={chunkingResult.chunks.length}
+                    prevChunk={prevChunk}
+                    nextChunk={nextChunk}
+                    detectedFormat={detectedFormat}
+                    onSelectPrev={() => {
+                      if (selectedChunkIdx > 0) {
+                        setSelectedChunkId(chunkingResult.chunks[selectedChunkIdx - 1].id);
+                      }
+                    }}
+                    onSelectNext={() => {
+                      if (selectedChunkIdx < chunkingResult.chunks.length - 1) {
+                        setSelectedChunkId(chunkingResult.chunks[selectedChunkIdx + 1].id);
+                      }
+                    }}
+                    onClose={() => setIsInspectorOpen(false)}
+                  />
+                )}
+              </div>
+            </>
+          )}
         </main>
       </div>
 
