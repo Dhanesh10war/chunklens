@@ -14,8 +14,8 @@
 - **Axe-Core E2E Status:** `@axe-core/playwright` and `e2e/networkEgress.spec.ts` are written and staged; awaiting user execution of `npm install` and `playwright install`.
 - **Zero Network Egress:** Strict CSP (`connect-src 'none'`) verified live via Chrome DevTools Protocol (`scripts/test-egress.cjs`).
 - **Export Button Contrast:** Measured 6.29:1 rendered contrast in Chrome browser (`#FFFFFF` on `#4F46E5`), satisfying WCAG 2.2 AA $\ge 4.5:1$. Split tokens guarantee 7.90:1 in light mode (`#4338CA`) and 6.29:1 in dark mode (`#4F46E5`).
-- **Typography Floor:** Strict 12px text floor verified by automated code grep rule and browser computed-style audit (0 sub-12px elements).
-- **Bundle Architecture:** Code-split with heavy modals (`TokenizerComparisonModal`, `ExportModal`, `CommandPalette`, `ComparisonView`, `SimilarityHeatmap`) lazy-loaded via `React.lazy`, bringing `index.js` down to **131.77 kB raw** / **39.23 kB gzip** (well below the 185 kB limit).
+- **Typography Floor & Labels:** Strict 12px text floor verified by automated code grep rule and browser computed-style audit (0 sub-12px elements). Real UI labels verified: Algorithm, Separators hierarchy, Measurement unit, Tokenizer encoding, and Size & overlap.
+- **Bundle Architecture:** Code-split with heavy modals (`TokenizerComparisonModal`, `ExportModal`, `CommandPalette`, `ComparisonView`, `SimilarityHeatmap`) lazy-loaded via `React.lazy`, bringing `index.js` down to **134.76 kB raw** / **40.15 kB gzip** (well below the 185 kB limit).
 
 ---
 

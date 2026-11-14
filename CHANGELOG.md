@@ -19,10 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Compact `UploadErrorBanner` with `role="alert"`, clear reason, retained document indicator, and copyable technical details (3.3).
 
 ### Changed
-- Lazy-loaded heavy modal dialogs and views (`TokenizerComparisonModal`, `ExportModal`, `CommandPalette`, `ComparisonView`, `SimilarityHeatmap`) via `React.lazy`, reducing main bundle `index.js` from 188.65 kB to 131.77 kB raw (39.23 kB gzip), well below the 185 kB budget limit.
+- Lazy-loaded heavy modal dialogs and views (`TokenizerComparisonModal`, `ExportModal`, `CommandPalette`, `ComparisonView`, `SimilarityHeatmap`) via `React.lazy`, reducing main bundle `index.js` from 188.65 kB to 134.76 kB raw (40.15 kB gzip), well below the 185 kB budget limit.
 - Split accent tokens into `--accent` (text/icons/rings), `--accent-solid` (#4338CA light / #4F46E5 dark), and `--on-accent` (#FFFFFF) guaranteeing $\ge 4.5:1$ contrast (7.90:1 light, 6.29:1 dark) on primary buttons (3.7).
 - Replaced all sub-12px font sizes with strict `text-xs` (12px) minimum text floor (3.7).
-- Updated all section labels and headers to clean sentence-case sans font styling (3.7).
+- Updated all section labels and headers to real UI sentence-case labels: Algorithm, Separators hierarchy, Measurement unit, Tokenizer encoding, and Size & overlap (3.7).
 - Self-hosted Inter and JetBrains Mono woff2 fonts; eliminated Google Fonts (3.1).
 - Implemented single-source strict Content Security Policy (`connect-src 'none'`) with zero network egress proof (3.1).
 - Reconciled Document vs Ingested token counts with tooltips and unit tests (3.5).

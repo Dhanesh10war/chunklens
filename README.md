@@ -1,7 +1,7 @@
 # 🔍 ChunkLens
 
-> **Enterprise Document Chunking, Tokenizer Comparison & Optimization Workbench for RAG Pipelines**  
-> *100% Client-Side • Zero Server Egress • Multi-Model BPE Analysis • Open Source (MIT)*
+> **Client-side document chunking and token cost workbench for RAG**  
+> *100% Client-Side • Zero Server Egress • Multi-Model BPE Analysis • Open Source (MIT) • Live demo: coming soon*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
