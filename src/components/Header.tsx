@@ -30,6 +30,9 @@ interface HeaderProps {
   isSidebarOpen: boolean;
   onToggleSidebar: () => void;
   onOpenCommandPalette?: () => void;
+  onPrefetchExport?: () => void;
+  onPrefetchCommandPalette?: () => void;
+  onPrefetchTokenizer?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -43,6 +46,9 @@ export const Header: React.FC<HeaderProps> = ({
   isSidebarOpen,
   onToggleSidebar,
   onOpenCommandPalette,
+  onPrefetchExport,
+  onPrefetchCommandPalette,
+  onPrefetchTokenizer,
 }) => {
   const { isDark, toggleTheme } = useTheme();
   const [isOverflowOpen, setIsOverflowOpen] = useState(false);
@@ -175,6 +181,8 @@ export const Header: React.FC<HeaderProps> = ({
             <Tooltip content="Open command palette" shortcut="⌘K">
               <button
                 onClick={onOpenCommandPalette}
+                onMouseEnter={onPrefetchCommandPalette}
+                onFocus={onPrefetchCommandPalette}
                 className="hidden xl:flex items-center space-x-1.5 h-7 px-2 rounded-md bg-elevated border border-border-default text-text-tertiary hover:text-text-primary hover:border-border-hover text-xs font-mono transition-colors active-press focus-ring"
                 aria-label="Open command palette"
               >
@@ -194,6 +202,8 @@ export const Header: React.FC<HeaderProps> = ({
                 size="sm"
                 icon={<Cpu className="h-3.5 w-3.5 text-text-secondary" />}
                 onClick={onTokenizerClick}
+                onMouseEnter={onPrefetchTokenizer}
+                onFocus={onPrefetchTokenizer}
                 aria-label="Compare tokenizers and embedding costs"
                 className="hidden xl:inline-flex"
               >
@@ -223,6 +233,8 @@ export const Header: React.FC<HeaderProps> = ({
               size="sm"
               icon={<Code2 className="h-3.5 w-3.5" />}
               onClick={onExportClick}
+              onMouseEnter={onPrefetchExport}
+              onFocus={onPrefetchExport}
               aria-label="Export code and chunks"
             >
               <span>Export</span>
@@ -303,6 +315,7 @@ export const Header: React.FC<HeaderProps> = ({
                       onTokenizerClick();
                       closeMenuAndReturnFocus();
                     }}
+                    onMouseEnter={onPrefetchTokenizer}
                     className="w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text-primary hover:bg-elevated flex items-center space-x-2 transition-colors focus:bg-elevated focus:outline-none"
                   >
                     <Cpu className="h-3.5 w-3.5 text-accent" />
@@ -318,6 +331,7 @@ export const Header: React.FC<HeaderProps> = ({
                       onOpenCommandPalette();
                       closeMenuAndReturnFocus();
                     }}
+                    onMouseEnter={onPrefetchCommandPalette}
                     className="w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text-primary hover:bg-elevated flex items-center justify-between transition-colors focus:bg-elevated focus:outline-none"
                   >
                     <span className="flex items-center space-x-2">

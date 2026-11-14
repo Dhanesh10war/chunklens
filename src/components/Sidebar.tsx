@@ -20,6 +20,7 @@ interface SidebarProps {
   onFileUpload: (file: File) => void;
   onNewDocument?: () => void;
   onOpenTokenizerModal?: () => void;
+  onPrefetchTokenizerModal?: () => void;
   currentDocumentTitle?: string;
   detectedFormat?: DetectedFormatInfo | null;
   isOpen: boolean;
@@ -38,6 +39,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onFileUpload,
   onNewDocument,
   onOpenTokenizerModal,
+  onPrefetchTokenizerModal,
   detectedFormat,
   isOpen,
   onClose,
@@ -336,6 +338,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <button
                 type="button"
                 onClick={onOpenTokenizerModal}
+                onMouseEnter={onPrefetchTokenizerModal}
+                onFocus={onPrefetchTokenizerModal}
                 className="w-full mt-1 h-7 px-2.5 rounded border border-border-default bg-elevated hover:bg-surface text-text-secondary hover:text-text-primary text-xs font-sans font-medium flex items-center justify-center space-x-1.5 transition-colors active-press focus-ring"
                 aria-label="Compare multi-model tokenizers and embedding costs"
               >

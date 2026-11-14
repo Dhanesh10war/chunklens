@@ -14,23 +14,26 @@ import { Layers, Grid3X3, Edit3 } from 'lucide-react';
 import { loadStoredSession, saveStoredSession, clearStoredSession, DEFAULT_SESSION } from './utils/storage';
 import { DetectedFormatInfo, detectFileFormat } from './utils/fileFormatDetector';
 import { useDocumentUpload } from './hooks/useDocumentUpload';
+import { ChunkLoadErrorBoundary } from './components/ui/ChunkLoadErrorBoundary';
+import { ModalLoadingFallback } from './components/ui/ModalLoadingFallback';
 
 // Lazy-load heavy modals and auxiliary views to keep main bundle well below budget
-const CommandPalette = React.lazy(() =>
-  import('./components/CommandPalette').then((m) => ({ default: m.CommandPalette }))
-);
-const ComparisonView = React.lazy(() =>
-  import('./components/ComparisonView').then((m) => ({ default: m.ComparisonView }))
-);
-const ExportModal = React.lazy(() =>
-  import('./components/ExportModal').then((m) => ({ default: m.ExportModal }))
-);
-const SimilarityHeatmap = React.lazy(() =>
-  import('./components/SimilarityHeatmap').then((m) => ({ default: m.SimilarityHeatmap }))
-);
-const TokenizerComparisonModal = React.lazy(() =>
-  import('./components/TokenizerComparisonModal').then((m) => ({ default: m.TokenizerComparisonModal }))
-);
+const prefetchCommandPalette = () =>
+  import('./components/CommandPalette').then((m) => ({ default: m.CommandPalette }));
+const prefetchComparisonView = () =>
+  import('./components/ComparisonView').then((m) => ({ default: m.ComparisonView }));
+const prefetchExportModal = () =>
+  import('./components/ExportModal').then((m) => ({ default: m.ExportModal }));
+const prefetchSimilarityHeatmap = () =>
+  import('./components/SimilarityHeatmap').then((m) => ({ default: m.SimilarityHeatmap }));
+const prefetchTokenizerModal = () =>
+  import('./components/TokenizerComparisonModal').then((m) => ({ default: m.TokenizerComparisonModal }));
+
+const CommandPalette = React.lazy(prefetchCommandPalette);
+const ComparisonView = React.lazy(prefetchComparisonView);
+const ExportModal = React.lazy(prefetchExportModal);
+const SimilarityHeatmap = React.lazy(prefetchSimilarityHeatmap);
+const TokenizerComparisonModal = React.lazy(prefetchTokenizerModal);
 
 export const AppContent: React.FC = () => {
   // Load restored session or default sample
@@ -56,6 +59,31 @@ export const AppContent: React.FC = () => {
   const [isTokenizerModalOpen, setIsTokenizerModalOpen] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'visualizer' | 'heatmap' | 'editor'>('visualizer');
   const { success } = useToast();
+
+  // Idle prefetching for modal dialogs (Cmd+K and Export)
+  useEffect(() => {
+    const idlePrefetch = () => {
+      prefetchCommandPalette();
+      prefetchExportModal();
+    };
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      const handle = (
+        window as unknown as {
+          requestIdleCallback: (cb: () => void, opts: { timeout: number }) => number;
+        }
+      ).requestIdleCallback(idlePrefetch, { timeout: 3000 });
+      return () => {
+        if ('cancelIdleCallback' in window) {
+          (
+            window as unknown as { cancelIdleCallback: (id: number) => void }
+          ).cancelIdleCallback(handle);
+        }
+      };
+    } else {
+      const timer = setTimeout(idlePrefetch, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   // Save session changes to localStorage
   useEffect(() => {
@@ -189,6 +217,9 @@ export const AppContent: React.FC = () => {
         isSidebarOpen={isSidebarOpen}
         onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        onPrefetchExport={prefetchExportModal}
+        onPrefetchCommandPalette={prefetchCommandPalette}
+        onPrefetchTokenizer={prefetchTokenizerModal}
       />
 
       {/* App Shell Layout: Collapsible Sidebar + Hero Main Canvas + Pro Inspector */}
@@ -209,6 +240,7 @@ export const AppContent: React.FC = () => {
           onDismissError={clearError}
           isExtractingPdf={isExtractingPdf}
           onOpenTokenizerModal={() => setIsTokenizerModalOpen(true)}
+          onPrefetchTokenizerModal={prefetchTokenizerModal}
         />
 
         {/* Hero Content Canvas */}
@@ -267,20 +299,24 @@ export const AppContent: React.FC = () => {
                     />
                   </div>
                 ) : activeTab === 'heatmap' ? (
-                  <Suspense fallback={<div className="p-8 text-center text-xs text-text-tertiary">Loading heatmap...</div>}>
-                    <SimilarityHeatmap chunks={chunkingResult.chunks} />
-                  </Suspense>
+                  <ChunkLoadErrorBoundary fallbackTitle="Failed to load Similarity Heatmap">
+                    <Suspense fallback={<div className="p-8 text-center text-xs text-text-tertiary">Loading heatmap...</div>}>
+                      <SimilarityHeatmap chunks={chunkingResult.chunks} />
+                    </Suspense>
+                  </ChunkLoadErrorBoundary>
                 ) : isCompareMode ? (
-                  <Suspense fallback={<div className="p-8 text-center text-xs text-text-tertiary">Loading comparison...</div>}>
-                    <ComparisonView
-                      rawText={deferredText}
-                      primaryConfig={config}
-                      onApplyVariantB={(newConfig) => {
-                        setConfig(newConfig);
-                        setIsCompareMode(false);
-                      }}
-                    />
-                  </Suspense>
+                  <ChunkLoadErrorBoundary fallbackTitle="Failed to load Comparison View">
+                    <Suspense fallback={<div className="p-8 text-center text-xs text-text-tertiary">Loading comparison...</div>}>
+                      <ComparisonView
+                        rawText={deferredText}
+                        primaryConfig={config}
+                        onApplyVariantB={(newConfig) => {
+                          setConfig(newConfig);
+                          setIsCompareMode(false);
+                        }}
+                      />
+                    </Suspense>
+                  </ChunkLoadErrorBoundary>
                 ) : (
                   <VisualCanvas
                     chunks={chunkingResult.chunks}
@@ -329,56 +365,62 @@ export const AppContent: React.FC = () => {
       </div>
 
       {/* Command Palette Modal (Cmd+K) */}
-      <Suspense fallback={null}>
-        {isCommandPaletteOpen && (
-          <CommandPalette
-            isOpen={isCommandPaletteOpen}
-            onClose={() => setIsCommandPaletteOpen(false)}
-            onSelectStrategy={(strategy: ChunkingStrategy) => setConfig({ ...config, strategy })}
-            currentStrategy={config.strategy}
-            onSelectSample={handleSelectSample}
-            onNewDocument={handleNewDocument}
-            onResetDocument={handleResetToDefaults}
-            onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
-            onToggleInspector={() => {
-              if (!isInspectorOpen && !selectedChunkId && chunkingResult.chunks.length > 0) {
-                setSelectedChunkId(chunkingResult.chunks[0].id);
-              }
-              setIsInspectorOpen((prev) => !prev);
-            }}
-            onOpenExport={() => setIsExportModalOpen(true)}
-            onOpenTokenizer={() => setIsTokenizerModalOpen(true)}
-            onSelectTab={setActiveTab}
-            onToggleCompare={() => setIsCompareMode(!isCompareMode)}
-          />
-        )}
-      </Suspense>
+      <ChunkLoadErrorBoundary fallbackTitle="Failed to load Command Palette">
+        <Suspense fallback={isCommandPaletteOpen ? <ModalLoadingFallback label="Loading command palette..." /> : null}>
+          {isCommandPaletteOpen && (
+            <CommandPalette
+              isOpen={isCommandPaletteOpen}
+              onClose={() => setIsCommandPaletteOpen(false)}
+              onSelectStrategy={(strategy: ChunkingStrategy) => setConfig({ ...config, strategy })}
+              currentStrategy={config.strategy}
+              onSelectSample={handleSelectSample}
+              onNewDocument={handleNewDocument}
+              onResetDocument={handleResetToDefaults}
+              onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
+              onToggleInspector={() => {
+                if (!isInspectorOpen && !selectedChunkId && chunkingResult.chunks.length > 0) {
+                  setSelectedChunkId(chunkingResult.chunks[0].id);
+                }
+                setIsInspectorOpen((prev) => !prev);
+              }}
+              onOpenExport={() => setIsExportModalOpen(true)}
+              onOpenTokenizer={() => setIsTokenizerModalOpen(true)}
+              onSelectTab={setActiveTab}
+              onToggleCompare={() => setIsCompareMode(!isCompareMode)}
+            />
+          )}
+        </Suspense>
+      </ChunkLoadErrorBoundary>
 
       {/* Code & Data Export Modal */}
-      <Suspense fallback={null}>
-        {isExportModalOpen && (
-          <ExportModal
-            isOpen={isExportModalOpen}
-            onClose={() => setIsExportModalOpen(false)}
-            config={config}
-            chunks={chunkingResult.chunks}
-            docTitle={documentTitle}
-          />
-        )}
-      </Suspense>
+      <ChunkLoadErrorBoundary fallbackTitle="Failed to load Export options">
+        <Suspense fallback={isExportModalOpen ? <ModalLoadingFallback label="Loading export options..." /> : null}>
+          {isExportModalOpen && (
+            <ExportModal
+              isOpen={isExportModalOpen}
+              onClose={() => setIsExportModalOpen(false)}
+              config={config}
+              chunks={chunkingResult.chunks}
+              docTitle={documentTitle}
+            />
+          )}
+        </Suspense>
+      </ChunkLoadErrorBoundary>
 
       {/* Tokenizer Comparison & Cost Analyzer Modal */}
-      <Suspense fallback={null}>
-        {isTokenizerModalOpen && (
-          <TokenizerComparisonModal
-            isOpen={isTokenizerModalOpen}
-            onClose={() => setIsTokenizerModalOpen(false)}
-            rawText={rawText}
-            chunks={chunkingResult.chunks}
-            baselineEncoding={config.encoding}
-          />
-        )}
-      </Suspense>
+      <ChunkLoadErrorBoundary fallbackTitle="Failed to load Tokenizer comparison">
+        <Suspense fallback={isTokenizerModalOpen ? <ModalLoadingFallback label="Loading tokenizer comparison..." /> : null}>
+          {isTokenizerModalOpen && (
+            <TokenizerComparisonModal
+              isOpen={isTokenizerModalOpen}
+              onClose={() => setIsTokenizerModalOpen(false)}
+              rawText={rawText}
+              chunks={chunkingResult.chunks}
+              baselineEncoding={config.encoding}
+            />
+          )}
+        </Suspense>
+      </ChunkLoadErrorBoundary>
     </div>
   );
 };
