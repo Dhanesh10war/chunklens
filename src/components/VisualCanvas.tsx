@@ -152,9 +152,9 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
       )}
 
       {/* Sub-header Toolbar: View Switcher & Stepper */}
-      <div className="h-9 px-4 sm:px-6 border-b border-border-default bg-surface/30 flex items-center justify-between text-xs select-none shrink-0">
+      <div className="h-9 px-3 sm:px-6 border-b border-border-default bg-surface/30 flex items-center justify-between text-xs select-none shrink-0">
         <div className="flex items-center space-x-3">
-          <span className="text-text-secondary font-mono text-xs tabular-nums">
+          <span className="text-text-secondary font-mono text-xs tabular-nums hidden sm:inline">
             {chunks.length} chunks generated
           </span>
 
@@ -185,12 +185,28 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
           )}
         </div>
 
-        {/* View Mode Toggle: Stream vs Cards */}
+        {/* View Mode Toggle: Stream vs Cards with responsive labels and whitespace-nowrap */}
         <SegmentedControl
           size="sm"
           options={[
-            { value: 'stream', label: 'Continuous Stream', icon: <Layers className="h-3 w-3" /> },
-            { value: 'cards', label: 'Separated Cards', icon: <LayoutList className="h-3 w-3" /> },
+            {
+              value: 'stream',
+              label: (
+                <span className="whitespace-nowrap">
+                  <span className="hidden sm:inline">Continuous </span>Stream
+                </span>
+              ),
+              icon: <Layers className="h-3 w-3" />,
+            },
+            {
+              value: 'cards',
+              label: (
+                <span className="whitespace-nowrap">
+                  <span className="hidden sm:inline">Separated </span>Cards
+                </span>
+              ),
+              icon: <LayoutList className="h-3 w-3" />,
+            },
           ]}
           value={viewMode}
           onChange={(val) => setViewMode(val as 'stream' | 'cards')}
@@ -244,7 +260,7 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
                   <div
                     onClick={() => onSelectChunk(isSelected ? null : chunk.id)}
                     className={cn(
-                      'group flex items-start gap-3 p-3 rounded-[6px] transition-all cursor-pointer border',
+                      'group flex flex-col sm:flex-row sm:items-start gap-1.5 sm:gap-3 p-3 rounded-[6px] transition-all cursor-pointer border',
                       isSelected
                         ? 'ring-2 ring-accent border-accent shadow-elevated'
                         : 'border-transparent hover:border-border-default'
@@ -255,38 +271,57 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
                       borderLeftWidth: '3px',
                     }}
                   >
-                    {/* Gutter: Index & Token Count */}
-                    <div className="w-14 shrink-0 flex flex-col items-start gap-0.5 text-text-tertiary select-none pt-0.5">
-                      <span className="font-semibold text-text-secondary tabular-nums text-xs">
-                        #{String(chunk.index + 1).padStart(2, '0')}
-                      </span>
-                      <span className="text-xs tabular-nums font-mono">
-                        {chunk.tokenCount} tok
-                      </span>
-                      {chunk.isOrphan && (
-                        <span
-                          className="text-xs text-status-warn font-sans font-medium px-1 rounded bg-status-warn/10 border border-status-warn/20"
-                          title="Mid-word or unclosed syntax cut"
-                        >
-                          Cut
+                    {/* Gutter: Index & Token Count (stacked horizontally on mobile, vertical column on sm+) */}
+                    <div className="w-full sm:w-14 shrink-0 flex flex-row sm:flex-col items-center sm:items-start justify-between sm:justify-start gap-2 sm:gap-0.5 text-text-tertiary select-none pt-0.5 border-b sm:border-b-0 border-border-subtle/40 pb-1 sm:pb-0">
+                      <div className="flex items-center gap-2 sm:flex-col sm:items-start sm:gap-0.5">
+                        <span className="font-semibold text-text-secondary tabular-nums text-xs">
+                          #{String(chunk.index + 1).padStart(2, '0')}
                         </span>
-                      )}
+                        <span className="text-xs tabular-nums font-mono">
+                          {chunk.tokenCount} tok
+                        </span>
+                        {chunk.isOrphan && (
+                          <span
+                            className="text-xs text-status-warn font-sans font-medium px-1 rounded bg-status-warn/10 border border-status-warn/20"
+                            title="Mid-word or unclosed syntax cut"
+                          >
+                            Cut
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Mobile Copy Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCopyChunk(chunk.id, chunk.text);
+                        }}
+                        className="sm:hidden h-6 w-6 rounded hover:bg-elevated text-text-tertiary hover:text-text-primary flex items-center justify-center transition-all focus-ring shrink-0"
+                        title="Copy chunk text"
+                        aria-label={`Copy chunk ${chunk.index + 1}`}
+                      >
+                        {copiedId === chunk.id ? (
+                          <Check className="h-3.5 w-3.5 text-status-success" />
+                        ) : (
+                          <Copy className="h-3 w-3" />
+                        )}
+                      </button>
                     </div>
 
-                    {/* Chunk Text Body */}
-                    <div className="flex-1 min-w-0">
+                    {/* Chunk Text Body (Full width on mobile) */}
+                    <div className="flex-1 min-w-0 w-full">
                       <div className="whitespace-pre-wrap leading-relaxed text-text-primary text-[13px] break-words">
                         {chunk.text}
                       </div>
                     </div>
 
-                    {/* Quick Copy Button */}
+                    {/* Quick Copy Button on desktop (hover reveal) */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleCopyChunk(chunk.id, chunk.text);
                       }}
-                      className="opacity-0 group-hover:opacity-100 h-6 w-6 rounded hover:bg-elevated text-text-tertiary hover:text-text-primary flex items-center justify-center transition-all focus-ring shrink-0"
+                      className="hidden sm:flex opacity-0 group-hover:opacity-100 h-6 w-6 rounded hover:bg-elevated text-text-tertiary hover:text-text-primary items-center justify-center transition-all focus-ring shrink-0"
                       title="Copy chunk text"
                       aria-label={`Copy chunk ${chunk.index + 1}`}
                     >

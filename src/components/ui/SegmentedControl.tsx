@@ -3,7 +3,7 @@ import { cn } from '../../utils/cn';
 
 export interface SegmentedOption<T extends string> {
   value: T;
-  label: string;
+  label: React.ReactNode;
   icon?: React.ReactNode;
   badge?: string | number;
 }
@@ -85,7 +85,7 @@ export function SegmentedControl<T extends string>({
             aria-selected={isSelected}
             onClick={() => onChange(opt.value)}
             className={cn(
-              'flex items-center justify-center space-x-1.5 px-2.5 py-1 rounded-[5px] font-medium transition-all active-press focus-ring',
+              'flex items-center justify-center space-x-1.5 px-2.5 py-1 rounded-[5px] font-medium whitespace-nowrap transition-all active-press focus-ring',
               isSelected
                 ? 'bg-surface text-text-primary shadow-subtle border border-border-subtle'
                 : 'text-text-secondary hover:text-text-primary border border-transparent'
