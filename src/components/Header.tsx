@@ -120,7 +120,7 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="h-12 border-b border-border-default bg-surface sticky top-0 z-30 select-none">
       <div className="h-full px-3 sm:px-4 flex items-center justify-between gap-2 sm:gap-3">
         {/* Left: Brand + Document Title + Reset */}
-        <div className="flex items-center space-x-2 min-w-0">
+        <div className="flex items-center space-x-2 shrink-0 sm:min-w-0">
           <Tooltip content={isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'} shortcut="[">
             <button
               onClick={onToggleSidebar}
@@ -170,7 +170,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Center: Privacy Indicator & How to Verify Popover */}
-        <div className="flex items-center shrink-0 ml-2 sm:ml-0">
+        <div className="flex items-center shrink-0 ml-2.5 sm:ml-0">
           <PrivacyPopover />
         </div>
 
