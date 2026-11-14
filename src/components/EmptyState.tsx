@@ -162,18 +162,18 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         {/* Paste Text Collapsible Toggle */}
         <div className="border border-border-default rounded-lg bg-surface/30 p-3">
           {!isPasting ? (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs text-text-secondary">
-                <ClipboardPaste className="h-4 w-4 text-text-tertiary" />
-                <span>Need to inspect a quick snippet or raw prompt?</span>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-xs text-text-secondary min-w-0">
+                <ClipboardPaste className="h-4 w-4 text-text-tertiary shrink-0" />
+                <span className="truncate">Need to inspect a quick snippet or raw prompt?</span>
               </div>
               <Button
                 variant="secondary"
                 size="sm"
                 onClick={() => setIsPasting(true)}
-                className="text-xs"
+                className="text-xs shrink-0 whitespace-nowrap"
               >
-                Paste Raw Text
+                Paste text
               </Button>
             </div>
           ) : (
