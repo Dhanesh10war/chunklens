@@ -241,7 +241,7 @@ export const Header: React.FC<HeaderProps> = ({
           </Tooltip>
 
           {/* Theme Toggle: Kept visible at >= 768px (Amendment E) */}
-          <Tooltip content={isDark ? 'Switch to light mode' : 'Switch to dark mode'} wrapperClassName="hidden md:inline-flex">
+          <Tooltip content={isDark ? 'Switch to light mode' : 'Switch to dark mode'} wrapperClassName="hidden md:flex">
             <button
               onClick={toggleTheme}
               className="h-7 w-7 rounded-md flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-elevated transition-colors active-press focus-ring"

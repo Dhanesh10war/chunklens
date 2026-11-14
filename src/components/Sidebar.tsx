@@ -262,7 +262,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             />
 
             {/* Strategy Context Banner */}
-            <div className="text-xs text-text-tertiary leading-relaxed p-2 rounded bg-elevated border border-border-subtle">
+            <div className="text-xs text-text-secondary leading-relaxed px-0.5">
               {config.strategy === 'recursive' &&
                 'Recursively tries separators (\\n\\n, \\n, " ") to maintain semantic boundary structure.'}
               {config.strategy === 'fixed' &&
