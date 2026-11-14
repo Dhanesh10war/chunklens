@@ -13,7 +13,8 @@
     "test:e2e": "playwright test",
     "typecheck": "tsc -b",
     "lint": "tsc -b",
-    "sync:csp": "node scripts/sync-csp.cjs"
+    "sync:csp": "node scripts/sync-csp.cjs",
+    "check:bundle": "node scripts/check-bundle.cjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",
