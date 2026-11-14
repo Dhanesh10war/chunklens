@@ -3,7 +3,6 @@ import {
   Upload,
   ClipboardPaste,
   ShieldCheck,
-  Check,
   ArrowRight,
 } from 'lucide-react';
 import { SAMPLE_DOCUMENTS } from '../data/samples';

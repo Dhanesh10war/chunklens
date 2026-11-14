@@ -15,7 +15,6 @@ import { cn } from '../utils/cn';
 import { copyToClipboard } from '../utils/clipboard';
 import { SegmentedControl } from './ui/SegmentedControl';
 import { useToast } from './ui/Toast';
-import { DetectedFormatInfo } from '../utils/fileFormatDetector';
 import { UploadErrorInfo } from '../hooks/useDocumentUpload';
 import { UploadErrorBanner } from './UploadErrorBanner';
 import { EmptyState } from './EmptyState';
@@ -24,7 +23,6 @@ interface VisualCanvasProps {
   chunks: ChunkMetadata[];
   selectedChunkId: string | null;
   onSelectChunk: (chunkId: string | null) => void;
-  detectedFormat?: DetectedFormatInfo | null;
   onLoadDefaultSample?: () => void;
   onUploadClick?: () => void;
   onDropFile?: (file: File) => void;
@@ -39,7 +37,6 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
   chunks,
   selectedChunkId,
   onSelectChunk,
-  detectedFormat,
   onDropFile,
   onSelectSample,
   onPasteText,
@@ -160,17 +157,6 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
           <span className="text-text-secondary font-mono text-xs tabular-nums">
             {chunks.length} chunks generated
           </span>
-
-          {detectedFormat && (
-            <span
-              className="hidden sm:inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-xs font-mono border border-border-default bg-surface text-text-secondary select-none"
-              title={`Format: ${detectedFormat.label} (${detectedFormat.description})`}
-            >
-              <span className="font-semibold text-accent">{detectedFormat.badge}</span>
-              <span className="text-text-tertiary">·</span>
-              <span>{detectedFormat.label}</span>
-            </span>
-          )}
 
           {selectedChunk && (
             <div className="flex items-center space-x-1 font-mono text-xs">

@@ -289,7 +289,6 @@ export const AppContent: React.FC = () => {
                       setSelectedChunkId(chunkId);
                       if (chunkId) setIsInspectorOpen(true);
                     }}
-                    detectedFormat={detectedFormat}
                     onDropFile={handleFileUploadProcess}
                     onSelectSample={handleSelectSample}
                     onPasteText={(text, title) => {
