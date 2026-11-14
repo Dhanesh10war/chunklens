@@ -1,7 +1,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import fs from 'fs';
 import { buildCspString } from './src/config/csp';
+
+const pkg = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url), 'utf-8'));
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
@@ -9,6 +12,9 @@ export default defineConfig(({ command }) => {
   const cspContent = buildCspString();
 
   return {
+    define: {
+      __APP_VERSION__: JSON.stringify(pkg.version),
+    },
     plugins: [
       react(),
       {

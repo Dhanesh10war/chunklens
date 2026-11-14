@@ -68,4 +68,9 @@ describe('Header Component (Responsive Priority & Overflow Menu - Item 3.6)', ()
     expect(html).toContain('aria-label="More actions"');
     expect(html).toContain('aria-haspopup="menu"');
   });
+
+  it('renders injected __APP_VERSION__ next to brand title (Item B1)', () => {
+    const html = renderToString(<Header {...defaultProps} />);
+    expect(html).toContain(`v${__APP_VERSION__}`);
+  });
 });
