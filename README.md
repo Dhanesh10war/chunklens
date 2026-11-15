@@ -94,6 +94,12 @@ You can independently verify the zero-egress guarantee at any time:
 
 - **Browser Heap Limits:** Because all processing runs client-side in the browser tab, extremely large files (>50 MB) or documents containing hundreds of pages may be limited by available browser memory.
 - **Scanned / Rasterized PDFs:** PDF extraction extracts text streams embedded directly in the document. Scanned images or rasterized PDFs without an embedded OCR text layer will not produce text (OCR engines are excluded to maintain a lightweight, instant bundle).
+- **Minimum Browser Support (PDF Engine):** Client-side PDF extraction is powered by `pdfjs-dist` v6 (`pdf.worker.min.mjs`), which relies on ECMAScript 2024 `Promise.withResolvers` in the Web Worker global scope. Minimum supported browser versions:
+  - Chrome / Chromium 119+ (released October 2023)
+  - Microsoft Edge 119+ (released October 2023)
+  - Mozilla Firefox 121+ (released December 2023)
+  - Apple Safari 17.4+ (released March 2024)
+  - Node.js 22+ for headless test environments (Node 20 is polyfilled in `src/utils/pdfParser.ts`).
 
 ---
 
