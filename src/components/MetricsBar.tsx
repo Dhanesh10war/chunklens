@@ -49,7 +49,7 @@ export const MetricsBar: React.FC<MetricsBarProps> = ({
     <div
       ref={containerRef}
       className={cn(
-        'border-b border-border-default bg-surface/50 text-xs font-mono select-none transition-all',
+        'border-b border-separator bg-surface-1/40 px-3 sm:px-4 py-2.5 select-none transition-all',
         className
       )}
       style={
@@ -61,135 +61,184 @@ export const MetricsBar: React.FC<MetricsBarProps> = ({
           : undefined
       }
     >
-      {/* Desktop View (>=1280px): Single Horizontal Strip */}
-      <div className="hidden xl:flex h-9 px-4 sm:px-6 items-center justify-between overflow-x-auto">
-        <div className="flex items-center space-x-3 sm:space-x-4 text-text-secondary whitespace-nowrap">
-          {/* Metric 1: Chunks */}
-          <div className="flex items-center space-x-1.5 shrink-0">
+      {/* Desktop View (>=1280px): Apple HIG Metric Tiles Grid */}
+      <div className="hidden xl:grid grid-cols-5 gap-2.5">
+        {/* Tile 1: Chunks */}
+        <div className="bg-surface-1 border border-separator rounded-card p-2.5 flex flex-col justify-between shadow-subtle transition-colors">
+          <div className="flex items-center justify-between text-xs font-medium text-text-secondary">
             <Tooltip content="Total chunk count created by current splitter strategy">
-              <span className="text-text-tertiary cursor-help">Chunks</span>
+              <span className="cursor-help">Chunks</span>
             </Tooltip>
-            <span className="text-text-primary font-medium tabular-nums">{chunks.length}</span>
           </div>
+          <div className="my-1">
+            {isProcessing ? (
+              <div className="h-6 w-12 bg-surface-2 animate-pulse rounded-control" />
+            ) : (
+              <span className="text-lg font-semibold text-text font-mono tabular-nums leading-none">
+                {chunks.length}
+              </span>
+            )}
+          </div>
+          <span className="text-2xs text-text-tertiary font-mono">partitions</span>
+        </div>
 
-          <span className="border-l border-border-subtle h-3.5 shrink-0" aria-hidden="true" />
-
-          {/* Metric 2: Ingested Tokens vs Document Tokens */}
-          <div className="flex items-center space-x-1.5 shrink-0" data-testid="metric-tokens">
+        {/* Tile 2: Ingested Tokens vs Document Tokens */}
+        <div className="bg-surface-1 border border-separator rounded-card p-2.5 flex flex-col justify-between shadow-subtle transition-colors" data-testid="metric-tokens">
+          <div className="flex items-center justify-between text-xs font-medium text-text-secondary">
             <Tooltip content="Ingested: total tokens ingested into vector store (overlap counted twice across adjacent chunks)">
-              <span className="text-text-tertiary cursor-help underline decoration-dotted decoration-border-default underline-offset-2">
+              <span className="cursor-help underline decoration-dotted decoration-separator underline-offset-2">
                 Ingested
               </span>
             </Tooltip>
-            <span className="text-text-primary font-medium tabular-nums" data-testid="ingested-tokens">
-              {totalChunkTokens.toLocaleString()} tok
-            </span>
-            <span className="text-text-tertiary text-xs tabular-nums hidden lg:inline-flex items-center space-x-1">
-              <span>(</span>
-              <Tooltip content="Document: unique tokens in source text without chunk overlap">
-                <span className="cursor-help hover:text-text-secondary" data-testid="document-tokens">
-                  {totalTokens.toLocaleString()} doc
-                </span>
-              </Tooltip>
-              <span>/</span>
-              <Tooltip content="Document characters: exact character count of raw document text">
-                <span className="cursor-help hover:text-text-secondary" data-testid="document-chars">
-                  {totalChars.toLocaleString()} ch
-                </span>
-              </Tooltip>
-              <span>)</span>
-            </span>
           </div>
+          <div className="my-1">
+            {isProcessing ? (
+              <div className="h-6 w-20 bg-surface-2 animate-pulse rounded-control" />
+            ) : (
+              <span className="text-lg font-semibold text-text font-mono tabular-nums leading-none" data-testid="ingested-tokens">
+                {totalChunkTokens.toLocaleString()} tok
+              </span>
+            )}
+          </div>
+          <div className="text-2xs text-text-tertiary font-mono tabular-nums flex items-center space-x-1">
+            <span>(</span>
+            <Tooltip content="Document: unique tokens in source text without chunk overlap">
+              <span className="cursor-help hover:text-text-secondary" data-testid="document-tokens">
+                {totalTokens.toLocaleString()} doc
+              </span>
+            </Tooltip>
+            <span>/</span>
+            <Tooltip content="Document characters: exact character count of raw document text">
+              <span className="cursor-help hover:text-text-secondary" data-testid="document-chars">
+                {totalChars.toLocaleString()} ch
+              </span>
+            </Tooltip>
+            <span>)</span>
+          </div>
+        </div>
 
-          <span className="border-l border-border-subtle h-3.5 shrink-0" aria-hidden="true" />
-
-          {/* Metric 3: Avg per Chunk */}
-          <div className="flex items-center space-x-1.5 shrink-0">
+        {/* Tile 3: Avg per Chunk */}
+        <div className="bg-surface-1 border border-separator rounded-card p-2.5 flex flex-col justify-between shadow-subtle transition-colors">
+          <div className="flex items-center justify-between text-xs font-medium text-text-secondary">
             <Tooltip content="Mean tokens per chunk and range [min–max]">
-              <span className="text-text-tertiary cursor-help">Avg/Chunk</span>
+              <span className="cursor-help">Avg/Chunk</span>
             </Tooltip>
-            <span className="text-text-primary font-medium tabular-nums">{avgTokensPerChunk}</span>
-            <span className="text-text-tertiary text-xs tabular-nums hidden sm:inline">
-              [{minTokensPerChunk}–{maxTokensPerChunk}]
-            </span>
           </div>
+          <div className="my-1">
+            {isProcessing ? (
+              <div className="h-6 w-14 bg-surface-2 animate-pulse rounded-control" />
+            ) : (
+              <span className="text-lg font-semibold text-text font-mono tabular-nums leading-none">
+                {avgTokensPerChunk}
+              </span>
+            )}
+          </div>
+          <span className="text-2xs text-text-tertiary font-mono tabular-nums">
+            [{minTokensPerChunk}–{maxTokensPerChunk}] tok
+          </span>
+        </div>
 
-          <span className="border-l border-border-subtle h-3.5 shrink-0" aria-hidden="true" />
-
-          {/* Metric 4: Est. Vector Cost */}
-          <div className="flex items-center space-x-1.5 shrink-0">
+        {/* Tile 4: Vector Cost (Hero Metric) */}
+        <div className="bg-surface-2/80 border border-separator/80 rounded-card p-2.5 flex flex-col justify-between shadow-subtle ring-1 ring-accent/20 transition-colors">
+          <div className="flex items-center justify-between text-xs font-medium text-text-secondary">
             <Tooltip content="Estimated embedding cost for total ingested tokens at $0.02 / 1M tokens (OpenAI text-embedding-3-small)">
-              <span className="text-text-tertiary cursor-help">Vector Cost</span>
+              <span className="cursor-help text-text font-medium">Vector Cost</span>
             </Tooltip>
-            <span className="text-text-primary font-medium tabular-nums">{costFormatted}</span>
           </div>
+          <div className="my-1">
+            {isProcessing ? (
+              <div className="h-6 w-16 bg-surface-3 animate-pulse rounded-control" />
+            ) : (
+              <span className="text-lg font-semibold text-accent font-mono tabular-nums leading-none">
+                {costFormatted}
+              </span>
+            )}
+          </div>
+          <span className="text-2xs text-text-secondary font-mono">@ $0.02 / 1M tok</span>
+        </div>
 
-          <span className="border-l border-border-subtle h-3.5 shrink-0" aria-hidden="true" />
-
-          {/* Metric 5: Execution Latency */}
-          <div className="flex items-center space-x-1.5 shrink-0">
+        {/* Tile 5: Execution Latency */}
+        <div className="bg-surface-1 border border-separator rounded-card p-2.5 flex flex-col justify-between shadow-subtle transition-colors">
+          <div className="flex items-center justify-between text-xs font-medium text-text-secondary">
             <Tooltip content="Time spent in Web Worker executing chunking and BPE tokenization">
-              <span className="text-text-tertiary cursor-help">Compute</span>
+              <span className="cursor-help">Compute</span>
             </Tooltip>
-            <span className="text-text-primary font-medium tabular-nums">{executionTimeMs} ms</span>
             {isProcessing && (
               <span
                 role="status"
                 aria-live="polite"
-                className="text-xs text-accent font-sans font-medium inline-flex items-center gap-1 shrink-0"
+                className="text-2xs text-accent font-sans font-medium inline-flex items-center gap-1 shrink-0"
               >
                 <Loader2 className="h-3 w-3 animate-spin shrink-0" aria-hidden="true" />
-                <span>(Worker computing...)</span>
+                <span>Computing...</span>
               </span>
             )}
           </div>
+          <div className="my-1">
+            {isProcessing ? (
+              <div className="h-6 w-16 bg-surface-2 animate-pulse rounded-control" />
+            ) : (
+              <span className="text-lg font-semibold text-text font-mono tabular-nums leading-none">
+                {executionTimeMs} ms
+              </span>
+            )}
+          </div>
+          <span className="text-2xs text-text-tertiary font-mono">Web Worker</span>
         </div>
       </div>
 
-      {/* Responsive View (<1280px): Compact Left-Aligned Wrapped Rows */}
-      <div className="xl:hidden px-3 sm:px-4 py-1.5 flex flex-wrap items-center justify-start gap-x-3 gap-y-1 text-xs text-text-secondary">
+      {/* Responsive View (<1280px): Compact Apple HIG Tiles */}
+      <div className="xl:hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 text-xs">
         {/* Metric 1: Chunks */}
-        <div className="flex items-center space-x-1.5 shrink-0">
-          <span className="text-text-tertiary">Chunks</span>
-          <span className="text-text-primary font-medium tabular-nums">{chunks.length}</span>
+        <div className="bg-surface-1 border border-separator rounded-card p-2 flex flex-col justify-between">
+          <span className="text-2xs text-text-secondary font-medium">Chunks</span>
+          <span className="text-base font-semibold text-text font-mono tabular-nums my-0.5">
+            {chunks.length}
+          </span>
+          <span className="text-2xs text-text-tertiary font-mono">parts</span>
         </div>
 
-        <span className="border-l border-border-subtle h-3.5 shrink-0" aria-hidden="true" />
-
         {/* Metric 2: Ingested & Doc Tokens */}
-        <div className="flex items-center space-x-1.5 shrink-0" data-testid="mobile-metric-tokens">
-          <span className="text-text-tertiary">Ingested</span>
-          <span className="text-text-primary font-medium tabular-nums">
+        <div className="bg-surface-1 border border-separator rounded-card p-2 flex flex-col justify-between" data-testid="mobile-metric-tokens">
+          <span className="text-2xs text-text-secondary font-medium">Ingested</span>
+          <span className="text-base font-semibold text-text font-mono tabular-nums my-0.5">
             {totalChunkTokens.toLocaleString()} tok
           </span>
-          <span className="text-text-tertiary text-xs">
+          <span className="text-2xs text-text-tertiary font-mono tabular-nums truncate">
             ({totalTokens.toLocaleString()} doc)
           </span>
         </div>
 
-        <span className="border-l border-border-subtle h-3.5 shrink-0" aria-hidden="true" />
-
         {/* Metric 3: Avg per Chunk */}
-        <div className="flex items-center space-x-1.5 shrink-0">
-          <span className="text-text-tertiary">Avg</span>
-          <span className="text-text-primary font-medium tabular-nums">{avgTokensPerChunk}</span>
-          <span className="text-text-tertiary text-xs tabular-nums">[{minTokensPerChunk}–{maxTokensPerChunk}]</span>
+        <div className="bg-surface-1 border border-separator rounded-card p-2 flex flex-col justify-between">
+          <span className="text-2xs text-text-secondary font-medium">Avg/Chunk</span>
+          <span className="text-base font-semibold text-text font-mono tabular-nums my-0.5">
+            {avgTokensPerChunk}
+          </span>
+          <span className="text-2xs text-text-tertiary font-mono tabular-nums">
+            [{minTokensPerChunk}–{maxTokensPerChunk}]
+          </span>
         </div>
-
-        <span className="border-l border-border-subtle h-3.5 shrink-0" aria-hidden="true" />
 
         {/* Metric 4: Cost */}
-        <div className="flex items-center space-x-1 shrink-0">
-          <span className="text-text-tertiary">Cost</span>
-          <span className="text-text-primary font-medium tabular-nums">{costFormatted}</span>
+        <div className="bg-surface-2/80 border border-separator/80 ring-1 ring-accent/20 rounded-card p-2 flex flex-col justify-between">
+          <span className="text-2xs text-text font-medium">Cost</span>
+          <span className="text-base font-semibold text-accent font-mono tabular-nums my-0.5">
+            {costFormatted}
+          </span>
+          <span className="text-2xs text-text-secondary font-mono">est.</span>
         </div>
 
-        <span className="border-l border-border-subtle h-3.5 shrink-0" aria-hidden="true" />
-
         {/* Metric 5: Latency */}
-        <div className="flex items-center space-x-1 shrink-0">
-          <span className="text-text-tertiary">Compute</span>
-          <span className="text-text-primary font-medium tabular-nums">{executionTimeMs} ms</span>
+        <div className="bg-surface-1 border border-separator rounded-card p-2 flex flex-col justify-between col-span-2 sm:col-span-1">
+          <div className="flex items-center justify-between">
+            <span className="text-2xs text-text-secondary font-medium">Compute</span>
+            {isProcessing && <Loader2 className="h-3 w-3 animate-spin text-accent" />}
+          </div>
+          <span className="text-base font-semibold text-text font-mono tabular-nums my-0.5">
+            {executionTimeMs} ms
+          </span>
+          <span className="text-2xs text-text-tertiary font-mono">worker</span>
         </div>
       </div>
     </div>
