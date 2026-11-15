@@ -105,6 +105,42 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
     }
   };
 
+  // Renders document prose in sans, code blocks in mono
+  const renderFormattedChunkText = (text: string) => {
+    if (!text.includes('```')) {
+      return (
+        <div className="font-sans text-sm leading-relaxed text-text whitespace-pre-wrap break-words select-text">
+          {text}
+        </div>
+      );
+    }
+
+    const parts = text.split(/(```[\s\S]*?```)/g);
+    return (
+      <div className="text-sm leading-relaxed text-text break-words select-text">
+        {parts.map((part, pIdx) => {
+          if (part.startsWith('```') && part.endsWith('```')) {
+            const rawCode = part.slice(3, -3);
+            const cleanCode = rawCode.replace(/^[a-z0-9_-]+\n/i, '');
+            return (
+              <pre
+                key={pIdx}
+                className="my-2 p-3 rounded-control bg-surface-2 border border-separator font-mono text-xs text-text overflow-x-auto whitespace-pre leading-normal"
+              >
+                <code>{cleanCode}</code>
+              </pre>
+            );
+          }
+          return (
+            <span key={pIdx} className="font-sans whitespace-pre-wrap">
+              {part}
+            </span>
+          );
+        })}
+      </div>
+    );
+  };
+
   // Empty state rendering
   if (chunks.length === 0) {
     return (
@@ -138,21 +174,21 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
           onDropFile(file);
         }
       }}
-      className="relative flex-1 flex flex-col h-full bg-bg-base overflow-hidden"
+      className="relative flex-1 flex flex-col h-full bg-bg overflow-hidden"
     >
       {/* Drag & Drop Visual Target Overlay */}
       {isDragOver && (
-        <div className="absolute inset-0 z-40 bg-bg-base/90 backdrop-blur-xs flex flex-col items-center justify-center border-2 border-dashed border-accent m-4 rounded-xl text-center select-none pointer-events-none animate-in fade-in duration-100">
+        <div className="absolute inset-0 z-40 bg-bg/90 backdrop-blur-xs flex flex-col items-center justify-center border-2 border-dashed border-accent m-4 rounded-panel text-center select-none pointer-events-none animate-in fade-in duration-100">
           <div className="h-12 w-12 rounded-full bg-accent-subtle border border-accent/30 flex items-center justify-center text-accent mb-2">
             <Upload className="h-6 w-6" />
           </div>
-          <p className="text-sm font-semibold text-text-primary">Drop document to auto-detect format</p>
+          <p className="text-sm font-semibold text-text">Drop document to auto-detect format</p>
           <p className="text-xs text-text-secondary mt-1">Supports PDF, Markdown, CSV, JSON, and Source Code</p>
         </div>
       )}
 
       {/* Sub-header Toolbar: View Switcher & Stepper */}
-      <div className="h-9 px-3 sm:px-6 border-b border-border-default bg-surface/30 flex items-center justify-between text-xs select-none shrink-0">
+      <div className="h-10 px-3 sm:px-6 border-b border-separator bg-surface-1/40 mac-translucent flex items-center justify-between text-xs select-none shrink-0">
         <div className="flex items-center space-x-3">
           <span className="text-text-secondary font-mono text-xs tabular-nums hidden sm:inline">
             {chunks.length} chunks generated
@@ -163,19 +199,19 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
               <button
                 disabled={selectedChunk.index === 0}
                 onClick={handlePrevChunk}
-                className="h-5 w-5 rounded bg-surface border border-border-default text-text-secondary disabled:opacity-25 hover:text-text-primary hover:bg-elevated flex items-center justify-center active-press focus-ring transition-colors"
+                className="h-6 w-6 rounded-control bg-surface-2 border border-separator text-text-secondary disabled:opacity-25 hover:text-text hover:bg-surface-3 flex items-center justify-center active-press focus-ring transition-colors"
                 title="Inspect previous chunk (or Left Arrow / K)"
                 aria-label="Previous chunk"
               >
                 <ChevronLeft className="h-3 w-3" />
               </button>
-              <span className="text-accent bg-accent-subtle px-1.5 py-0.2 rounded text-xs tabular-nums font-mono border border-accent/20">
+              <span className="text-accent bg-accent-subtle px-2 py-0.5 rounded-control text-xs tabular-nums font-mono border border-accent/20">
                 #{selectedChunk.index + 1} of {chunks.length} ({selectedChunk.tokenCount} tok)
               </span>
               <button
                 disabled={selectedChunk.index === chunks.length - 1}
                 onClick={handleNextChunk}
-                className="h-5 w-5 rounded bg-surface border border-border-default text-text-secondary disabled:opacity-25 hover:text-text-primary hover:bg-elevated flex items-center justify-center active-press focus-ring transition-colors"
+                className="h-6 w-6 rounded-control bg-surface-2 border border-separator text-text-secondary disabled:opacity-25 hover:text-text hover:bg-surface-3 flex items-center justify-center active-press focus-ring transition-colors"
                 title="Inspect next chunk (or Right Arrow / J)"
                 aria-label="Next chunk"
               >
@@ -185,7 +221,7 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
           )}
         </div>
 
-        {/* View Mode Toggle: Stream vs Cards with responsive labels and whitespace-nowrap */}
+        {/* View Mode Toggle: Stream vs Cards */}
         <SegmentedControl
           size="sm"
           options={[
@@ -196,7 +232,7 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
                   <span className="hidden sm:inline">Continuous </span>Stream
                 </span>
               ),
-              icon: <Layers className="h-3 w-3" />,
+              icon: <Layers className="h-3.5 w-3.5" />,
             },
             {
               value: 'cards',
@@ -205,7 +241,7 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
                   <span className="hidden sm:inline">Separated </span>Cards
                 </span>
               ),
-              icon: <LayoutList className="h-3 w-3" />,
+              icon: <LayoutList className="h-3.5 w-3.5" />,
             },
           ]}
           value={viewMode}
@@ -214,7 +250,7 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
         />
       </div>
 
-      {/* Upload Error Banner (if file upload failed while canvas is populated) */}
+      {/* Upload Error Banner */}
       {uploadError && (
         <div className="px-4 sm:px-6 pt-3">
           <UploadErrorBanner
@@ -229,25 +265,26 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
       <div className="flex-1 overflow-y-auto p-4 sm:p-6" style={{ contentVisibility: 'auto' }}>
         {viewMode === 'stream' ? (
           /* CONTINUOUS READING COLUMN (Hero Mode) */
-          <div className="max-w-4xl mx-auto flex flex-col font-mono text-xs">
+          <div className="max-w-4xl mx-auto flex flex-col gap-2">
             {chunks.map((chunk, idx) => {
               const isSelected = chunk.id === selectedChunkId;
-              const paletteIdx = chunk.index % 8;
+              const paletteIdx = chunk.index % 6;
               const prevChunk = idx > 0 ? chunks[idx - 1] : null;
-              const prevPaletteIdx = prevChunk ? prevChunk.index % 8 : 0;
+              const prevPaletteIdx = prevChunk ? prevChunk.index % 6 : 0;
+              const budgetPercent = Math.min(100, Math.round((chunk.tokenCount / 512) * 100));
 
               return (
                 <React.Fragment key={chunk.id}>
                   {/* Overlap Diagonal Hatch Band */}
                   {chunk.overlapPrevChars > 0 && (
                     <div
-                      className="my-1 py-1 px-3 border border-dashed rounded-[4px] flex items-center justify-between text-xs font-mono select-none"
+                      className="my-1 py-1 px-3 border border-dashed rounded-control flex items-center justify-between text-xs font-mono select-none"
                       style={{
                         backgroundImage: `repeating-linear-gradient(-45deg, var(--chunk-${prevPaletteIdx}-bg), var(--chunk-${prevPaletteIdx}-bg) 4px, var(--chunk-${paletteIdx}-bg) 4px, var(--chunk-${paletteIdx}-bg) 8px)`,
                         borderColor: `var(--chunk-${paletteIdx})`,
                       }}
                     >
-                      <span className="text-text-primary font-medium bg-surface/80 px-1.5 py-0.5 rounded shadow-subtle">
+                      <span className="text-text font-medium bg-surface-1/90 px-2 py-0.5 rounded-control shadow-subtle border border-separator">
                         ▨▨ ~{chunk.overlapPrevChars} ch overlap with Chunk #{chunk.index}
                       </span>
                       <span className="text-text-tertiary hidden sm:inline">
@@ -256,14 +293,14 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
                     </div>
                   )}
 
-                  {/* Chunk Reading Row */}
+                  {/* Chunk Reading Card */}
                   <div
                     onClick={() => onSelectChunk(isSelected ? null : chunk.id)}
                     className={cn(
-                      'group flex flex-col sm:flex-row sm:items-start gap-1.5 sm:gap-3 p-3 rounded-[6px] transition-all cursor-pointer border',
+                      'group flex flex-col p-3.5 sm:p-4 rounded-card transition-all cursor-pointer border shadow-subtle',
                       isSelected
-                        ? 'ring-2 ring-accent border-accent shadow-elevated'
-                        : 'border-transparent hover:border-border-default'
+                        ? 'ring-2 ring-accent border-accent/40 shadow-elevated'
+                        : 'border-separator/40 hover:border-separator'
                     )}
                     style={{
                       backgroundColor: `var(--chunk-${paletteIdx}-bg)`,
@@ -271,18 +308,37 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
                       borderLeftWidth: '3px',
                     }}
                   >
-                    {/* Gutter: Index & Token Count (stacked horizontally on mobile, vertical column on sm+) */}
-                    <div className="w-full sm:w-14 shrink-0 flex flex-row sm:flex-col items-center sm:items-start justify-between sm:justify-start gap-2 sm:gap-0.5 text-text-tertiary select-none pt-0.5 border-b sm:border-b-0 border-border-subtle/40 pb-1 sm:pb-0">
-                      <div className="flex items-center gap-2 sm:flex-col sm:items-start sm:gap-0.5">
-                        <span className="font-semibold text-text-secondary tabular-nums text-xs">
+                    {/* Header Row: #01 Pill, Token count + Budget Bar, Copy Button */}
+                    <div className="flex items-center justify-between gap-3 pb-2.5 mb-2.5 border-b border-separator/30 text-xs select-none">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="px-1.5 py-0.5 rounded-control bg-surface-1 dark:bg-surface-3 border border-separator font-mono font-medium text-xs text-text tabular-nums shrink-0">
                           #{String(chunk.index + 1).padStart(2, '0')}
                         </span>
-                        <span className="text-xs tabular-nums font-mono">
-                          {chunk.tokenCount} tok
-                        </span>
+                        <div className="flex items-center gap-1.5 font-mono text-xs text-text-secondary">
+                          <span className="tabular-nums font-medium text-text">
+                            {chunk.tokenCount}
+                          </span>
+                          <span className="text-text-tertiary">/ 512 tok</span>
+                        </div>
+                        {/* Token Budget Progress Bar */}
+                        <div className="w-16 h-1.5 bg-surface-2 rounded-full overflow-hidden hidden sm:block shrink-0">
+                          <div
+                            className="h-full rounded-full transition-all"
+                            style={{
+                              width: `${budgetPercent}%`,
+                              backgroundColor: `var(--chunk-${paletteIdx})`,
+                            }}
+                          />
+                        </div>
+                        {chunk.sectionHeader && (
+                          <span className="text-xs text-text-tertiary hidden md:flex items-center gap-1 truncate max-w-xs">
+                            <Bookmark className="h-3 w-3 shrink-0" />
+                            <span className="truncate">{chunk.sectionHeader}</span>
+                          </span>
+                        )}
                         {chunk.isOrphan && (
                           <span
-                            className="text-xs text-status-warn font-sans font-medium px-1 rounded bg-status-warn/10 border border-status-warn/20"
+                            className="text-xs text-status-warn font-sans font-medium px-1.5 py-0.2 rounded-control bg-status-warn-subtle border border-status-warn/20"
                             title="Mid-word or unclosed syntax cut"
                           >
                             Cut
@@ -290,13 +346,13 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
                         )}
                       </div>
 
-                      {/* Mobile Copy Button */}
+                      {/* Copy Action Button */}
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleCopyChunk(chunk.id, chunk.text);
                         }}
-                        className="sm:hidden h-6 w-6 rounded hover:bg-elevated text-text-tertiary hover:text-text-primary flex items-center justify-center transition-all focus-ring shrink-0"
+                        className="h-7 w-7 rounded-control hover:bg-surface-2 text-text-tertiary hover:text-text flex items-center justify-center transition-all focus-ring shrink-0"
                         title="Copy chunk text"
                         aria-label={`Copy chunk ${chunk.index + 1}`}
                       >
@@ -308,29 +364,10 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
                       </button>
                     </div>
 
-                    {/* Chunk Text Body (Full width on mobile) */}
-                    <div className="flex-1 min-w-0 w-full">
-                      <div className="whitespace-pre-wrap leading-relaxed text-text-primary text-[13px] break-words">
-                        {chunk.text}
-                      </div>
+                    {/* Chunk Text Content (Prose in sans, code in mono) */}
+                    <div className="min-w-0 w-full">
+                      {renderFormattedChunkText(chunk.text)}
                     </div>
-
-                    {/* Quick Copy Button on desktop (hover reveal) */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleCopyChunk(chunk.id, chunk.text);
-                      }}
-                      className="hidden sm:flex opacity-0 group-hover:opacity-100 h-6 w-6 rounded hover:bg-elevated text-text-tertiary hover:text-text-primary items-center justify-center transition-all focus-ring shrink-0"
-                      title="Copy chunk text"
-                      aria-label={`Copy chunk ${chunk.index + 1}`}
-                    >
-                      {copiedId === chunk.id ? (
-                        <Check className="h-3.5 w-3.5 text-status-success" />
-                      ) : (
-                        <Copy className="h-3 w-3" />
-                      )}
-                    </button>
                   </div>
                 </React.Fragment>
               );
@@ -338,56 +375,68 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
           </div>
         ) : (
           /* SEPARATED CARDS GRID */
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-6xl mx-auto font-mono text-xs">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-6xl mx-auto text-xs">
             {chunks.map((chunk) => {
               const isSelected = chunk.id === selectedChunkId;
-              const paletteIdx = chunk.index % 8;
+              const paletteIdx = chunk.index % 6;
+              const budgetPercent = Math.min(100, Math.round((chunk.tokenCount / 512) * 100));
 
               return (
                 <div
                   key={chunk.id}
                   onClick={() => onSelectChunk(isSelected ? null : chunk.id)}
                   className={cn(
-                    'p-4 rounded-lg border transition-all cursor-pointer flex flex-col justify-between',
+                    'p-4 rounded-card border transition-all cursor-pointer flex flex-col justify-between shadow-subtle',
                     isSelected
-                      ? 'ring-2 ring-accent border-accent shadow-elevated bg-elevated'
-                      : 'border-border-default hover:border-border-strong bg-surface'
+                      ? 'ring-2 ring-accent border-accent/40 shadow-elevated bg-surface-2'
+                      : 'border-separator hover:border-separator/80 bg-surface-1 hover:bg-surface-2/40'
                   )}
                   style={{
-                    borderTopColor: `var(--chunk-${paletteIdx})`,
-                    borderTopWidth: '3px',
+                    borderLeftColor: `var(--chunk-${paletteIdx})`,
+                    borderLeftWidth: '3px',
                   }}
                 >
                   {/* Card Header Bar */}
-                  <div className="flex items-center justify-between pb-2 mb-2 border-b border-border-subtle">
-                    <div className="flex items-center space-x-2">
-                      <span className="font-semibold text-text-primary px-1.5 py-0.2 rounded bg-elevated border border-border-default tabular-nums text-xs">
+                  <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-separator text-xs select-none">
+                    <div className="flex items-center space-x-2 min-w-0">
+                      <span className="font-semibold text-text px-1.5 py-0.5 rounded-control bg-surface-2 border border-separator tabular-nums text-xs font-mono">
                         #{chunk.index + 1}
                       </span>
                       {chunk.sectionHeader && (
-                        <span className="text-xs text-text-secondary flex items-center space-x-1 truncate max-w-xs">
+                        <span className="text-xs text-text-secondary flex items-center space-x-1 truncate max-w-[160px]">
                           <Bookmark className="h-3 w-3 text-text-tertiary shrink-0" />
                           <span className="truncate">{chunk.sectionHeader}</span>
                         </span>
                       )}
                       {chunk.isOrphan && (
-                        <span className="text-xs text-status-warn bg-status-warn/10 border border-status-warn/20 px-1.5 py-0.2 rounded flex items-center gap-1">
+                        <span className="text-xs text-status-warn bg-status-warn-subtle border border-status-warn/20 px-1.5 py-0.2 rounded-control flex items-center gap-1 font-sans">
                           <AlertTriangle className="h-3 w-3 text-status-warn" />
-                          <span>Mid-word cut</span>
+                          <span>Cut</span>
                         </span>
                       )}
                     </div>
 
-                    <div className="flex items-center space-x-3 text-text-secondary text-xs">
-                      <span className="tabular-nums">
-                        <strong className="text-text-primary">{chunk.tokenCount}</strong> tok ({chunk.charCount} ch)
-                      </span>
+                    <div className="flex items-center space-x-2.5 text-text-secondary text-xs">
+                      <div className="flex items-center gap-1.5 font-mono">
+                        <span className="tabular-nums">
+                          <strong className="text-text font-medium">{chunk.tokenCount}</strong> tok
+                        </span>
+                        <div className="w-12 h-1.5 bg-surface-2 rounded-full overflow-hidden hidden sm:block shrink-0">
+                          <div
+                            className="h-full rounded-full"
+                            style={{
+                              width: `${budgetPercent}%`,
+                              backgroundColor: `var(--chunk-${paletteIdx})`,
+                            }}
+                          />
+                        </div>
+                      </div>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleCopyChunk(chunk.id, chunk.text);
                         }}
-                        className="h-6 w-6 rounded hover:bg-elevated text-text-tertiary hover:text-text-primary flex items-center justify-center transition-colors focus-ring"
+                        className="h-7 w-7 rounded-control hover:bg-surface-3 text-text-tertiary hover:text-text flex items-center justify-center transition-colors focus-ring"
                         title="Copy chunk text"
                         aria-label={`Copy chunk ${chunk.index + 1}`}
                       >
@@ -400,16 +449,16 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
                     </div>
                   </div>
 
-                  {/* Chunk Text */}
-                  <p className="whitespace-pre-wrap leading-relaxed text-text-primary text-[13px] break-words">
-                    {chunk.text}
-                  </p>
+                  {/* Chunk Text Content */}
+                  <div className="my-1">
+                    {renderFormattedChunkText(chunk.text)}
+                  </div>
 
                   {/* Overlap Footnote */}
                   {chunk.overlapPrevChars > 0 && (
-                    <div className="mt-2 pt-2 border-t border-border-subtle flex items-center justify-between text-xs text-text-tertiary tabular-nums">
-                      <span>Overlap with previous: ~{chunk.overlapPrevChars} chars</span>
-                      <span>Offsets: [{chunk.startCharIndex} .. {chunk.endCharIndex}]</span>
+                    <div className="mt-3 pt-2 border-t border-separator flex items-center justify-between text-2xs text-text-tertiary font-mono tabular-nums select-none">
+                      <span>Overlap with prev: ~{chunk.overlapPrevChars} ch</span>
+                      <span>[{chunk.startCharIndex} .. {chunk.endCharIndex}]</span>
                     </div>
                   )}
                 </div>
