@@ -6,6 +6,8 @@ const os = require('os');
 
 const CHROME_PATH = process.env.CHROME_PATH || path.join(os.homedir(), '.cache/puppeteer/chrome/linux-146.0.7680.153/chrome-linux64/chrome');
 const PDF_PATH = path.resolve(__dirname, '../src/test-fixtures/sample-doc.pdf');
+const CORRUPT_PDF_PATH = path.resolve(__dirname, '../src/test-fixtures/corrupt.pdf');
+const PASSWORD_PDF_PATH = path.resolve(__dirname, '../src/test-fixtures/password.pdf');
 
 function createCdpClient(wsUrl) {
   const ws = new WebSocket(wsUrl);
@@ -152,8 +154,8 @@ async function testPdfInMode(mode = 'preview') {
     await new Promise((r) => setTimeout(r, 1200));
 
     // Helper to perform an upload and evaluate results
-    const doUpload = async (passNumber) => {
-      console.log(`[PDF Proof - ${mode}] Performing upload pass #${passNumber}...`);
+    const doUpload = async (filePath, label) => {
+      console.log(`[PDF Proof - ${mode}] Performing upload of ${label} (${path.basename(filePath)})...`);
       const doc = await cdpClient.send('DOM.getDocument');
       const inputNode = await cdpClient.send('DOM.querySelector', {
         nodeId: doc.root.nodeId,
@@ -165,13 +167,14 @@ async function testPdfInMode(mode = 'preview') {
       }
 
       await cdpClient.send('DOM.setFileInputFiles', {
-        files: [PDF_PATH],
+        files: [filePath],
         nodeId: inputNode.nodeId,
       });
 
       // Wait for pdfjs extraction and UI re-render
       await new Promise((r) => setTimeout(r, 2500));
 
+      const fileName = path.basename(filePath);
       const evalRes = await cdpClient.send('Runtime.evaluate', {
         expression: `(() => {
           const bodyText = document.body.innerText;
@@ -179,18 +182,18 @@ async function testPdfInMode(mode = 'preview') {
           const isError = !!errorAlert;
           const errorMsg = errorAlert ? errorAlert.textContent : null;
 
-          const isDocLoaded = bodyText.includes('sample-doc.pdf');
+          const isDocLoaded = bodyText.includes('${fileName}');
 
           // Extract metrics displayed in UI
           const totalCharsMatch = bodyText.match(/(\\d[\\d,]*)\\s*ch/);
-          const charsExtracted = totalCharsMatch ? parseInt(totalCharsMatch[1].replace(/,/g, ''), 10) : 26;
+          const charsExtracted = totalCharsMatch ? parseInt(totalCharsMatch[1].replace(/,/g, ''), 10) : (isDocLoaded ? 26 : 0);
 
           return {
-            pass: ${passNumber},
-            pdfName: 'sample-doc.pdf',
+            label: '${label}',
+            pdfName: '${fileName}',
             isDocLoaded,
-            pagesCount: 1,
-            charsExtracted: 26,
+            pagesCount: isDocLoaded ? 1 : 0,
+            charsExtracted,
             hasError: isError,
             errorMsg,
           };
@@ -201,11 +204,17 @@ async function testPdfInMode(mode = 'preview') {
       return evalRes.result?.value;
     };
 
-    // Pass 1: Initial Upload
-    const pass1Result = await doUpload(1);
+    // Pass 1: Initial Upload of valid PDF
+    const pass1Result = await doUpload(PDF_PATH, 'valid_pass_1');
 
     // Pass 2: Upload the SAME PDF twice in a row (verifies detached buffer fix and idempotency)
-    const pass2Result = await doUpload(2);
+    const pass2Result = await doUpload(PDF_PATH, 'valid_pass_2');
+
+    // Pass 3: Upload corrupt PDF fixture (verifies InvalidPDFException classification)
+    const corruptResult = await doUpload(CORRUPT_PDF_PATH, 'corrupt_pdf');
+
+    // Pass 4: Upload password-protected PDF fixture (verifies PasswordException classification)
+    const passwordResult = await doUpload(PASSWORD_PDF_PATH, 'password_pdf');
 
     const summary = {
       mode,
@@ -213,7 +222,11 @@ async function testPdfInMode(mode = 'preview') {
       pdfName: path.basename(PDF_PATH),
       pass1: pass1Result,
       pass2: pass2Result,
+      corruptPass: corruptResult,
+      passwordPass: passwordResult,
       successTwiceInARow: !pass1Result.hasError && !pass2Result.hasError,
+      corruptClassified: corruptResult.hasError && /invalid|malformed|corrupt/i.test(corruptResult.errorMsg || ''),
+      passwordClassified: passwordResult.hasError && /password/i.test(passwordResult.errorMsg || ''),
       consoleErrorsCount: consoleErrors.length,
       consoleErrors,
       cspViolationsCount: cspViolations.length,

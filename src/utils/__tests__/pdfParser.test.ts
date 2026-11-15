@@ -118,4 +118,22 @@ describe('extractTextFromPdf', () => {
     const emptyBuffer = new ArrayBuffer(0);
     await expect(extractTextFromPdf(emptyBuffer)).rejects.toThrow(/empty \(0 bytes\)/);
   });
+
+  it('classifies encrypted/password-protected PDF as PasswordException', async () => {
+    const header = '%PDF-1.4\n';
+    const obj1 = '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n';
+    const obj2 = '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n';
+    const obj3 = '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] >>\nendobj\n';
+    const obj4 = '4 0 obj\n<< /Filter /Standard /V 1 /R 2 /O (12345678901234567890123456789012) /U (12345678901234567890123456789012) /P -4 >>\nendobj\n';
+    const offset1 = Buffer.byteLength(header);
+    const offset2 = offset1 + Buffer.byteLength(obj1);
+    const offset3 = offset2 + Buffer.byteLength(obj2);
+    const offset4 = offset3 + Buffer.byteLength(obj3);
+    const xrefOffset = offset4 + Buffer.byteLength(obj4);
+    const pad = (n: number) => String(n).padStart(10, '0');
+    const xref = `xref\n0 5\n0000000000 65535 f \r\n${pad(offset1)} 00000 n \r\n${pad(offset2)} 00000 n \r\n${pad(offset3)} 00000 n \r\n${pad(offset4)} 00000 n \r\ntrailer\n<< /Size 5 /Root 1 0 R /Encrypt 4 0 R /ID [<0123456789abcdef0123456789abcdef> <0123456789abcdef0123456789abcdef>] >>\nstartxref\n${xrefOffset}\n%%EOF\n`;
+    const encryptedPdf = new Uint8Array(Buffer.from(header + obj1 + obj2 + obj3 + obj4 + xref, 'utf8'));
+
+    await expect(extractTextFromPdf(encryptedPdf)).rejects.toThrow(/password-protected/i);
+  });
 });

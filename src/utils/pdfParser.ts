@@ -5,6 +5,19 @@
 
 import pdfWorkerUrl from 'pdfjs-dist/legacy/build/pdf.worker.min.mjs?url';
 
+// Ensure Promise.withResolvers is polyfilled for environments without native support (Node < 22, older runtimes)
+if (typeof (Promise as any).withResolvers === 'undefined') {
+  (Promise as any).withResolvers = function <T>() {
+    let resolve!: (value: T | PromiseLike<T>) => void;
+    let reject!: (reason?: any) => void;
+    const promise = new Promise<T>((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+    return { promise, resolve, reject };
+  };
+}
+
 export interface PdfParseResult {
   text: string;
   pageCount: number;
@@ -42,6 +55,7 @@ export async function extractTextFromPdf(data: ArrayBuffer | Uint8Array): Promis
     data: clonedBytes,
     useWorkerFetch: false,
     isEvalSupported: false,
+    enableScripting: false,
     useSystemFonts: true,
   });
 
