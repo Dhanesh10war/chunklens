@@ -322,7 +322,12 @@ export const ChunkInspector: React.FC<ChunkInspectorProps> = ({
                 )}
               </button>
             </div>
-            <div className="p-3 rounded-card bg-bg border border-separator font-mono text-xs text-text whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto break-words select-text">
+            <div
+              tabIndex={0}
+              role="region"
+              aria-label="Chunk content preview"
+              className="p-3 rounded-card bg-bg border border-separator font-mono text-xs text-text whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto break-words select-text focus-ring"
+            >
               {chunk.text}
             </div>
           </div>

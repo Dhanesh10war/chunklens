@@ -320,7 +320,12 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
                     {activePair.chunkA.tokenCount} tok • {activePair.chunkA.charCount} ch
                   </span>
                 </div>
-                <div className="font-sans text-xs text-text whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto">
+                <div
+                  tabIndex={0}
+                  role="region"
+                  aria-label={`Chunk ${activePair.row + 1} text preview`}
+                  className="font-sans text-xs text-text whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto focus-ring rounded-control"
+                >
                   {activePair.chunkA.text}
                 </div>
               </div>
@@ -333,7 +338,12 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
                     {activePair.chunkB.tokenCount} tok • {activePair.chunkB.charCount} ch
                   </span>
                 </div>
-                <div className="font-sans text-xs text-text whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto">
+                <div
+                  tabIndex={0}
+                  role="region"
+                  aria-label={`Chunk ${activePair.col + 1} text preview`}
+                  className="font-sans text-xs text-text whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto focus-ring rounded-control"
+                >
                   {activePair.chunkB.text}
                 </div>
               </div>

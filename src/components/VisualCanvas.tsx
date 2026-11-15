@@ -125,7 +125,10 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
             return (
               <pre
                 key={pIdx}
-                className="my-2 p-3 rounded-control bg-surface-2 border border-separator font-mono text-xs text-text overflow-x-auto whitespace-pre leading-normal"
+                tabIndex={0}
+                role="region"
+                aria-label="Code block"
+                className="my-2 p-3 rounded-control bg-surface-2 border border-separator font-mono text-xs text-text overflow-x-auto whitespace-pre leading-normal focus-ring"
               >
                 <code>{cleanCode}</code>
               </pre>

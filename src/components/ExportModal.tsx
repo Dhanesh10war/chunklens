@@ -147,7 +147,12 @@ export const ExportModal: React.FC<ExportModalProps> = ({
             )}
           </button>
 
-          <pre className="text-text overflow-x-auto max-h-[380px] p-4 rounded-card bg-surface-1 border border-separator leading-relaxed selection:bg-accent/20">
+          <pre
+            tabIndex={0}
+            role="region"
+            aria-label="Exported code snippet"
+            className="text-text overflow-x-auto max-h-[380px] p-4 rounded-card bg-surface-1 border border-separator leading-relaxed selection:bg-accent/20 focus-ring"
+          >
             {code}
           </pre>
         </div>
