@@ -13,7 +13,7 @@
 - **Unit & Integration Tests:** 126 tests passing across 20 test suites (`npm test`, 100% pass, 0 flaky)
 - **Dependency Security Audit (`npm audit`):** Marked `UNMEASURED (offline sandbox)` locally. Outbound POST to `registry.npmjs.org/-/npm/v1/security/audits/quick` is blocked by local development sandbox security policy (HTTP 403 Forbidden). Dedicated `audit` job runs independently in GitHub Actions CI without blocking build pipelines.
 - **Custom DOM A11y Checks:** 0 violations across loaded, empty, and error states at 1440px and 375px viewports (button names, form labels, duplicate IDs, ARIA roles, tabindex verified).
-- **Axe-Core & Playwright E2E Status:** Staged and configured (`e2e/networkEgress.spec.ts`, `e2e/accessibility.spec.ts`); marked written, not yet run locally (runs in GitHub Actions CI via `npx playwright install --with-deps chromium`).
+- **Axe-Core & Playwright E2E Status:** **MEASURED: 0 violations** across all 3 test suites (`loaded state at 1440px and 375px`, `empty state after reset`, `error state with corrupt PDF upload`). Strictly gated on WCAG tags (`wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`). Best-practice rule `page-has-heading-one` resolved by declaring level-one brand heading `<h1>ChunkLens</h1>` in Header and sequentially nesting content headings in EmptyState.
 - **Zero Network Egress:** Strict CSP (`connect-src 'none'`) verified live via Chrome DevTools Protocol (`scripts/test-egress.cjs`).
 - **Export Button Contrast:** Measured 6.29:1 rendered contrast in Chrome browser (`#FFFFFF` on `#4F46E5`), satisfying WCAG 2.2 AA $\ge 4.5:1$. Split tokens guarantee 7.90:1 in light mode (`#4338CA`) and 6.29:1 in dark mode (`#4F46E5`).
 - **Typography Floor & Labels:** Strict 12px text floor verified by automated code grep rule and browser computed-style audit (0 sub-12px elements). Real UI labels verified: Algorithm, Separators hierarchy, Measurement unit, Tokenizer encoding, and Size & overlap.
@@ -32,7 +32,7 @@
 | **Linting** | UNMEASURED (`tsc -b` duplicate) | **UNMEASURED (`tsc -b` duplicate)** | ℹ️ Duplicate of typecheck |
 | **Dependency Security (`npm audit`)** | UNMEASURED | **UNMEASURED (offline sandbox policy; gated in CI audit job)** | ℹ️ Blocked by sandbox 403; runs in CI |
 | **Custom DOM A11y Violations (1440 & 375)** | 0 | **0 (Loaded, Empty, Error)** | ✅ Zero violations |
-| **Axe-Core / Playwright E2E Status** | UNMEASURED | **Written, runs in CI** | 🔄 GitHub Actions gate |
+| **Axe-Core / Playwright E2E Status** | UNMEASURED | **0 violations (3 tests: loaded @ 1440/375, empty, error)** | ✅ MEASURED (0 WCAG violations) |
 | **External Network Requests** | Google Fonts | **0 (Strict CSP `connect-src 'none'`)** | ✅ Verified zero egress |
 | **Main JS Bundle (`index.js` Raw / Gzip)** | 172.06 kB / 48.33 kB | **136.09 kB / 40.30 kB** | ✅ 48.91 kB under budget |
 | **React Vendor Bundle (Raw / Gzip)** | 134.67 kB / 43.22 kB | **134.67 kB / 43.22 kB** | ✅ Stable |
@@ -63,6 +63,9 @@
 | **ISS-32** | Low | 2 | Should (2) | S (1) | 4.0 | Error banner lacked danger color tokens. | Defined `--status-danger` tokens with verified $\ge 3:1$ icon contrast and 5.45:1 text contrast. | ✅ FIXED (`V4`) |
 | **ISS-33** | Low | 2 | Could (1) | S (1) | 2.0 | Metrics strip used pipe characters and overflowed horizontally. | Converted to compact wrapped rows with CSS hairline dividers below `xl`. | ✅ FIXED (`V7`) |
 | **ISS-34** | Low | 2 | Could (1) | S (1) | 2.0 | Chunk gutter squeezed text reading column at 375px. | Stacked `#01 / token gutter` above chunk text on mobile viewports. | ✅ FIXED (`V8`) |
+| **ISS-35** | High | 4 | Must (3) | S (1) | 12.0 | `color-contrast` violation on worker computing status due to `animate-pulse` opacity dip (2.46:1). | Replaced text opacity pulsing with steady `Loader2 animate-spin` icon and `role="status"` (6.36:1 contrast). | ✅ FIXED |
+| **ISS-36** | High | 4 | Must (3) | S (1) | 12.0 | `nested-interactive` violation in EmptyState dropzone (`role="button"` wrapping `<Button>`). | Removed interactive button role from dropzone container so inner `<Button>` manages focus. | ✅ FIXED |
+| **ISS-37** | Med | 3 | Should (2) | S (1) | 6.0 | Missing landmark region and `page-has-heading-one` heading order in EmptyState. | Added `<section role="region" aria-label="...">` landmark and promoted Header brand to `<h1>`. | ✅ FIXED |
 
 ---
 
