@@ -150,6 +150,12 @@ async function testPdfInMode(mode = 'preview') {
     await cdpClient.send('Page.enable');
     await cdpClient.send('DOM.enable');
     await cdpClient.send('Runtime.enable');
+    await cdpClient.send('Emulation.setDeviceMetricsOverride', {
+      width: 1440,
+      height: 900,
+      deviceScaleFactor: 1,
+      mobile: false,
+    });
 
     await new Promise((r) => setTimeout(r, 1200));
 
@@ -177,31 +183,68 @@ async function testPdfInMode(mode = 'preview') {
       const fileName = path.basename(filePath);
       const evalRes = await cdpClient.send('Runtime.evaluate', {
         expression: `(() => {
-          const bodyText = document.body.innerText;
+          const fileName = '${fileName}';
+          const headerTitleEl = document.querySelector('header span[title]');
+          const activeDocTitle = headerTitleEl ? headerTitleEl.getAttribute('title') : '';
+
           const errorAlert = document.querySelector('[role="alert"]');
-          const isError = !!errorAlert;
-          const errorMsg = errorAlert ? errorAlert.textContent : null;
+          const isErrorAlertPresent = !!errorAlert;
+          const errorAlertText = errorAlert ? errorAlert.textContent.trim().replace(/\\s+/g, ' ') : null;
 
-          const isDocLoaded = bodyText.includes('${fileName}');
+          // Check if this error belongs to the attempted file
+          const hasError = isErrorAlertPresent && (errorAlertText ? errorAlertText.includes(fileName) : false);
+          const errorMsg = hasError ? errorAlertText : null;
 
-          // Extract metrics displayed in UI
-          const totalCharsMatch = bodyText.match(/(\\d[\\d,]*)\\s*ch/);
-          const charsExtracted = totalCharsMatch ? parseInt(totalCharsMatch[1].replace(/,/g, ''), 10) : (isDocLoaded ? 26 : 0);
+          // The file is only successfully loaded if the header active title matches fileName and no error occurred
+          const isDocLoaded = (activeDocTitle === fileName) && !hasError;
+
+          let charsExtracted = 0;
+          let pagesCount = 0;
+          let extractedText = '';
+
+          if (isDocLoaded) {
+            // Get chunk text rendered in visualizer
+            const chunkEls = Array.from(document.querySelectorAll('.whitespace-pre-wrap'));
+            extractedText = chunkEls.map((el) => el.textContent || '').join('\\n\\n');
+
+            // Also check document-chars metric from MetricsBar
+            const docCharsEl = document.querySelector('[data-testid="document-chars"]');
+            const docCharsMatch = docCharsEl ? docCharsEl.textContent.match(/(\\d[\\d,]*)\\s*ch/) : null;
+
+            if (docCharsMatch) {
+              charsExtracted = parseInt(docCharsMatch[1].replace(/,/g, ''), 10);
+            } else if (extractedText) {
+              charsExtracted = extractedText.length;
+            }
+
+            const pageMatches = extractedText.match(/--- Page \\d+ ---/g);
+            pagesCount = pageMatches ? pageMatches.length : 1;
+          }
 
           return {
             label: '${label}',
-            pdfName: '${fileName}',
+            pdfName: fileName,
+            activeDocTitle,
             isDocLoaded,
-            pagesCount: isDocLoaded ? 1 : 0,
+            pagesCount,
             charsExtracted,
-            hasError: isError,
+            extractedText,
+            hasError,
             errorMsg,
           };
         })()`,
         returnByValue: true,
       });
 
-      return evalRes.result?.value;
+      const resVal = evalRes.result?.value;
+      if (resVal && resVal.isDocLoaded && resVal.extractedText) {
+        console.log(`[Extracted Text for ${label}]:`);
+        console.log(JSON.stringify(resVal.extractedText));
+        console.log(`--- Raw Extracted Text (${label}) ---`);
+        console.log(resVal.extractedText);
+        console.log(`-------------------------------------`);
+      }
+      return resVal;
     };
 
     // Pass 1: Initial Upload of valid PDF
