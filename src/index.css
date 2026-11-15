@@ -43,111 +43,200 @@
   src: url('/fonts/jetbrains-mono-500.woff2') format('woff2');
 }
 
-:root {
-  /* LIGHT THEME */
-  --bg-base: #FAFAFA;
-  --bg-surface: #FFFFFF;
-  --bg-elevated: #F4F4F5;
-  --border-subtle: rgba(0, 0, 0, 0.05);
-  --border-default: rgba(0, 0, 0, 0.08);
-  --border-hover: rgba(0, 0, 0, 0.16);
+/* ==========================================================================
+   Apple HIG OKLCH Color Tokens: Light (Default root) & Dark ([data-theme="dark"])
+   60-30-10 Split: 60% neutral background, 30% surfaces, 10% accent.
+   Cool neutrals (hue ~270, chroma < 0.01) harmonizing with Apple Blue.
+   ========================================================================== */
 
-  --text-primary: #18181B;
-  --text-secondary: #71717A;
-  --text-tertiary: #64646D; /* 5.2:1 contrast against #FAFAFA */
+:root,
+[data-theme="light"],
+.light {
+  /* Core Apple HIG Surfaces (Light) */
+  --bg: oklch(0.97 0.002 270);
+  --surface-1: oklch(1 0 0);
+  --surface-2: oklch(0.955 0.003 270);
+  --surface-3: oklch(0.93 0.004 270);
+  --surface-toolbar: oklch(1 0 0 / 0.78);
 
-  --accent: oklch(0.55 0.18 275);
-  --accent-hover: oklch(0.50 0.18 275);
-  --accent-subtle: rgba(79, 70, 229, 0.08);
-  --accent-ring: oklch(0.55 0.18 275);
-  --accent-solid: #4338CA; /* indigo-700: 8.04:1 contrast vs #FFFFFF */
-  --accent-solid-hover: #3730A3; /* indigo-800: 10.2:1 contrast vs #FFFFFF */
+  /* Typography - Tuned for WCAG 2.2 AA (>= 4.5:1 body text in both modes) */
+  --text: oklch(0.22 0.005 270);           /* 15.9:1 vs bg, 17.4:1 vs surface-1 */
+  --text-secondary: oklch(0.42 0.01 270);  /* 7.2:1 vs bg, 7.8:1 vs surface-1 */
+  --text-tertiary: oklch(0.50 0.01 270);   /* 5.3:1 vs bg, 4.9:1 vs chunk tints */
+
+  /* Hairlines and Separators */
+  --separator: oklch(0 0 0 / 0.08);
+  --separator-subtle: oklch(0 0 0 / 0.04);
+
+  /* Single System Accent: Apple Blue */
+  --accent: oklch(0.50 0.21 255);          /* 5.5:1 vs surface-1, 5.0:1 vs subtle */
+  --accent-hover: oklch(0.45 0.21 255);
+  --accent-subtle: oklch(0.62 0.21 255 / 0.08);
+  --accent-ring: oklch(0.62 0.21 255);
+  --accent-solid: #4338CA;    /* 7.90:1 contrast vs #FFFFFF (Amendment A) */
+  --accent-solid-hover: #3730A3;
   --on-accent: #FFFFFF;
 
-  --status-error: oklch(0.55 0.18 25);
+  /* Muted Semantic Indicators */
+  --status-success: oklch(0.60 0.13 145);
+  --status-success-subtle: oklch(0.60 0.13 145 / 0.10);
+  --status-success-text: oklch(0.38 0.12 145);
+  --status-warn: oklch(0.68 0.15 75);
+  --status-warn-subtle: oklch(0.68 0.15 75 / 0.10);
+  --status-warn-text: oklch(0.42 0.12 75);
+  --status-error: oklch(0.50 0.20 25);     /* >= 5.2:1 vs light surfaces */
+  --status-error-subtle: oklch(0.58 0.20 25 / 0.10);
+  --status-error-text: oklch(0.45 0.18 25);
   --status-danger: var(--status-error);
-  --status-warn: oklch(0.65 0.15 75);
-  --status-success: oklch(0.58 0.14 150);
 
-  /* Light Chunk Palette (L=0.60, C=0.13) */
-  --chunk-0: oklch(0.60 0.13 250);
-  --chunk-0-bg: oklch(0.60 0.13 250 / 0.10);
-  --chunk-1: oklch(0.60 0.13 200);
-  --chunk-1-bg: oklch(0.60 0.13 200 / 0.10);
-  --chunk-2: oklch(0.60 0.13 150);
-  --chunk-2-bg: oklch(0.60 0.13 150 / 0.10);
-  --chunk-3: oklch(0.60 0.13 85);
-  --chunk-3-bg: oklch(0.60 0.13 85 / 0.10);
-  --chunk-4: oklch(0.60 0.13 40);
-  --chunk-4-bg: oklch(0.60 0.13 40 / 0.10);
-  --chunk-5: oklch(0.60 0.13 340);
-  --chunk-5-bg: oklch(0.60 0.13 340 / 0.10);
-  --chunk-6: oklch(0.60 0.13 290);
-  --chunk-6-bg: oklch(0.60 0.13 290 / 0.10);
-  --chunk-7: oklch(0.60 0.13 120);
-  --chunk-7-bg: oklch(0.60 0.13 120 / 0.10);
+  /* Light Shadows: Soft and layered */
+  --shadow-subtle: 0 1px 2px 0 oklch(0 0 0 / 0.05);
+  --shadow-card: 0 1px 3px 0 oklch(0 0 0 / 0.04), 0 4px 12px 0 oklch(0 0 0 / 0.03);
+  --shadow-elevated: 0 4px 14px 0 oklch(0 0 0 / 0.08), 0 1px 2px 0 oklch(0 0 0 / 0.04);
+  --shadow-modal: 0 12px 32px 0 oklch(0 0 0 / 0.12), 0 2px 6px 0 oklch(0 0 0 / 0.04);
+
+  /* 6 Equal Lightness/Chroma Data Viz Chunk Colors (L=0.62, C=0.14) */
+  --chunk-0: oklch(0.62 0.14 255);
+  --chunk-0-bg: oklch(0.62 0.14 255 / 0.10);
+  --chunk-1: oklch(0.62 0.14 190);
+  --chunk-1-bg: oklch(0.62 0.14 190 / 0.10);
+  --chunk-2: oklch(0.62 0.14 150);
+  --chunk-2-bg: oklch(0.62 0.14 150 / 0.10);
+  --chunk-3: oklch(0.62 0.14 85);
+  --chunk-3-bg: oklch(0.62 0.14 85 / 0.10);
+  --chunk-4: oklch(0.62 0.14 25);
+  --chunk-4-bg: oklch(0.62 0.14 25 / 0.10);
+  --chunk-5: oklch(0.62 0.14 330);
+  --chunk-5-bg: oklch(0.62 0.14 330 / 0.10);
+  --chunk-6: var(--chunk-0);
+  --chunk-6-bg: var(--chunk-0-bg);
+  --chunk-7: var(--chunk-1);
+  --chunk-7-bg: var(--chunk-1-bg);
+
+  /* Compatibility Semantic Aliases */
+  --bg-base: var(--bg);
+  --bg-surface: var(--surface-1);
+  --bg-elevated: var(--surface-2);
+  --border-subtle: var(--separator-subtle);
+  --border-default: var(--separator);
+  --border-hover: oklch(0 0 0 / 0.16);
+  --text-primary: var(--text);
 }
 
+[data-theme="dark"],
 .dark {
-  /* DARK THEME (DEFAULT) */
-  --bg-base: #0A0A0B;      /* near-black neutral, NOT navy */
-  --bg-surface: #111113;   /* panels */
-  --bg-elevated: #17171A;  /* popovers, menus, hovered rows */
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.10);
-  --border-hover: rgba(255, 255, 255, 0.18);
+  /* Core Apple HIG Surfaces (Dark) - Designed separately, lighter surfaces for elevation */
+  --bg: oklch(0.15 0.004 270);
+  --surface-1: oklch(0.21 0.005 270);
+  --surface-2: oklch(0.26 0.006 270);
+  --surface-3: oklch(0.31 0.007 270);
+  --surface-toolbar: oklch(0.15 0.004 270 / 0.78);
 
-  --text-primary: #EDEDEF;
-  --text-secondary: #A1A1AA;
-  --text-tertiary: #8A8A93; /* 5.9:1 contrast against #0A0A0B */
+  /* Typography - Tuned for WCAG 2.2 AA (>= 4.5:1 body text in both modes) */
+  --text: oklch(0.97 0 0);                 /* 18.1:1 vs bg, 16.3:1 vs surface-1 */
+  --text-secondary: oklch(0.75 0.01 270);  /* 8.7:1 vs bg, 7.8:1 vs surface-1 */
+  --text-tertiary: oklch(0.64 0.01 270);   /* 5.9:1 vs bg, 5.3:1 vs surface-1, 4.6:1 vs surface-2 */
 
-  --accent: oklch(0.68 0.14 275);
-  --accent-hover: oklch(0.72 0.14 275);
-  --accent-subtle: rgba(99, 102, 241, 0.12);
-  --accent-ring: oklch(0.68 0.14 275);
-  --accent-solid: #4F46E5; /* indigo-600: 6.37:1 contrast vs #FFFFFF */
-  --accent-solid-hover: #4338CA; /* indigo-700: 8.04:1 contrast vs #FFFFFF */
+  /* Hairlines and Separators */
+  --separator: oklch(1 0 0 / 0.10);
+  --separator-subtle: oklch(1 0 0 / 0.05);
+
+  /* Single System Accent: Slightly desaturated for dark mode */
+  --accent: oklch(0.67 0.19 255);          /* 6.4:1 vs dark surfaces */
+  --accent-hover: oklch(0.72 0.19 255);
+  --accent-subtle: oklch(0.67 0.19 255 / 0.14);
+  --accent-ring: oklch(0.67 0.19 255);
+  --accent-solid: #4F46E5;    /* 6.29:1 contrast vs #FFFFFF (Amendment A) */
+  --accent-solid-hover: #4338CA;
   --on-accent: #FFFFFF;
 
-  --status-error: oklch(0.65 0.15 25);
+  /* Muted Semantic Indicators */
+  --status-success: oklch(0.72 0.12 145);
+  --status-success-subtle: oklch(0.72 0.12 145 / 0.14);
+  --status-success-text: oklch(0.82 0.10 145);
+  --status-warn: oklch(0.78 0.13 75);
+  --status-warn-subtle: oklch(0.78 0.13 75 / 0.14);
+  --status-warn-text: oklch(0.85 0.10 75);
+  --status-error: oklch(0.72 0.18 25);     /* >= 6.8:1 vs dark surfaces */
+  --status-error-subtle: oklch(0.68 0.18 25 / 0.14);
+  --status-error-text: oklch(0.82 0.14 25);
   --status-danger: var(--status-error);
-  --status-warn: oklch(0.75 0.13 75);
-  --status-success: oklch(0.70 0.12 150);
 
-  /* Dark Chunk Palette (L=0.72, C=0.11) */
-  --chunk-0: oklch(0.72 0.11 250);
-  --chunk-0-bg: oklch(0.72 0.11 250 / 0.13);
-  --chunk-1: oklch(0.72 0.11 200);
-  --chunk-1-bg: oklch(0.72 0.11 200 / 0.13);
-  --chunk-2: oklch(0.72 0.11 150);
-  --chunk-2-bg: oklch(0.72 0.11 150 / 0.13);
-  --chunk-3: oklch(0.72 0.11 90);
-  --chunk-3-bg: oklch(0.72 0.11 90 / 0.13);
-  --chunk-4: oklch(0.72 0.11 40);
-  --chunk-4-bg: oklch(0.72 0.11 40 / 0.13);
-  --chunk-5: oklch(0.72 0.11 340);
-  --chunk-5-bg: oklch(0.72 0.11 340 / 0.13);
-  --chunk-6: oklch(0.72 0.11 290);
-  --chunk-6-bg: oklch(0.72 0.11 290 / 0.13);
-  --chunk-7: oklch(0.72 0.11 120);
-  --chunk-7-bg: oklch(0.72 0.11 120 / 0.13);
+  /* Dark Shadows: Subtle 1px inner top highlight instead of muddy dark drop shadows */
+  --shadow-subtle: inset 0 1px 0 oklch(1 0 0 / 0.06);
+  --shadow-card: inset 0 1px 0 oklch(1 0 0 / 0.06);
+  --shadow-elevated: inset 0 1px 0 oklch(1 0 0 / 0.06), 0 8px 24px 0 oklch(0 0 0 / 0.40);
+  --shadow-modal: inset 0 1px 0 oklch(1 0 0 / 0.08), 0 20px 40px 0 oklch(0 0 0 / 0.60);
+
+  /* 6 Equal Lightness/Chroma Data Viz Chunk Colors (L=0.74, C=0.13) */
+  --chunk-0: oklch(0.74 0.13 255);
+  --chunk-0-bg: oklch(0.74 0.13 255 / 0.14);
+  --chunk-1: oklch(0.74 0.13 190);
+  --chunk-1-bg: oklch(0.74 0.13 190 / 0.14);
+  --chunk-2: oklch(0.74 0.13 150);
+  --chunk-2-bg: oklch(0.74 0.13 150 / 0.14);
+  --chunk-3: oklch(0.74 0.13 85);
+  --chunk-3-bg: oklch(0.74 0.13 85 / 0.14);
+  --chunk-4: oklch(0.74 0.13 25);
+  --chunk-4-bg: oklch(0.74 0.13 25 / 0.14);
+  --chunk-5: oklch(0.74 0.13 330);
+  --chunk-5-bg: oklch(0.74 0.13 330 / 0.14);
+  --chunk-6: var(--chunk-0);
+  --chunk-6-bg: var(--chunk-0-bg);
+  --chunk-7: var(--chunk-1);
+  --chunk-7-bg: var(--chunk-1-bg);
+
+  /* Compatibility Semantic Aliases */
+  --bg-base: var(--bg);
+  --bg-surface: var(--surface-1);
+  --bg-elevated: var(--surface-2);
+  --border-subtle: var(--separator-subtle);
+  --border-default: var(--separator);
+  --border-hover: oklch(1 0 0 / 0.18);
+  --text-primary: var(--text);
 }
 
 @layer base {
   * {
-    border-color: var(--border-default);
+    border-color: var(--separator);
   }
   html {
-    background-color: var(--bg-base);
-    color: var(--text-primary);
+    background-color: var(--bg);
+    color: var(--text);
   }
   body {
-    background-color: var(--bg-base);
-    color: var(--text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, 'Geist Sans', 'Inter', 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+  }
+}
+
+/* 200ms Color-Only Theme Transition */
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition: background-color 200ms cubic-bezier(0.2, 0, 0, 1),
+              border-color 200ms cubic-bezier(0.2, 0, 0, 1),
+              color 200ms cubic-bezier(0.2, 0, 0, 1),
+              fill 200ms cubic-bezier(0.2, 0, 0, 1),
+              stroke 200ms cubic-bezier(0.2, 0, 0, 1),
+              box-shadow 200ms cubic-bezier(0.2, 0, 0, 1) !important;
+  transition-delay: 0s !important;
+}
+
+/* Apple macOS-style Translucent Surface with Solid Fallback */
+.mac-translucent {
+  background-color: var(--surface-toolbar);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+@supports not ((backdrop-filter: blur(20px)) or (-webkit-backdrop-filter: blur(20px))) {
+  .mac-translucent {
+    background-color: var(--surface-1);
   }
 }
 
@@ -160,17 +249,17 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-default);
-  border-radius: 3px;
+  background: var(--separator);
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--border-hover);
+  background: var(--text-tertiary);
 }
 
-/* Interaction and Craft Utilities (Emil Kowalski / Linear quality) */
+/* Apple HIG Interaction and Craft Utilities */
 @layer utilities {
   .active-press {
-    transition: transform 120ms ease-out;
+    transition: transform 120ms cubic-bezier(0.2, 0, 0, 1);
   }
   .active-press:active {
     transform: scale(0.98);
@@ -185,6 +274,17 @@
   .tabular-nums {
     font-variant-numeric: tabular-nums;
   }
+  .title-tracking {
+    letter-spacing: -0.01em;
+  }
+  .section-label {
+    font-size: 11px;
+    line-height: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-tertiary);
+    font-weight: 600;
+  }
 }
 
 /* Diagonal Overlap Pattern */
@@ -196,7 +296,7 @@
     var(--overlap-c2, rgba(255, 255, 255, 0.12)) 4px,
     var(--overlap-c2, rgba(255, 255, 255, 0.12)) 8px
   );
-  border-bottom: 1.5px dashed var(--border-default);
+  border-bottom: 1px dashed var(--separator);
 }
 
 /* Accessibility: Respect prefers-reduced-motion */

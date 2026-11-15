@@ -4,34 +4,30 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: 'class',
+  darkMode: ['class', '[data-theme="dark"]'],
   theme: {
     extend: {
       colors: {
-        // Semantic Enterprise Tokens (Linear / Vercel grade)
-        'bg-base': 'var(--bg-base)',
-        'bg-surface': 'var(--bg-surface)',
-        'bg-elevated': 'var(--bg-elevated)',
-
-        // Backwards-compatible aliases mapping to semantic tokens
-        canvas: 'var(--bg-base)',
-        panel: 'var(--bg-surface)',
-        surface: 'var(--bg-surface)',
-        subtle: 'var(--bg-elevated)',
-        'surface-elevated': 'var(--bg-elevated)',
-
-        border: {
-          subtle: 'var(--border-subtle)',
-          DEFAULT: 'var(--border-default)',
-          hover: 'var(--border-hover)',
+        // Apple HIG Core Surfaces & Neutrals
+        bg: 'var(--bg)',
+        'surface-1': 'var(--surface-1)',
+        'surface-2': 'var(--surface-2)',
+        'surface-3': 'var(--surface-3)',
+        'surface-toolbar': 'var(--surface-toolbar)',
+        separator: {
+          DEFAULT: 'var(--separator)',
+          subtle: 'var(--separator-subtle)',
         },
 
+        // Typography Tokens
         text: {
-          primary: 'var(--text-primary)',
+          DEFAULT: 'var(--text)',
+          primary: 'var(--text)',
           secondary: 'var(--text-secondary)',
           tertiary: 'var(--text-tertiary)',
         },
 
+        // Apple System Accent (Blue)
         accent: {
           DEFAULT: 'var(--accent)',
           hover: 'var(--accent-hover)',
@@ -42,7 +38,34 @@ export default {
           'on-solid': 'var(--on-accent)',
         },
 
-        // Single primary accent mapping
+        // Muted Semantic Status Indicators
+        status: {
+          success: 'var(--status-success)',
+          'success-subtle': 'var(--status-success-subtle)',
+          'success-text': 'var(--status-success-text)',
+          warn: 'var(--status-warn)',
+          'warn-subtle': 'var(--status-warn-subtle)',
+          'warn-text': 'var(--status-warn-text)',
+          error: 'var(--status-error)',
+          'error-subtle': 'var(--status-error-subtle)',
+          'error-text': 'var(--status-error-text)',
+          danger: 'var(--status-danger)',
+        },
+
+        // Backwards-compatible semantic aliases
+        'bg-base': 'var(--bg)',
+        'bg-surface': 'var(--surface-1)',
+        'bg-elevated': 'var(--surface-2)',
+        canvas: 'var(--bg)',
+        panel: 'var(--surface-1)',
+        surface: 'var(--surface-1)',
+        subtle: 'var(--surface-2)',
+        'surface-elevated': 'var(--surface-2)',
+        border: {
+          subtle: 'var(--separator-subtle)',
+          DEFAULT: 'var(--separator)',
+          hover: 'var(--border-hover)',
+        },
         primary: {
           DEFAULT: 'var(--accent)',
           50: 'var(--accent-subtle)',
@@ -51,38 +74,45 @@ export default {
           600: 'var(--accent)',
           700: 'var(--accent-hover)',
         },
-
-        status: {
-          error: 'var(--status-error)',
-          danger: 'var(--status-danger, var(--status-error))',
-          warn: 'var(--status-warn)',
-          success: 'var(--status-success)',
-        },
       },
       fontSize: {
-        '2xs': ['11px', { lineHeight: '14px', letterSpacing: '0.01em' }],
+        '2xs': ['11px', { lineHeight: '14px', letterSpacing: '0.04em' }],
         'xs': ['12px', { lineHeight: '16px', letterSpacing: '0' }],
         'sm': ['13px', { lineHeight: '18px', letterSpacing: '-0.005em' }],
-        'base': ['14px', { lineHeight: '20px', letterSpacing: '-0.01em' }],
-        'md': ['16px', { lineHeight: '24px', letterSpacing: '-0.015em' }],
-        'lg': ['20px', { lineHeight: '28px', letterSpacing: '-0.02em' }],
-        'xl': ['28px', { lineHeight: '34px', letterSpacing: '-0.025em' }],
+        'base': ['15px', { lineHeight: '22px', letterSpacing: '-0.01em' }],
+        'md': ['15px', { lineHeight: '22px', letterSpacing: '-0.01em' }],
+        'lg': ['20px', { lineHeight: '26px', letterSpacing: '-0.015em' }],
+        'xl': ['28px', { lineHeight: '34px', letterSpacing: '-0.02em' }],
+        '2xl': ['28px', { lineHeight: '34px', letterSpacing: '-0.02em' }],
+      },
+      fontWeight: {
+        normal: '400',
+        medium: '500',
+        semibold: '600',
       },
       fontFamily: {
-        sans: ['Geist Sans', 'Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
-        mono: ['Geist Mono', '"JetBrains Mono"', '"SF Mono"', 'Menlo', 'Monaco', 'monospace'],
+        sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"Inter"', 'system-ui', 'sans-serif'],
+        mono: ['"SF Mono"', 'ui-monospace', '"JetBrains Mono"', 'Menlo', 'monospace'],
       },
       borderRadius: {
+        none: '0',
         sm: '4px',
-        DEFAULT: '6px',
-        md: '6px',
+        DEFAULT: '8px',
+        md: '8px',
+        control: '8px',
         lg: '8px',
+        card: '12px',
         xl: '12px',
+        panel: '16px',
+        '2xl': '16px',
+        full: '9999px',
       },
       boxShadow: {
-        subtle: '0 1px 2px 0 rgba(0, 0, 0, 0.25)',
-        elevated: '0 4px 12px 0 rgba(0, 0, 0, 0.35)',
-        modal: '0 12px 32px 0 rgba(0, 0, 0, 0.50)',
+        subtle: 'var(--shadow-subtle)',
+        card: 'var(--shadow-card)',
+        elevated: 'var(--shadow-elevated)',
+        modal: 'var(--shadow-modal)',
+        'inner-highlight': 'inset 0 1px 0 oklch(1 0 0 / 0.06)',
       },
     },
   },
