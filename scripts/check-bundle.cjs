@@ -26,17 +26,21 @@ const jsPath = path.join(ASSETS_DIR, jsMainFile);
 const cssPath = path.join(ASSETS_DIR, cssMainFile);
 
 const jsSizeBytes = fs.statSync(jsPath).size;
-const jsSizeKb = parseFloat((jsSizeBytes / 1024).toFixed(2));
-const cssSizeBytes = fs.statSync(cssPath).size;
-const cssSizeKb = parseFloat((cssSizeBytes / 1024).toFixed(2));
+const jsSizeKb = parseFloat((jsSizeBytes / 1000).toFixed(2));
+const jsSizeKib = parseFloat((jsSizeBytes / 1024).toFixed(2));
 
-const JS_LIMIT_KB = 185.0;
-const CSS_LIMIT_KB = 45.0;
+const cssSizeBytes = fs.statSync(cssPath).size;
+const cssSizeKb = parseFloat((cssSizeBytes / 1000).toFixed(2));
+const cssSizeKib = parseFloat((cssSizeBytes / 1024).toFixed(2));
+
+const JS_LIMIT_KB = 185.0; // Decimal kB (185,000 bytes) standard matching Vite output
+const CSS_LIMIT_KB = 45.0;  // Decimal kB (45,000 bytes) standard matching Vite output
 
 let hasError = false;
 
 console.log('--- ChunkLens Production Bundle Budget Gate ---');
-console.log(`JavaScript (${jsMainFile}): ${jsSizeKb} kB (Budget: <= ${JS_LIMIT_KB} kB)`);
+console.log('Metric Standard: Decimal kB (1 kB = 1,000 bytes) matching Vite build output [binary KiB in brackets]');
+console.log(`JavaScript (${jsMainFile}): ${jsSizeKb} kB [${jsSizeKib} KiB] (Budget: <= ${JS_LIMIT_KB} kB)`);
 if (jsSizeKb > JS_LIMIT_KB) {
   console.error(`[BUDGET BREACH] JavaScript bundle exceeds ${JS_LIMIT_KB} kB limit by ${(jsSizeKb - JS_LIMIT_KB).toFixed(2)} kB.`);
   hasError = true;
@@ -44,7 +48,7 @@ if (jsSizeKb > JS_LIMIT_KB) {
   console.log(`[PASS] JavaScript bundle is ${(JS_LIMIT_KB - jsSizeKb).toFixed(2)} kB under budget.`);
 }
 
-console.log(`CSS (${cssMainFile}): ${cssSizeKb} kB (Budget: <= ${CSS_LIMIT_KB} kB)`);
+console.log(`CSS (${cssMainFile}): ${cssSizeKb} kB [${cssSizeKib} KiB] (Budget: <= ${CSS_LIMIT_KB} kB)`);
 if (cssSizeKb > CSS_LIMIT_KB) {
   console.error(`[BUDGET BREACH] CSS bundle exceeds ${CSS_LIMIT_KB} kB limit by ${(cssSizeKb - CSS_LIMIT_KB).toFixed(2)} kB.`);
   hasError = true;
