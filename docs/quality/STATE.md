@@ -35,8 +35,8 @@
 | **Lucide Icons Chunk (Raw / Gzip)** | 23.89 kB / 6.10 kB | **27.28 kB / 6.90 kB** | ✅ Compact |
 | **PDF Engine (`pdfjs-dist` Raw / Gzip)** | 512.51 kB / 155.91 kB | **512.51 kB / 155.91 kB** | ✅ Isolated chunk |
 | **PDF Worker Chunk (Raw)** | 1,298.21 kB | **1,298.21 kB** | ✅ Dedicated worker |
-| **Tiktoken Tokenizer Chunk (Raw / Gzip)** | 5,603.11 kB / 2,567.88 kB | **5,603.11 kB / 2,567.88 kB** | ✅ Lazy vendor chunk |
-| **Chunking Worker Chunk (Raw)** | 5,613.94 kB | **5,613.94 kB** | ✅ Dedicated worker |
+| **Tiktoken Tokenizer Chunk (Raw / Gzip)** | 5,603.11 kB / 2,567.88 kB | **5,603.11 kB / 2,567.88 kB** | 5.6 MB, duplicated, v0.4 target |
+| **Chunking Worker Chunk (Raw)** | 5,613.94 kB | **5,613.94 kB** | 5.6 MB, duplicated, v0.4 target |
 | **CSS Bundle (Raw / Gzip)** | 28.50 kB / 5.80 kB | **33.17 kB / 7.11 kB** | ✅ 11.83 kB under budget |
 | **Index HTML (Raw / Gzip)** | 1.20 kB / 0.60 kB | **1.79 kB / 0.86 kB** | ✅ Strict CSP headers |
 | **Export Button Contrast (WCAG 2.2 AA)** | UNMEASURED | **6.29:1 (dark) / 7.90:1 (light)** | ✅ $\ge 4.5:1$ passed |
