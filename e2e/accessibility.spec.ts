@@ -20,7 +20,7 @@ function assertNoAxeViolations(violations: any[]) {
 }
 
 test.describe('WCAG 2.2 AA Accessibility Audits', () => {
-  test('evaluates loaded state accessibility at desktop (1440px) and mobile (375px)', async ({ page }) => {
+  test('evaluates loaded state accessibility at desktop (1440px, 1366px) and mobile (375px)', async ({ page }) => {
     // 1. Desktop 1440x900
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/');
@@ -29,7 +29,18 @@ test.describe('WCAG 2.2 AA Accessibility Audits', () => {
     const desktopResults = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
     assertNoAxeViolations(desktopResults.violations);
 
-    // 2. Mobile 375x812
+    // 2. Desktop 1366x768 (Apple HIG / standard laptop viewport)
+    await page.setViewportSize({ width: 1366, height: 768 });
+    await page.waitForTimeout(200);
+    const hasHorizontalOverflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+    );
+    expect(hasHorizontalOverflow, 'no horizontal scrollbar at 1366px').toBe(false);
+
+    const laptopResults = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+    assertNoAxeViolations(laptopResults.violations);
+
+    // 3. Mobile 375x812
     await page.setViewportSize({ width: 375, height: 812 });
     await page.waitForTimeout(300);
 
