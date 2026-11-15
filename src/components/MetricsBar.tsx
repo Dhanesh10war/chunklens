@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { Loader2 } from 'lucide-react';
 import { ChunkingResult } from '../engine/types';
 import { Tooltip } from './ui/Tooltip';
 import { cn } from '../utils/cn';
@@ -132,8 +133,13 @@ export const MetricsBar: React.FC<MetricsBarProps> = ({
             </Tooltip>
             <span className="text-text-primary font-medium tabular-nums">{executionTimeMs} ms</span>
             {isProcessing && (
-              <span className="text-xs text-accent animate-pulse font-sans font-medium">
-                (Worker computing...)
+              <span
+                role="status"
+                aria-live="polite"
+                className="text-xs text-accent font-sans font-medium inline-flex items-center gap-1 shrink-0"
+              >
+                <Loader2 className="h-3 w-3 animate-spin shrink-0" aria-hidden="true" />
+                <span>(Worker computing...)</span>
               </span>
             )}
           </div>

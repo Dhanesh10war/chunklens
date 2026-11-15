@@ -135,7 +135,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="h-6 w-6 rounded bg-elevated border border-border-default flex items-center justify-center text-accent">
               <Layers className="h-3.5 w-3.5" />
             </div>
-            <span className="font-semibold text-xs tracking-tight text-text-primary">ChunkLens</span>
+            <h1 className="font-semibold text-xs tracking-tight text-text-primary m-0 p-0 inline">ChunkLens</h1>
             <span className="text-xs font-mono text-text-tertiary mr-2 sm:mr-0">{`v${__APP_VERSION__}`}</span>
           </div>
 

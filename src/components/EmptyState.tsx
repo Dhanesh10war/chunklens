@@ -51,7 +51,11 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 sm:p-8 flex flex-col items-center justify-start bg-bg-base text-text-primary">
+    <section
+      role="region"
+      aria-label="Document setup and sample selection"
+      className="flex-1 overflow-y-auto p-4 sm:p-8 flex flex-col items-center justify-start bg-bg-base text-text-primary"
+    >
       <div className="max-w-4xl w-full space-y-6 my-auto">
         {/* Error Banner (if file upload failed) */}
         {uploadError && (
@@ -69,9 +73,9 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             <ShieldCheck className="h-3.5 w-3.5" />
             <span>100% client-side · zero network egress</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-text-primary">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-text-primary">
             Document Chunking &amp; RAG Cost Workbench
-          </h1>
+          </h2>
           <p className="text-xs sm:text-sm text-text-secondary max-w-xl mx-auto">
             Test, compare, and optimize chunking strategies, inspect token splits, and measure embedding costs across frontier LLMs.
           </p>
@@ -79,15 +83,6 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 
         {/* Primary Upload Dropzone */}
         <div
-          role="button"
-          tabIndex={0}
-          aria-label="Upload document dropzone: drop files or click to browse"
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              fileInputRef.current?.click();
-            }
-          }}
           onClick={() => fileInputRef.current?.click()}
           onDragOver={(e) => {
             e.preventDefault();
@@ -96,7 +91,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           onDragLeave={() => setIsDragOver(false)}
           onDrop={handleDrop}
           className={cn(
-            'group relative border-2 border-dashed rounded-xl p-6 sm:p-8 text-center cursor-pointer transition-all select-none focus-ring',
+            'group relative border-2 border-dashed rounded-xl p-6 sm:p-8 text-center cursor-pointer transition-all select-none',
             isDragOver
               ? 'border-accent bg-accent-subtle/30 scale-[1.005]'
               : 'border-border-default hover:border-border-strong bg-surface/40 hover:bg-surface/70'
@@ -220,9 +215,9 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         {/* Sample Corpora Cards */}
         <div className="space-y-3 pt-2">
           <div className="flex items-center justify-between">
-            <h2 className="text-xs font-semibold text-text-primary">
+            <h3 className="text-xs font-semibold text-text-primary">
               Or start with a sample corpus
-            </h2>
+            </h3>
             <span className="text-xs text-text-tertiary font-mono">
               6 bundled benchmarks
             </span>
@@ -275,6 +270,6 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
