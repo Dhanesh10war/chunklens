@@ -24,7 +24,7 @@ describe('multiModel tokenizer engine', () => {
       expect(estimateTokensForModel(sampleProse, 'gpt-4', 14, 16)).toBe(16);
     });
 
-    it('estimates Claude 3.5 tokens with expansion relative to cl100k', () => {
+    it('estimates Claude tokens with expansion relative to cl100k', () => {
       const claudeProse = estimateTokensForModel(sampleProse, 'claude-3-5', 14, 16);
       expect(claudeProse).toBeGreaterThan(16);
 
@@ -33,13 +33,13 @@ describe('multiModel tokenizer engine', () => {
       expect(claudeCode).toBeGreaterThan(42);
     });
 
-    it('estimates Meta Llama 3 tokens close to o200k', () => {
+    it('estimates Llama tokens close to o200k', () => {
       const llamaTokens = estimateTokensForModel(sampleProse, 'llama-3', 14, 16);
       expect(llamaTokens).toBeGreaterThanOrEqual(14);
       expect(llamaTokens).toBeLessThan(20);
     });
 
-    it('estimates Gemini 1.5 with SentencePiece whitespace compression', () => {
+    it('estimates Gemini with SentencePiece whitespace compression', () => {
       const geminiTokens = estimateTokensForModel('    indented text block    ', 'gemini-1-5', 6, 8);
       expect(geminiTokens).toBeGreaterThan(0);
     });

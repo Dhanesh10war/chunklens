@@ -325,12 +325,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onChangeConfig({ ...config, encoding: e.target.value as TokenizerEncoding })
               }
               options={[
-                { value: 'o200k_base', label: 'OpenAI GPT-4o / mini (o200k)' },
-                { value: 'cl100k_base', label: 'OpenAI GPT-4 / text-embedding-3 (cl100k)' },
-                { value: 'p50k_base', label: 'OpenAI Codex / Davinci (p50k)' },
-                { value: 'r50k_base', label: 'OpenAI GPT-3 / GPT-2 (r50k)' },
+                { value: 'o200k_base', label: 'o200k_base (OpenAI exact)' },
+                { value: 'cl100k_base', label: 'cl100k_base (OpenAI exact)' },
               ]}
-              helperText="Token estimates in inspector and comparison table will use this model."
+              helperText="Only OpenAI encodings (o200k_base, cl100k_base) are exact. Claude, Gemini, Llama, and Cohere are estimates."
             />
 
             {/* Unified Tokenizer & Cost Comparison Trigger */}

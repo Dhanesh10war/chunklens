@@ -17,63 +17,63 @@ export interface ModelProfile {
 export const SUPPORTED_MODELS: ModelProfile[] = [
   {
     id: 'gpt-4o',
-    name: 'OpenAI GPT-4o / mini',
+    name: 'OpenAI (o200k_base)',
     family: 'OpenAI',
-    tokenizerName: 'o200k_base (BPE)',
+    tokenizerName: 'o200k_base (exact)',
     vocabSize: '200,000',
     isExact: true,
     contextWindow: '128k',
-    description: 'Native OpenAI flagship tokenizer with high-efficiency unicode & code compression.',
+    description: 'Exact OpenAI BPE encoding with high-efficiency unicode & code compression.',
   },
   {
     id: 'gpt-4',
-    name: 'OpenAI GPT-4 / 3.5 / Ada',
+    name: 'OpenAI (cl100k_base)',
     family: 'OpenAI',
-    tokenizerName: 'cl100k_base (BPE)',
+    tokenizerName: 'cl100k_base (exact)',
     vocabSize: '100,000',
     isExact: true,
     contextWindow: '128k',
-    description: 'Standard OpenAI legacy embedding and completion tokenizer.',
+    description: 'Exact OpenAI legacy BPE encoding for text-embedding-3 and completions.',
   },
   {
     id: 'claude-3-5',
-    name: 'Anthropic Claude 3.5 Sonnet',
+    name: 'Claude (estimate)',
     family: 'Anthropic',
-    tokenizerName: 'Claude BPE Profile',
+    tokenizerName: 'BPE (estimate)',
     vocabSize: '~65,000',
     isExact: false,
     contextWindow: '200k',
-    description: 'Anthropic custom BPE tokenizer; higher token expansion on code and symbols.',
+    description: 'Anthropic BPE token count estimate.',
   },
   {
     id: 'llama-3',
-    name: 'Meta Llama 3 / 3.1 / 3.2',
+    name: 'Llama (estimate)',
     family: 'Meta',
-    tokenizerName: 'Tiktoken BPE (128k)',
+    tokenizerName: 'BPE (estimate)',
     vocabSize: '128,000',
     isExact: false,
     contextWindow: '128k',
-    description: 'Meta open-weight flagship tokenizer optimized for multilingual and coding.',
+    description: 'Meta BPE token count estimate.',
   },
   {
     id: 'gemini-1-5',
-    name: 'Google Gemini 1.5 Pro / Flash',
+    name: 'Gemini (estimate)',
     family: 'Google',
-    tokenizerName: 'SentencePiece (256k)',
+    tokenizerName: 'SentencePiece (estimate)',
     vocabSize: '256,000',
     isExact: false,
     contextWindow: '1M – 2M',
-    description: 'DeepMind 256k SentencePiece tokenizer with superior whitespace handling.',
+    description: 'Google SentencePiece token count estimate.',
   },
   {
     id: 'cohere-command',
-    name: 'Cohere Command R+ / Embed v3',
+    name: 'Cohere (estimate)',
     family: 'Cohere',
-    tokenizerName: 'Cohere BPE (256k)',
+    tokenizerName: 'BPE (estimate)',
     vocabSize: '256,000',
     isExact: false,
     contextWindow: '128k',
-    description: 'Cohere enterprise RAG and multilingual retrieval tokenizer.',
+    description: 'Cohere BPE token count estimate.',
   },
 ];
 
@@ -143,12 +143,12 @@ export function estimateTokensForModel(
       return Math.round(exactCl100k * multiplier);
     }
     case 'llama-3': {
-      // Llama 3 has 128k vocab; ~1.03x vs o200k on prose, ~1.06x with punctuation
+      // Llama family estimate with 128k vocab
       const multiplier = 1.03 + Math.min(0.08, symbolDensity * 0.25);
       return Math.round(exactO200k * multiplier);
     }
     case 'gemini-1-5': {
-      // Gemini 256k SentencePiece compresses whitespace and common bigrams efficiently
+      // Gemini family estimate with 256k SentencePiece
       const whitespaceCompression = Math.min(0.05, whitespaceDensity * 0.15);
       const multiplier = 0.98 + Math.min(0.08, symbolDensity * 0.3) - whitespaceCompression;
       return Math.max(1, Math.round(exactO200k * multiplier));

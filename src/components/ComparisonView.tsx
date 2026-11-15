@@ -125,8 +125,8 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ primaryConfig, r
             }
             className="h-7 bg-canvas border border-border rounded px-1.5 text-slate-200 text-xs focus-ring hover:border-border-hover"
           >
-            <option value="o200k_base">o200k</option>
-            <option value="cl100k_base">cl100k</option>
+            <option value="o200k_base">o200k_base (exact)</option>
+            <option value="cl100k_base">cl100k_base (exact)</option>
           </select>
         </div>
       </div>

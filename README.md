@@ -35,14 +35,14 @@ Retrieval-Augmented Generation (RAG) applications succeed or fail on the quality
 - 🎯 **Sentence Boundary (LlamaIndex):** Grammatical punctuation-aware boundary splitting with strict overlap retention.
 - 🪟 **Fixed-Size Sliding Window:** Strict character or token sliding windows with configurable overlap.
 
-### 2. 6 Frontier Tokenizers Across 5 Model Families
-Compare token counts, density ratios, and expansion variances across frontier LLM tokenizer families:
-- **OpenAI GPT-4o / mini (`o200k_base`):** 200,000 vocabulary (exact BPE)
-- **OpenAI GPT-4 / 3.5 / Ada (`cl100k_base`):** 100,000 vocabulary (exact BPE)
-- **Anthropic Claude 3.5 Sonnet:** Calibrated BPE profile (~65k vocabulary)
-- **Meta Llama 3 / 3.1 / 3.2:** 128,000 BPE profile
-- **Google Gemini 1.5 Pro / Flash:** 256,000 SentencePiece profile
-- **Cohere Command R+ / Embed v3:** 256,000 BPE profile
+### 2. Multi-Model Tokenizer Matrix & Embedding Cost Analyzer
+Compare token counts, density ratios, and variance across model families. Only the two OpenAI encodings (`o200k_base`, `cl100k_base`) are exact; other families are estimates based on their tokenization characteristics:
+- **o200k_base (OpenAI):** 200,000 vocabulary (exact BPE)
+- **cl100k_base (OpenAI):** 100,000 vocabulary (exact BPE)
+- **Claude (estimate):** Anthropic BPE token count estimate (~65k vocabulary)
+- **Gemini (estimate):** Google SentencePiece token count estimate (256k vocabulary)
+- **Llama (estimate):** Meta BPE token count estimate (128k vocabulary)
+- **Cohere (estimate):** Cohere BPE token count estimate (256k vocabulary)
 - **Embedding Cost Analyzer:** Estimates real-time vector pipeline costs across OpenAI (`text-embedding-3-small`, `text-embedding-3-large`), Cohere Embed v3, and Voyage AI at 10k and 100k document scale.
 
 ### 3. Interactive Visual Canvas & Inspector

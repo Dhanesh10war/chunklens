@@ -93,7 +93,7 @@ export const TokenizerComparisonModal: React.FC<TokenizerComparisonModalProps> =
           <div className="flex items-center space-x-2">
             <span className="text-slate-400">Active Baseline:</span>
             <span className="font-semibold text-white px-2 py-0.5 rounded bg-subtle border border-border-subtle font-mono">
-              {baselineEncoding === 'o200k_base' ? 'OpenAI GPT-4o (o200k_base)' : 'OpenAI GPT-4 (cl100k_base)'}
+              {baselineEncoding === 'o200k_base' ? 'o200k_base (OpenAI exact)' : 'cl100k_base (OpenAI exact)'}
             </span>
           </div>
           <div className="flex items-center space-x-4 font-mono text-slate-300">
@@ -193,11 +193,11 @@ export const TokenizerComparisonModal: React.FC<TokenizerComparisonModalProps> =
                               <span className="font-sans font-medium text-white">{model.name}</span>
                               {model.isExact ? (
                                 <span className="text-xs px-1 py-0.2 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
-                                  Exact BPE
+                                  Exact
                                 </span>
                               ) : (
                                 <span className="text-xs px-1 py-0.2 rounded bg-slate-700/50 text-slate-400 border border-border font-mono">
-                                  Profile
+                                  Estimate
                                 </span>
                               )}
                             </div>
@@ -240,11 +240,7 @@ export const TokenizerComparisonModal: React.FC<TokenizerComparisonModalProps> =
               <div className="text-xs text-slate-400 bg-subtle p-3 rounded-md border border-border flex items-start space-x-2">
                 <Scale className="h-4 w-4 text-primary-400 shrink-0 mt-0.5" />
                 <div>
-                  <strong className="text-slate-200">Architecture Insight:</strong> OpenAI’s{' '}
-                  <code className="text-primary-300">o200k_base</code> has a 200,000 token vocabulary offering ~12-18% higher
-                  compression over legacy <code className="text-primary-300">cl100k_base</code>. Anthropic Claude’s tokenizer expands
-                  more aggressively on punctuation, indentation, and code symbols. When chunking multi-model RAG pipelines, ensure target
-                  chunk sizes do not violate the downstream model's effective context envelope.
+                  <strong className="text-slate-200">Architecture Insight:</strong> Only the two OpenAI encodings (<code className="text-primary-300">o200k_base</code> and <code className="text-primary-300">cl100k_base</code>) are exact BPE encodings computed directly in-browser. Token counts for Claude, Gemini, Llama, and Cohere are estimates based on family tokenization characteristics.
                 </div>
               </div>
             </div>
