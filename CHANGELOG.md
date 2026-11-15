@@ -51,6 +51,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed header spacing at 375px viewport ensuring $\ge 6$px bounding box gap between shield and version badge (V2).
 - Fixed empty-state paste text button clipping at 375px by shortening copy to "Have a snippet?" (V1).
 
+### Security
+- Upgraded `pdfjs-dist` from 5.6.205 to 6.5.438 to remediate CVE-2026-16633 (high severity XSS vulnerability affecting versions >=5.6.205 <6.2.108).
+- Explicitly disabled embedded scripting (`enableScripting: false`) and eval evaluation (`isEvalSupported: false`) in PDF worker options.
+
 ## [0.2.0] - 2026-11-12
 Tagged at commit `ffb2f16`.
 

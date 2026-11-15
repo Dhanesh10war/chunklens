@@ -10,7 +10,7 @@
 - **Health:** Production Grade (v0.3.0 Release)
 - **TypeScript:** Strict type-checking passed (`npm run typecheck`, 0 diagnostic errors)
 - **Linting:** Defined in `package.json` as `"tsc -b"`; duplicate of typecheck, marked `UNMEASURED` and omitted from CI.
-- **Unit & Integration Tests:** 124 tests passing across 20 test suites (`npm test`, 100% pass, 0 flaky)
+- **Unit & Integration Tests:** 125 tests passing across 20 test suites (`npm test`, 100% pass, 0 flaky)
 - **Custom DOM A11y Checks:** 0 violations across loaded, empty, and error states at 1440px and 375px viewports (button names, form labels, duplicate IDs, ARIA roles, tabindex verified).
 - **Axe-Core & Playwright E2E Status:** Staged and configured (`e2e/networkEgress.spec.ts`, `e2e/accessibility.spec.ts`); marked written, not yet run locally (runs in GitHub Actions CI via `npx playwright install --with-deps chromium`).
 - **Zero Network Egress:** Strict CSP (`connect-src 'none'`) verified live via Chrome DevTools Protocol (`scripts/test-egress.cjs`).
@@ -24,7 +24,7 @@
 
 | Metric | v0.2.0 Baseline (`ffb2f16`) | Current v0.3.0 Release | Status |
 | :--- | :---: | :---: | :--- |
-| **Unit / Integration Tests** | 86 (12 suites) | **124 (20 suites)** | ✅ Ratcheted (+38) |
+| **Unit / Integration Tests** | 86 (12 suites) | **125 (20 suites)** | ✅ Ratcheted (+39) |
 | **TypeScript Diagnostics** | 0 errors (`tsc -b`) | **0 errors (`tsc -b`)** | ✅ Clean |
 | **Linting** | UNMEASURED (`tsc -b` duplicate) | **UNMEASURED (`tsc -b` duplicate)** | ℹ️ Duplicate of typecheck |
 | **Custom DOM A11y Violations (1440 & 375)** | 0 | **0 (Loaded, Empty, Error)** | ✅ Zero violations |
@@ -33,8 +33,8 @@
 | **Main JS Bundle (`index.js` Raw / Gzip)** | 172.06 kB / 48.33 kB | **132.99 kB / 40.33 kB** | ✅ 52.01 kB under budget |
 | **React Vendor Bundle (Raw / Gzip)** | 134.67 kB / 43.22 kB | **134.67 kB / 43.22 kB** | ✅ Stable |
 | **Lucide Icons Chunk (Raw / Gzip)** | 23.89 kB / 6.10 kB | **27.28 kB / 6.90 kB** | ✅ Compact |
-| **PDF Engine (`pdfjs-dist` Raw / Gzip)** | 512.51 kB / 155.91 kB | **512.51 kB / 155.91 kB** | ✅ Isolated chunk |
-| **PDF Worker Chunk (Raw)** | 1,298.21 kB | **1,298.21 kB** | ✅ Dedicated worker |
+| **PDF Engine (`pdfjs-dist` Raw / Gzip)** | 512.51 kB / 155.91 kB | **558.13 kB / 170.14 kB** | ✅ Isolated chunk |
+| **PDF Worker Chunk (Raw)** | 1,298.21 kB | **1,327.59 kB** | ✅ Dedicated worker |
 | **Tiktoken Tokenizer Chunk (Raw / Gzip)** | 5,603.11 kB / 2,567.88 kB | **5,603.11 kB / 2,567.88 kB** | 5.6 MB, duplicated, v0.4 target |
 | **Chunking Worker Chunk (Raw)** | 5,613.94 kB | **5,613.94 kB** | 5.6 MB, duplicated, v0.4 target |
 | **CSS Bundle (Raw / Gzip)** | 28.50 kB / 5.80 kB | **33.17 kB / 7.11 kB** | ✅ 11.83 kB under budget |
