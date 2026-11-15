@@ -52,17 +52,17 @@ export const PrivacyPopover: React.FC<PrivacyPopoverProps> = ({ className }) => 
 
   return (
     <div className={cn('relative inline-flex items-center', className)} ref={popoverRef}>
-      {/* Trigger Button: Full text >= 1200px, Icon + Tooltip < 1200px */}
+      {/* Trigger Button: Quiet success-tinted pill per Apple HIG */}
       <Tooltip content="Zero network egress · 100% client-side (Click for audit steps)">
         <button
           onClick={() => setIsOpen((prev) => !prev)}
           aria-expanded={isOpen}
           aria-haspopup="dialog"
           aria-label="Privacy verification: 100% client-side with zero network egress"
-          className="flex items-center justify-center space-x-1.5 min-h-[28px] min-w-[28px] px-2 rounded-md hover:bg-elevated text-text-tertiary hover:text-text-primary text-xs font-mono transition-colors active-press focus-ring"
+          className="flex items-center justify-center space-x-1.5 h-7 px-2.5 rounded-full bg-status-success-subtle border border-status-success/20 text-status-success-text text-2xs font-mono transition-all hover:border-status-success/40 active-press focus-ring"
         >
-          <ShieldCheck className="h-3.5 w-3.5 text-status-success shrink-0" />
-          <span className="hidden min-[1200px]:inline">100% client-side · zero network egress</span>
+          <span className="h-1.5 w-1.5 rounded-full bg-status-success shrink-0" aria-hidden="true" />
+          <span className="hidden min-[1200px]:inline font-medium">100% client-side · zero network egress</span>
         </button>
       </Tooltip>
 
@@ -71,66 +71,54 @@ export const PrivacyPopover: React.FC<PrivacyPopoverProps> = ({ className }) => 
         <div
           role="dialog"
           aria-label="Privacy & Zero Network Egress Verification"
-          className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-80 sm:w-96 rounded-lg bg-surface border border-border-default shadow-modal p-4 z-50 text-xs font-sans text-text-secondary animate-in fade-in duration-100"
+          className="absolute top-full right-0 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 mt-2 w-80 sm:w-96 rounded-card mac-translucent border border-separator shadow-modal p-4 z-50 text-xs font-sans text-text-secondary animate-in fade-in duration-100"
         >
           {/* Header */}
-          <div className="flex items-center justify-between pb-2.5 border-b border-border-subtle">
-            <div className="flex items-center space-x-2 text-text-primary font-semibold text-sm">
+          <div className="flex items-center justify-between pb-2.5 border-b border-separator">
+            <div className="flex items-center space-x-2 text-text font-semibold text-sm">
               <ShieldCheck className="h-4 w-4 text-status-success" />
               <span>Zero Network Egress</span>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="h-6 w-6 rounded flex items-center justify-center text-text-tertiary hover:text-text-primary hover:bg-elevated transition-colors"
+              className="h-6 w-6 rounded-control flex items-center justify-center text-text-secondary hover:text-text hover:bg-surface-2 transition-colors focus-ring"
               aria-label="Close verification popover"
             >
               <X className="h-3.5 w-3.5" />
             </button>
           </div>
 
-          {/* Proof points */}
-          <div className="mt-3 space-y-2.5">
-            <div className="flex items-start space-x-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-status-success mt-1.5 shrink-0" />
-              <p>
-                <strong className="text-text-primary font-medium">Strict Content Security Policy:</strong>{' '}
-                Production enforces <code className="px-1 py-0.5 rounded bg-elevated font-mono text-xs text-text-primary">connect-src 'none'</code>, mathematically preventing any outbound fetch, XHR, WebSockets, or telemetry beacons.
-              </p>
+          {/* Proof Body */}
+          <div className="py-3 space-y-2.5 leading-relaxed text-xs">
+            <p>
+              ChunkLens executes <span className="text-text font-medium">100% in your browser</span>.
+              Documents, embeddings, and tokenizer data never leave your device.
+            </p>
+
+            <div className="p-2.5 rounded-control bg-surface-2 border border-separator space-y-1.5 text-2xs font-mono text-text-secondary">
+              <div className="flex items-center justify-between text-text font-semibold">
+                <span>Verification Proof</span>
+                <span className="text-status-success-text">Active CSP</span>
+              </div>
+              <p className="text-text-tertiary">Policy: connect-src &apos;none&apos;</p>
+              <p className="text-text-tertiary">External Network Requests: 0</p>
             </div>
 
-            <div className="flex items-start space-x-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-status-success mt-1.5 shrink-0" />
-              <p>
-                <strong className="text-text-primary font-medium">100% Self-Hosted Assets:</strong> All Inter & JetBrains Mono font files and PDF.js workers are bundled locally in the build. Zero queries to Google Fonts or third-party CDNs.
-              </p>
-            </div>
-
-            <div className="flex items-start space-x-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-status-success mt-1.5 shrink-0" />
-              <p>
-                <strong className="text-text-primary font-medium">Offline Air-Gap Ready:</strong> Turn off Wi-Fi or enable Airplane Mode. Chunking, BPE tokenization, and vector similarity continue running at full speed in your local Web Worker.
-              </p>
-            </div>
+            <p className="text-text-tertiary text-2xs">
+              Audit yourself: Open DevTools Network tab, upload any document, and confirm zero outbound requests.
+            </p>
           </div>
 
-          {/* How to verify in DevTools */}
-          <div className="mt-3.5 pt-3 border-t border-border-subtle bg-elevated/40 rounded p-2.5">
-            <div className="flex items-center justify-between text-xs font-medium text-text-primary mb-1">
-              <span>How to verify in DevTools:</span>
-              <button
-                onClick={handleCopyVerification}
-                className="flex items-center space-x-1 text-xs text-accent hover:underline font-mono"
-              >
-                {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                <span>{copied ? 'Copied' : 'Copy steps'}</span>
-              </button>
-            </div>
-            <ol className="list-decimal list-inside space-y-0.5 text-xs text-text-tertiary">
-              <li>Open Browser DevTools (<kbd className="font-mono">F12</kbd> or <kbd className="font-mono">⌘⌥I</kbd>)</li>
-              <li>Switch to the <strong className="text-text-secondary">Network</strong> tab</li>
-              <li>Upload a file or toggle chunk sizes</li>
-              <li>Confirm 0 external network requests are made</li>
-            </ol>
+          {/* Actions */}
+          <div className="pt-2 border-t border-separator flex items-center justify-between">
+            <button
+              onClick={handleCopyVerification}
+              className="inline-flex items-center space-x-1.5 text-2xs font-mono text-text-secondary hover:text-text transition-colors focus-ring rounded-control px-1.5 py-1 hover:bg-surface-2"
+            >
+              {copied ? <Check className="h-3 w-3 text-status-success" /> : <Copy className="h-3 w-3" />}
+              <span>{copied ? 'Copied Steps' : 'Copy Audit Steps'}</span>
+            </button>
+            <span className="text-2xs font-mono text-status-success-text">Self-contained</span>
           </div>
         </div>
       )}

@@ -29,10 +29,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center font-medium font-sans rounded-md select-none transition-colors active-press focus-ring disabled:opacity-40 disabled:pointer-events-none disabled:active:scale-100';
+      'inline-flex items-center justify-center font-medium font-sans rounded-control select-none transition-colors active-press focus-ring disabled:opacity-40 disabled:pointer-events-none disabled:active:scale-100';
 
     const sizeStyles = {
-      sm: 'h-7 px-2.5 text-xs gap-1.5',
+      sm: 'h-8 px-2.5 text-xs gap-1.5',
       md: 'h-8 px-3 text-xs gap-2',
       lg: 'h-9 px-4 text-sm gap-2',
     }[size];
@@ -41,11 +41,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       primary:
         'bg-[var(--accent-solid)] text-[var(--on-accent)] hover:bg-[var(--accent-solid-hover)] border border-transparent shadow-subtle',
       secondary:
-        'bg-surface text-text-primary border border-border-default hover:bg-elevated hover:border-border-hover',
+        'bg-surface-2 text-text border border-border-default hover:bg-surface-3 hover:border-border-hover',
       ghost:
-        'bg-transparent text-text-secondary hover:text-text-primary hover:bg-elevated border border-transparent',
+        'bg-transparent text-text-secondary hover:text-text hover:bg-surface-2 border border-transparent',
       danger:
-        'bg-status-error/10 text-status-error border border-status-error/20 hover:bg-status-error/20',
+        'bg-status-error-subtle text-status-error-text border border-status-error/20 hover:bg-status-error/20',
     }[variant];
 
     return (
@@ -79,8 +79,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ) : (
           icon && <span className="shrink-0 text-current">{icon}</span>
         )}
-        {children && <span>{children}</span>}
-        {!isLoading && iconRight && <span className="shrink-0 text-current">{iconRight}</span>}
+        {children}
+        {iconRight && <span className="shrink-0 text-current">{iconRight}</span>}
       </button>
     );
   }

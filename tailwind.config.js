@@ -64,6 +64,7 @@ export default {
         border: {
           subtle: 'var(--separator-subtle)',
           DEFAULT: 'var(--separator)',
+          default: 'var(--separator)',
           hover: 'var(--border-hover)',
         },
         primary: {

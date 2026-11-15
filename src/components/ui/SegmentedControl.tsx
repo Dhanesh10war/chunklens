@@ -32,7 +32,7 @@ export function SegmentedControl<T extends string>({
       <div
         role="tablist"
         aria-label={ariaLabel}
-        className={cn('flex space-x-4 border-b border-border-default', className)}
+        className={cn('flex space-x-4 border-b border-separator', className)}
       >
         {options.map((opt) => {
           const isSelected = opt.value === value;
@@ -45,14 +45,14 @@ export function SegmentedControl<T extends string>({
               className={cn(
                 'flex items-center space-x-1.5 pb-2 text-xs font-medium border-b-2 transition-colors active-press focus-ring',
                 isSelected
-                  ? 'border-accent text-text-primary'
-                  : 'border-transparent text-text-secondary hover:text-text-primary'
+                  ? 'border-accent text-text'
+                  : 'border-transparent text-text-secondary hover:text-text'
               )}
             >
               {opt.icon && <span className="shrink-0">{opt.icon}</span>}
               <span>{opt.label}</span>
               {opt.badge !== undefined && (
-                <span className="text-xs font-mono px-1.5 py-0.2 rounded bg-elevated text-text-tertiary">
+                <span className="text-2xs font-mono px-1.5 py-0.5 rounded-full bg-surface-2 text-text-tertiary">
                   {opt.badge}
                 </span>
               )}
@@ -63,15 +63,15 @@ export function SegmentedControl<T extends string>({
     );
   }
 
-  // 'subtle' pill variant (Linear / Raycast style)
-  const sizeClasses = size === 'sm' ? 'h-7 p-0.5 text-xs' : 'h-8 p-1 text-xs';
+  // Apple HIG pill-style track in surface-2 with raised white (light) or surface-3 (dark) thumb
+  const sizeClasses = size === 'sm' ? 'h-7 p-0.5 text-xs' : 'h-8 p-0.5 text-xs';
 
   return (
     <div
       role="tablist"
       aria-label={ariaLabel}
       className={cn(
-        'inline-flex items-center rounded-md bg-elevated border border-border-subtle select-none',
+        'inline-flex items-center rounded-control bg-surface-2 border border-separator select-none',
         sizeClasses,
         className
       )}
@@ -85,16 +85,16 @@ export function SegmentedControl<T extends string>({
             aria-selected={isSelected}
             onClick={() => onChange(opt.value)}
             className={cn(
-              'flex items-center justify-center space-x-1.5 px-2.5 py-1 rounded-[5px] font-medium whitespace-nowrap transition-all active-press focus-ring',
+              'flex items-center justify-center space-x-1.5 px-3 py-1 rounded-[6px] font-medium whitespace-nowrap transition-all duration-150 active-press focus-ring',
               isSelected
-                ? 'bg-surface text-text-primary shadow-subtle border border-border-subtle'
-                : 'text-text-secondary hover:text-text-primary border border-transparent'
+                ? 'bg-surface-1 dark:bg-surface-3 text-text shadow-subtle'
+                : 'text-text-secondary hover:text-text'
             )}
           >
             {opt.icon && <span className="shrink-0">{opt.icon}</span>}
             <span>{opt.label}</span>
             {opt.badge !== undefined && (
-              <span className="text-xs font-mono px-1.5 py-0.2 rounded bg-surface text-text-tertiary">
+              <span className="text-2xs font-mono px-1.5 py-0.2 rounded-full bg-surface-2 text-text-tertiary">
                 {opt.badge}
               </span>
             )}

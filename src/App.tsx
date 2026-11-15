@@ -205,7 +205,7 @@ export const AppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-bg-base text-text-primary font-sans antialiased">
-      {/* 48px Header */}
+      {/* 52px macOS Unified Header */}
       <Header
         documentTitle={documentTitle}
         detectedFormat={detectedFormat}
@@ -220,10 +220,12 @@ export const AppContent: React.FC = () => {
         onPrefetchExport={prefetchExportModal}
         onPrefetchCommandPalette={prefetchCommandPalette}
         onPrefetchTokenizer={prefetchTokenizerModal}
+        activeTab={activeTab}
+        onChangeTab={setActiveTab}
       />
 
       {/* App Shell Layout: Collapsible Sidebar + Hero Main Canvas + Pro Inspector */}
-      <div className="flex-1 flex overflow-hidden h-[calc(100vh-48px)]">
+      <div className="flex-1 flex overflow-hidden h-[calc(100vh-52px)]">
         {/* Left Sidebar */}
         <Sidebar
           config={config}
@@ -263,8 +265,8 @@ export const AppContent: React.FC = () => {
                 isProcessing={isProcessing}
               />
 
-              {/* Canvas Subnavigation Bar */}
-              <div className="px-4 sm:px-6 py-2 border-b border-border-default bg-surface/30 flex items-center justify-between">
+              {/* Canvas Subnavigation Bar (Mobile only, desktop uses toolbar segmented control) */}
+              <div className="px-4 sm:px-6 py-2 border-b border-separator bg-surface-1/30 flex md:hidden items-center justify-between">
                 <SegmentedControl
                   variant="underline"
                   options={[
