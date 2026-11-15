@@ -8,7 +8,7 @@
 
 ## 1. Tooling & Build Execution Log
 
-The following commands were executed in the repository root (`/home/drago/projects/Venture/chunklens`):
+The following commands were executed in the repository root (`chunklens/`):
 
 | Check | Command Executed | Exit Code | Result Summary |
 | :--- | :--- | :--- | :--- |

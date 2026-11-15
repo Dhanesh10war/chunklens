@@ -1,8 +1,9 @@
 const { spawn } = require('child_process');
 const http = require('http');
 const path = require('path');
+const os = require('os');
 
-const CHROME_PATH = '/home/drago/.cache/puppeteer/chrome/linux-146.0.7680.153/chrome-linux64/chrome';
+const CHROME_PATH = process.env.CHROME_PATH || path.join(os.homedir(), '.cache/puppeteer/chrome/linux-146.0.7680.153/chrome-linux64/chrome');
 const PREVIEW_PORT = 4173;
 const PREVIEW_URL = `http://127.0.0.1:${PREVIEW_PORT}/`;
 

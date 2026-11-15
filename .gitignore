@@ -13,6 +13,8 @@ dist-ssr
 *.local
 *.tsbuildinfo
 tsconfig.tsbuildinfo
+docs/PROJECT_BRIEFING.md
+docs/briefing-shots/
 
 # Editor directories and files
 .vscode/*

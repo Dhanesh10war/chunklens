@@ -42,7 +42,7 @@
 - **Node vs Browser Globals in Tests:** Vitest runs in Node. Browser globals (`window`, `localStorage`, `navigator.clipboard`) are undefined unless guarded with `typeof window !== 'undefined'` or isomorphic fallbacks.
 - **Strict TypeScript:** `"noUnusedLocals": true` and `"noUnusedParameters": true` cause compile failures on unused imports or args.
 - **Large Tokenizer Bundle:** `js-tiktoken` vocab is 5.6 MB. `vite.config.ts` uses `manualChunks` to keep application code under 100 kB. Never remove chunk splitting.
-- **Execution Directory:** The repository is located at `/home/drago/projects/Venture/chunklens`. Always run commands inside `chunklens/`.
+- **Execution Directory:** Always run commands inside the repository root (`chunklens/`).
 
 ## UI Conventions & Design System Tokens (Linear / Vercel Benchmark)
 - **Palette Tokens:**
