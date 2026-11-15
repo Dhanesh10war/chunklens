@@ -37,7 +37,8 @@ test.describe('WCAG 2.2 AA Accessibility Audits', () => {
     assertNoAxeViolations(mobileResults.violations);
   });
 
-  test('evaluates empty state accessibility after resetting document', async ({ page }) => {
+  test('evaluates empty state accessibility after resetting document at 1440px and 375px', async ({ page }) => {
+    // 1. Desktop 1440x900
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/');
     await page.waitForSelector('header');
@@ -55,11 +56,29 @@ test.describe('WCAG 2.2 AA Accessibility Audits', () => {
     const emptyRegion = page.getByRole('region', { name: 'Document setup and sample selection' });
     await expect(emptyRegion).toBeVisible();
 
-    const emptyResults = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
-    assertNoAxeViolations(emptyResults.violations);
+    const desktopResults = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+    assertNoAxeViolations(desktopResults.violations);
+
+    // 2. Mobile 375x812 (drawer open)
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.waitForTimeout(300);
+
+    const mobileResults = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+    assertNoAxeViolations(mobileResults.violations);
+
+    // 3. Mobile 375x812 (drawer closed, viewing empty canvas)
+    const closeDrawerBtn = page.getByRole('button', { name: 'Close configuration drawer' });
+    if (await closeDrawerBtn.isVisible()) {
+      await closeDrawerBtn.click();
+      await page.waitForTimeout(300);
+      await expect(emptyRegion).toBeVisible();
+      const mobileCanvasResults = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+      assertNoAxeViolations(mobileCanvasResults.violations);
+    }
   });
 
-  test('evaluates error state accessibility with corrupt PDF upload', async ({ page }) => {
+  test('evaluates error state accessibility with corrupt PDF upload at 1440px and 375px', async ({ page }) => {
+    // 1. Desktop 1440x900
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/');
     await page.waitForSelector('header');
@@ -68,10 +87,38 @@ test.describe('WCAG 2.2 AA Accessibility Audits', () => {
     const fileInput = page.locator('input[type="file"]').first();
 
     await fileInput.setInputFiles(corruptPdfPath);
-    const alert = page.getByRole('alert').first();
+
+    // Assert exactly one role="alert" rendered across the page (no duplicate announcements)
+    const alert = page.getByRole('alert');
+    await expect(alert).toHaveCount(1);
     await expect(alert).toBeVisible({ timeout: 10000 });
 
-    const errorResults = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
-    assertNoAxeViolations(errorResults.violations);
+    const desktopResults = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+    assertNoAxeViolations(desktopResults.violations);
+
+    // 2. Mobile 375x812 (drawer closed so alert banner on main canvas is prominent)
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.waitForTimeout(300);
+
+    const closeDrawerBtn = page.getByRole('button', { name: 'Close configuration drawer' });
+    if (await closeDrawerBtn.isVisible()) {
+      await closeDrawerBtn.click();
+      await page.waitForTimeout(300);
+    }
+
+    await expect(alert).toHaveCount(1);
+    await expect(alert).toBeVisible();
+
+    const mobileAlertResults = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+    assertNoAxeViolations(mobileAlertResults.violations);
+
+    // 3. Mobile 375x812 (drawer opened)
+    const openDrawerBtn = page.getByRole('button', { name: /expand sidebar/i });
+    if (await openDrawerBtn.isVisible()) {
+      await openDrawerBtn.click();
+      await page.waitForTimeout(300);
+      const mobileDrawerResults = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+      assertNoAxeViolations(mobileDrawerResults.violations);
+    }
   });
 });

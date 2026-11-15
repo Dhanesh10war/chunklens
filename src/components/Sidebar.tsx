@@ -8,8 +8,6 @@ import { Input } from './ui/Input';
 import { SegmentedControl } from './ui/SegmentedControl';
 import { SliderWithInput } from './ui/SliderWithInput';
 import { DetectedFormatInfo } from '../utils/fileFormatDetector';
-import { UploadErrorInfo } from '../hooks/useDocumentUpload';
-import { UploadErrorBanner } from './UploadErrorBanner';
 import { cn } from '../utils/cn';
 
 interface SidebarProps {
@@ -25,8 +23,6 @@ interface SidebarProps {
   detectedFormat?: DetectedFormatInfo | null;
   isOpen: boolean;
   onClose?: () => void;
-  uploadError?: UploadErrorInfo | null;
-  onDismissError?: () => void;
   isExtractingPdf?: boolean;
   className?: string;
 }
@@ -43,8 +39,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   detectedFormat,
   isOpen,
   onClose,
-  uploadError,
-  onDismissError,
   isExtractingPdf = false,
   className,
 }) => {
@@ -225,16 +219,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <span className="text-text-tertiary font-normal">({detectedFormat.label})</span>
                 </span>
               </div>
-            )}
-
-            {/* Upload Error Banner with Recovery */}
-            {uploadError && (
-              <UploadErrorBanner
-                error={uploadError}
-                onDismiss={onDismissError || (() => {})}
-                onChooseAnotherFile={() => fileInputRef.current?.click()}
-                className="mt-1"
-              />
             )}
           </div>
 

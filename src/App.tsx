@@ -236,8 +236,6 @@ export const AppContent: React.FC = () => {
           detectedFormat={detectedFormat}
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
-          uploadError={uploadError}
-          onDismissError={clearError}
           isExtractingPdf={isExtractingPdf}
           onOpenTokenizerModal={() => setIsTokenizerModalOpen(true)}
           onPrefetchTokenizerModal={prefetchTokenizerModal}
