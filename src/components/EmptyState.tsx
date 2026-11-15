@@ -69,8 +69,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 
         {/* Hero Banner */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono bg-accent-subtle text-accent border border-accent/20 select-none">
-            <ShieldCheck className="h-3.5 w-3.5" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono bg-status-success-subtle text-status-success-text border border-status-success/20 select-none">
+            <ShieldCheck className="h-3.5 w-3.5 text-status-success" />
             <span>100% client-side · zero network egress</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-text-primary">
@@ -91,10 +91,10 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           onDragLeave={() => setIsDragOver(false)}
           onDrop={handleDrop}
           className={cn(
-            'group relative border-2 border-dashed rounded-xl p-6 sm:p-8 text-center cursor-pointer transition-all select-none',
+            'group relative border-2 border-dashed rounded-panel p-6 sm:p-8 text-center cursor-pointer transition-all select-none',
             isDragOver
               ? 'border-accent bg-accent-subtle/30 scale-[1.005]'
-              : 'border-border-default hover:border-border-strong bg-surface/40 hover:bg-surface/70'
+              : 'border-separator hover:border-separator/80 bg-surface-1/40 hover:bg-surface-1/70'
           )}
         >
           <input
@@ -155,7 +155,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         </div>
 
         {/* Paste Text Collapsible Toggle */}
-        <div className="border border-border-default rounded-lg bg-surface/30 p-3">
+        <div className="border border-separator rounded-card bg-surface-1/40 p-3">
           {!isPasting ? (
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 text-xs text-text-secondary min-w-0">
@@ -242,7 +242,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
                       onSelectSample(sample.id);
                     }
                   }}
-                  className="group p-3.5 rounded-lg border border-border-default hover:border-accent bg-surface/50 hover:bg-elevated transition-all cursor-pointer flex flex-col justify-between text-left focus-ring"
+                  className="group p-3.5 rounded-card border border-separator hover:border-accent/40 bg-surface-1/70 hover:bg-surface-2 transition-all cursor-pointer flex flex-col justify-between text-left focus-ring shadow-subtle"
                 >
                   <div className="space-y-1.5">
                     <div className="flex items-start justify-between gap-2">

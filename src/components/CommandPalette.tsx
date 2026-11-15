@@ -85,8 +85,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         e.preventDefault();
         if (isOpen) {
           onClose();
-        } else {
-          // Open triggered from parent or toggled
         }
       }
     };
@@ -99,9 +97,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     {
       id: 'strat-recursive',
       category: 'Strategies',
-      title: 'Recursive Character Splitting',
-      subtitle: 'Hierarchical boundary recursion for RAG',
-      icon: <Sliders className="h-4 w-4" />,
+      title: 'Recursive Character Splitter',
+      subtitle: 'Recursively uses linebreaks and spaces for natural semantic boundaries',
+      icon: <Layers className="h-4 w-4" />,
       action: () => {
         onSelectStrategy('recursive');
         onClose();
@@ -111,8 +109,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     {
       id: 'strat-fixed',
       category: 'Strategies',
-      title: 'Fixed-Size Sliding Window',
-      subtitle: 'Strict token/char window with overlap',
+      title: 'Fixed Size with Overlap',
+      subtitle: 'Strict token or character windowing with sliding overlap',
       icon: <Sliders className="h-4 w-4" />,
       action: () => {
         onSelectStrategy('fixed');
@@ -121,23 +119,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       active: currentStrategy === 'fixed',
     },
     {
-      id: 'strat-sentence',
-      category: 'Strategies',
-      title: 'Sentence-Based Splitting',
-      subtitle: 'Preserves grammatical sentence boundaries',
-      icon: <Sliders className="h-4 w-4" />,
-      action: () => {
-        onSelectStrategy('sentence');
-        onClose();
-      },
-      active: currentStrategy === 'sentence',
-    },
-    {
       id: 'strat-markdown',
       category: 'Strategies',
-      title: 'Markdown Header Splitting',
-      subtitle: 'H1–H6 section hierarchy with metadata context',
-      icon: <Sliders className="h-4 w-4" />,
+      title: 'Markdown Header Splitter',
+      subtitle: 'Splits hierarchically along Markdown headers (# H1, ## H2)',
+      icon: <FileText className="h-4 w-4" />,
       action: () => {
         onSelectStrategy('markdown');
         onClose();
@@ -145,11 +131,23 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       active: currentStrategy === 'markdown',
     },
     {
+      id: 'strat-sentence',
+      category: 'Strategies',
+      title: 'Sentence / Paragraph Aware',
+      subtitle: 'Preserves sentences (. ! ?) and whole paragraphs intact',
+      icon: <SplitSquareVertical className="h-4 w-4" />,
+      action: () => {
+        onSelectStrategy('sentence');
+        onClose();
+      },
+      active: currentStrategy === 'sentence',
+    },
+    {
       id: 'strat-tabular',
       category: 'Strategies',
-      title: 'Tabular CSV / JSON Record Chunking',
-      subtitle: 'Schema-preserving records for structured datasets',
-      icon: <Sliders className="h-4 w-4" />,
+      title: 'Tabular CSV & JSON Records',
+      subtitle: 'Preserves columns and emits row chunks with headers',
+      icon: <Grid3X3 className="h-4 w-4" />,
       action: () => {
         onSelectStrategy('tabular');
         onClose();
@@ -157,14 +155,26 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       active: currentStrategy === 'tabular',
     },
 
-    // Documents
+    // Sample Documents
+    ...SAMPLE_DOCUMENTS.map((sample): CommandItem => ({
+      id: `doc-${sample.id}`,
+      category: 'Documents',
+      title: `Load ${sample.title}`,
+      subtitle: sample.category,
+      icon: <FileText className="h-4 w-4" />,
+      action: () => {
+        onSelectSample(sample.id);
+        onClose();
+      },
+    })),
+
     ...(onNewDocument
       ? [
           {
             id: 'doc-new',
             category: 'Documents' as const,
-            title: 'New Document (Clear Canvas)',
-            subtitle: 'Clear current document and open the file dropzone & sample picker',
+            title: 'New Document (Clear canvas & paste/upload)',
+            subtitle: 'Resets active text and opens the dropzone',
             icon: <FilePlus className="h-4 w-4" />,
             action: () => {
               onNewDocument();
@@ -173,22 +183,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           },
         ]
       : []),
-    ...SAMPLE_DOCUMENTS.map((doc) => ({
-      id: `doc-${doc.id}`,
-      category: 'Documents' as const,
-      title: `Load: ${doc.title}`,
-      subtitle: `${doc.category} — ${doc.description}`,
-      icon: <FileText className="h-4 w-4" />,
-      action: () => {
-        onSelectSample(doc.id);
-        onClose();
-      },
-    })),
+
     {
-      id: 'doc-reset',
+      id: 'doc-reset-defaults',
       category: 'Documents',
-      title: 'Reset Document to Defaults',
-      subtitle: 'Restore default sample text and configuration',
+      title: 'Reset to Default Document & Configuration',
+      subtitle: 'Restores sample state and default chunking parameters',
       icon: <RotateCcw className="h-4 w-4" />,
       action: () => {
         onResetDocument();
@@ -198,9 +198,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
     // Views
     {
-      id: 'view-chunks',
+      id: 'view-visualizer',
       category: 'Views',
-      title: 'View Continuous Chunks Canvas',
+      title: 'Switch to Chunks Visualizer',
+      subtitle: 'Continuous stream or separated card views',
+      shortcut: '1',
       icon: <Layers className="h-4 w-4" />,
       action: () => {
         onSelectTab('visualizer');
@@ -210,8 +212,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     {
       id: 'view-heatmap',
       category: 'Views',
-      title: 'View Cosine Similarity Heatmap',
-      subtitle: 'TF-IDF chunk-to-chunk correlation matrix',
+      title: 'Switch to Similarity Heatmap',
+      subtitle: 'N x N semantic similarity matrix and boundary continuity',
+      shortcut: '2',
       icon: <Grid3X3 className="h-4 w-4" />,
       action: () => {
         onSelectTab('heatmap');
@@ -221,30 +224,22 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     {
       id: 'view-editor',
       category: 'Views',
-      title: 'Edit Raw Document Text',
+      title: 'Switch to Raw Document Editor',
+      subtitle: 'Edit source document text directly',
+      shortcut: '3',
       icon: <Edit3 className="h-4 w-4" />,
       action: () => {
         onSelectTab('editor');
         onClose();
       },
     },
-    {
-      id: 'view-compare',
-      category: 'Views',
-      title: 'Toggle A/B Comparison Mode',
-      subtitle: 'Compare two chunking parameter configurations side-by-side',
-      icon: <SplitSquareVertical className="h-4 w-4" />,
-      action: () => {
-        onToggleCompare();
-        onClose();
-      },
-    },
 
     // Panels & Settings
     {
-      id: 'panel-sidebar',
+      id: 'panel-toggle-sidebar',
       category: 'Panels & Settings',
       title: 'Toggle Left Sidebar',
+      subtitle: 'Collapse or expand parameter controls',
       shortcut: '[',
       icon: <PanelLeft className="h-4 w-4" />,
       action: () => {
@@ -253,9 +248,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       },
     },
     {
-      id: 'panel-inspector',
+      id: 'panel-toggle-inspector',
       category: 'Panels & Settings',
-      title: 'Toggle Chunk Inspector',
+      title: 'Toggle Right Inspector',
+      subtitle: 'Inspect selected chunk token & boundary diagnostics',
       shortcut: ']',
       icon: <PanelRight className="h-4 w-4" />,
       action: () => {
@@ -264,9 +260,21 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       },
     },
     {
-      id: 'panel-theme',
+      id: 'action-toggle-compare',
+      category: 'Panels & Settings',
+      title: 'Toggle A/B Strategy Compare Mode',
+      subtitle: 'Side-by-side splitter comparison',
+      icon: <SplitSquareVertical className="h-4 w-4" />,
+      action: () => {
+        onToggleCompare();
+        onClose();
+      },
+    },
+    {
+      id: 'setting-toggle-theme',
       category: 'Panels & Settings',
       title: isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme',
+      subtitle: 'Apple HIG macOS Appearance',
       icon: isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />,
       action: () => {
         toggleTheme();
@@ -329,15 +337,15 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-150"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-xl rounded-xl bg-surface border border-border-default shadow-elevated overflow-hidden flex flex-col max-h-[75vh]"
+        className="w-full max-w-xl rounded-panel bg-surface-1 mac-translucent border border-separator shadow-modal overflow-hidden flex flex-col max-h-[75vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Input Bar */}
-        <div className="h-12 px-4 border-b border-border-default flex items-center space-x-3 bg-surface">
+        <div className="h-12 px-4 border-b border-separator flex items-center space-x-3 bg-surface-1/50 mac-translucent">
           <Search className="h-4 w-4 text-text-tertiary shrink-0" />
           <input
             ref={inputRef}
@@ -349,16 +357,16 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             }}
             onKeyDown={handleKeyDown}
             placeholder="Type a command or search actions..."
-            className="flex-1 bg-transparent border-0 text-xs text-text-primary placeholder:text-text-tertiary focus:outline-none"
+            className="flex-1 bg-transparent border-0 text-xs text-text placeholder:text-text-tertiary focus:outline-none font-sans"
             aria-label="Command search"
           />
-          <kbd className="text-xs font-mono px-1.5 py-0.5 rounded bg-elevated border border-border-default text-text-tertiary">
+          <kbd className="text-2xs font-mono px-1.5 py-0.5 rounded bg-surface-2 border border-separator text-text-secondary">
             ESC
           </kbd>
         </div>
 
         {/* Command Results List */}
-        <div ref={listRef} className="flex-1 overflow-y-auto p-2 divide-y divide-border-subtle">
+        <div ref={listRef} className="flex-1 overflow-y-auto p-2 divide-y divide-separator/40">
           {filtered.length === 0 ? (
             <div className="py-8 text-center text-xs text-text-tertiary">
               No matching commands found.
@@ -372,10 +380,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                   onClick={cmd.action}
                   onMouseEnter={() => setSelectedIndex(idx)}
                   className={cn(
-                    'flex items-center justify-between px-3 py-2 rounded-md cursor-pointer text-xs transition-colors',
+                    'flex items-center justify-between px-3 py-2 rounded-control cursor-pointer text-xs transition-colors border',
                     isSelected
-                      ? 'bg-elevated text-text-primary'
-                      : 'text-text-secondary hover:text-text-primary'
+                      ? 'bg-accent-subtle text-text border-accent/25'
+                      : 'text-text-secondary hover:text-text hover:bg-surface-2 border-transparent'
                   )}
                 >
                   <div className="flex items-center space-x-2.5 min-w-0">
@@ -390,7 +398,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                         )}
                       </div>
                       {cmd.subtitle && (
-                        <span className="text-xs text-text-tertiary truncate">
+                        <span className="text-2xs text-text-tertiary truncate">
                           {cmd.subtitle}
                         </span>
                       )}
@@ -398,7 +406,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                   </div>
 
                   {cmd.shortcut && (
-                    <kbd className="text-xs font-mono px-1.5 py-0.5 rounded bg-surface border border-border-default text-text-tertiary">
+                    <kbd className="text-2xs font-mono px-1.5 py-0.5 rounded bg-surface-1 dark:bg-surface-3 border border-separator text-text-secondary">
                       {cmd.shortcut}
                     </kbd>
                   )}
@@ -409,7 +417,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         </div>
 
         {/* Footer Shortcut Legend */}
-        <div className="h-8 px-4 border-t border-border-default bg-elevated flex items-center justify-between text-xs font-mono text-text-tertiary select-none">
+        <div className="h-8 px-4 border-t border-separator bg-surface-2/60 flex items-center justify-between text-2xs font-mono text-text-tertiary select-none">
           <div className="flex items-center space-x-3">
             <span>↑↓ Navigate</span>
             <span>↵ Select</span>

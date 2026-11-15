@@ -56,25 +56,25 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 animate-in fade-in duration-150">
-      <div className="bg-panel border border-border rounded-lg w-full max-w-3xl overflow-hidden shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-150">
+      <div className="bg-surface-1 mac-translucent border border-separator rounded-panel w-full max-w-3xl overflow-hidden shadow-modal">
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-border bg-surface">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-separator bg-surface-1/50 mac-translucent">
           <div className="flex items-center space-x-2.5">
-            <div className="p-1.5 rounded-md bg-primary/10 border border-primary/20 text-primary">
+            <div className="p-1.5 rounded-control bg-surface-2 border border-separator text-accent">
               <Terminal className="h-4 w-4" />
             </div>
             <div>
-              <h3 className="font-semibold text-slate-100 text-sm tracking-tight">Export Pipeline Code & Datasets</h3>
-              <p className="text-xs text-slate-400">
-                Production-ready code snippets or export <span className="font-mono text-slate-300 tabular-nums">{chunks.length}</span> structured chunks for vector stores.
+              <h3 className="font-semibold text-text text-sm tracking-tight">Export Pipeline Code &amp; Datasets</h3>
+              <p className="text-xs text-text-secondary">
+                Production-ready code snippets or export <span className="font-mono text-text tabular-nums">{chunks.length}</span> structured chunks for vector stores.
               </p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-md text-slate-400 hover:text-slate-200 hover:bg-panel active-press focus-ring transition-colors"
+            className="p-1.5 rounded-control text-text-secondary hover:text-text hover:bg-surface-2 active-press focus-ring transition-colors"
             aria-label="Close export modal"
           >
             <X className="h-4 w-4" />
@@ -82,7 +82,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         </div>
 
         {/* Top Controls: Framework Tabs & Direct Dataset Download */}
-        <div className="flex flex-wrap items-center justify-between border-b border-border bg-panel px-4 pt-1.5 gap-2">
+        <div className="flex flex-wrap items-center justify-between border-b border-separator bg-surface-2/30 px-4 pt-1.5 gap-2">
           <div className="flex gap-1 overflow-x-auto">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -94,11 +94,11 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                   className={cn(
                     'flex items-center space-x-2 px-3 py-2 text-xs font-medium border-b-2 transition-all whitespace-nowrap active-press focus-ring',
                     isActive
-                      ? 'border-primary text-primary-light bg-surface rounded-t-sm'
-                      : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-surface/50'
+                      ? 'border-accent text-accent bg-surface-1 rounded-t-control'
+                      : 'border-transparent text-text-secondary hover:text-text hover:bg-surface-2/50'
                   )}
                 >
-                  <Icon className={cn('h-3.5 w-3.5', isActive ? 'text-primary' : 'text-slate-500')} />
+                  <Icon className={cn('h-3.5 w-3.5', isActive ? 'text-accent' : 'text-text-tertiary')} />
                   <span>{tab.label}</span>
                 </button>
               );
@@ -110,18 +110,18 @@ export const ExportModal: React.FC<ExportModalProps> = ({
             <div className="flex items-center gap-1.5 pb-1.5">
               <button
                 onClick={handleDownloadJson}
-                className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-md text-xs bg-surface hover:bg-subtle text-slate-200 border border-border active-press focus-ring transition-colors shadow-subtle"
+                className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-control text-xs bg-surface-2 hover:bg-surface-3 text-text border border-separator active-press focus-ring transition-colors shadow-subtle"
                 title="Download chunked data as JSON with full metadata"
               >
-                <FileJson className="h-3.5 w-3.5 text-cyan-400" />
+                <FileJson className="h-3.5 w-3.5 text-accent" />
                 <span className="font-mono">JSON</span>
               </button>
               <button
                 onClick={handleDownloadCsv}
-                className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-md text-xs bg-surface hover:bg-subtle text-slate-200 border border-border active-press focus-ring transition-colors shadow-subtle"
+                className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-control text-xs bg-surface-2 hover:bg-surface-3 text-text border border-separator active-press focus-ring transition-colors shadow-subtle"
                 title="Download chunked data as CSV spreadsheet"
               >
-                <FileSpreadsheet className="h-3.5 w-3.5 text-emerald-400" />
+                <FileSpreadsheet className="h-3.5 w-3.5 text-status-success" />
                 <span className="font-mono">CSV</span>
               </button>
             </div>
@@ -129,40 +129,40 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         </div>
 
         {/* Code Preview Box */}
-        <div className="relative p-5 bg-canvas font-mono text-xs">
+        <div className="relative p-5 bg-bg font-mono text-xs">
           <button
             onClick={handleCopy}
-            className="absolute top-7 right-7 flex items-center space-x-1.5 px-3 py-1.5 rounded-md bg-primary/15 border border-primary/30 text-primary hover:bg-primary/25 active-press focus-ring transition-colors shadow-subtle"
+            className="absolute top-7 right-7 flex items-center space-x-1.5 px-3 py-1.5 rounded-control bg-accent text-white hover:bg-accent-hover active-press focus-ring transition-colors shadow-subtle font-sans text-xs font-medium"
           >
             {copied ? (
               <>
-                <Check className="h-3.5 w-3.5 text-emerald-400" />
-                <span className="text-emerald-400 font-medium">Copied!</span>
+                <Check className="h-3.5 w-3.5" />
+                <span>Copied!</span>
               </>
             ) : (
               <>
                 <Copy className="h-3.5 w-3.5" />
-                <span className="font-medium">Copy Code</span>
+                <span>Copy Code</span>
               </>
             )}
           </button>
 
-          <pre className="text-slate-300 overflow-x-auto max-h-[380px] p-4 rounded-md bg-panel border border-border leading-relaxed selection:bg-primary/20">
+          <pre className="text-text overflow-x-auto max-h-[380px] p-4 rounded-card bg-surface-1 border border-separator leading-relaxed selection:bg-accent/20">
             {code}
           </pre>
         </div>
 
         {/* Modal Footer */}
-        <div className="px-5 py-3 border-t border-border bg-surface flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
-          <span className="font-mono text-slate-400">
-            Target: <span className="text-slate-200">{config.strategy}</span> •{' '}
-            <span className="tabular-nums text-slate-200">{config.chunkSize}</span> {config.unit} •{' '}
-            <span className="tabular-nums text-slate-200">{config.chunkOverlap}</span> overlap
+        <div className="px-5 py-3 border-t border-separator bg-surface-1/50 mac-translucent flex flex-wrap items-center justify-between gap-2 text-xs text-text-secondary">
+          <span className="font-mono text-text-secondary">
+            Target: <span className="text-text font-medium">{config.strategy}</span> •{' '}
+            <span className="tabular-nums text-text font-medium">{config.chunkSize}</span> {config.unit} •{' '}
+            <span className="tabular-nums text-text font-medium">{config.chunkOverlap}</span> overlap
           </span>
           <div className="flex items-center space-x-2">
             <button
               onClick={onClose}
-              className="px-4 py-1.5 rounded-md bg-panel hover:bg-subtle text-slate-300 hover:text-white border border-border active-press focus-ring transition-colors text-xs font-medium"
+              className="px-4 py-1.5 rounded-control bg-surface-2 hover:bg-surface-3 text-text border border-separator active-press focus-ring transition-colors text-xs font-medium"
             >
               Close
             </button>
