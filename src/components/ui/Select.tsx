@@ -32,14 +32,14 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ref={ref}
             id={generatedId}
             className={cn(
-              'h-8 w-full appearance-none rounded-md bg-surface text-text-primary border border-border-default hover:border-border-hover pl-2.5 pr-8 text-xs font-sans transition-colors cursor-pointer focus-ring',
+              'h-8 w-full appearance-none rounded-control bg-surface-2 text-text border border-border-default hover:border-border-hover pl-2.5 pr-8 text-xs font-sans transition-colors cursor-pointer focus-ring',
               className
             )}
             {...props}
           >
             {options
               ? options.map((opt) => (
-                  <option key={opt.value} value={opt.value} className="bg-surface text-text-primary">
+                  <option key={opt.value} value={opt.value} className="bg-surface-1 text-text">
                     {opt.label}
                   </option>
                 ))

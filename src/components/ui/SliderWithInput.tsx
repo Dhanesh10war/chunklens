@@ -56,7 +56,7 @@ export const SliderWithInput: React.FC<SliderWithInputProps> = ({
             value={value}
             onChange={handleInputChange}
             aria-label={`${label} numeric value`}
-            className="h-6 w-16 text-right font-mono text-xs tabular-nums bg-surface border border-border-default hover:border-border-hover rounded px-1.5 text-text-primary focus-ring"
+            className="h-6 w-16 text-right font-mono text-xs tabular-nums bg-surface-2 border border-border-default hover:border-border-hover rounded-control px-1.5 text-text focus-ring"
           />
           {unitLabel && (
             <span className="text-xs text-text-tertiary font-mono select-none">
@@ -77,7 +77,7 @@ export const SliderWithInput: React.FC<SliderWithInputProps> = ({
           value={value}
           onChange={handleSliderChange}
           aria-label={label}
-          className="w-full h-1.5 bg-elevated rounded-lg appearance-none cursor-pointer accent-accent focus-ring"
+          className="w-full h-1.5 bg-surface-2 rounded-full appearance-none cursor-pointer accent-accent focus-ring"
         />
       </div>
 

@@ -32,7 +32,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             id={generatedId}
             className={cn(
-              'h-8 w-full rounded-md bg-surface text-text-primary border text-xs font-sans px-2.5 transition-colors placeholder:text-text-tertiary focus-ring',
+              'h-8 w-full rounded-control bg-surface-2 text-text border text-xs font-sans px-2.5 transition-colors placeholder:text-text-tertiary focus-ring',
               error
                 ? 'border-status-error focus-visible:ring-status-error'
                 : 'border-border-default hover:border-border-hover',

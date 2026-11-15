@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { ChunkingConfig, ChunkingStrategy, TokenizerEncoding, ChunkUnit } from '../engine/types';
 import { SAMPLE_DOCUMENTS } from '../data/samples';
-import { Upload, RotateCcw, FileText, Check, FilePlus, Cpu } from 'lucide-react';
+import { Upload, RotateCcw, FileText, FilePlus, Cpu, ChevronDown, ChevronRight } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Select } from './ui/Select';
 import { Input } from './ui/Input';
@@ -44,6 +44,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDraggingFile, setIsDraggingFile] = useState(false);
+
+  // Collapsible section toggles (default open)
+  const [isStrategySectionOpen, setIsStrategySectionOpen] = useState(true);
+  const [isTokenizerSectionOpen, setIsTokenizerSectionOpen] = useState(true);
+  const [isSizeSectionOpen, setIsSizeSectionOpen] = useState(true);
 
   const [separatorsText, setSeparatorsText] = useState<string>(
     config.separators ? config.separators.map((s) => JSON.stringify(s)).join(', ') : ''
@@ -103,19 +108,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <aside
       className={cn(
-        'w-full sm:w-[320px] bg-surface border-r border-border-default flex flex-col h-full shrink-0 select-none overflow-y-auto z-20',
+        'w-full sm:w-[320px] mac-translucent border-r border-separator flex flex-col h-full shrink-0 select-none overflow-y-auto z-20',
         className
       )}
     >
       <div className="flex flex-col flex-1 pb-8">
         {/* Mobile Header / Close Bar */}
-        <div className="flex items-center justify-between p-3 border-b border-border-subtle lg:hidden">
-          <span className="font-semibold text-xs text-text-primary">
+        <div className="flex items-center justify-between p-3 border-b border-separator lg:hidden">
+          <span className="font-semibold text-xs text-text">
             Configuration
           </span>
           <button
             onClick={onClose}
-            className="p-1 rounded hover:bg-elevated text-text-secondary hover:text-text-primary text-xs focus-ring"
+            className="p-1 rounded-control hover:bg-surface-2 text-text-secondary hover:text-text text-xs focus-ring transition-colors"
             aria-label="Close configuration drawer"
           >
             ✕
@@ -123,16 +128,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         <div className="p-4 flex flex-col gap-5 text-xs">
-          {/* SECTION 1: SOURCE */}
+          {/* SECTION 1: SOURCE (macOS Source List) */}
           <div className="flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-[13px] font-semibold text-text-primary">
+              <span className="text-xs font-semibold text-text select-none">
                 Document source
               </span>
               {onNewDocument && (
                 <button
                   onClick={onNewDocument}
-                  className="inline-flex items-center gap-1 text-xs font-sans text-accent hover:text-accent-hover hover:underline focus-ring rounded px-1"
+                  className="inline-flex items-center gap-1 text-xs font-sans text-accent hover:text-accent-hover focus-ring rounded-control px-1.5 py-0.5 transition-colors"
                   title="Clear document and open empty dropzone"
                   aria-label="New document: clear canvas"
                 >
@@ -142,26 +147,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
               )}
             </div>
 
-            {/* Sample Corpora Selection */}
-            <div className="flex flex-col gap-1 border border-border-default rounded-md bg-base p-1">
+            {/* Sample Corpora Selection - macOS Source List Items */}
+            <div className="flex flex-col gap-0.5 border border-separator rounded-card bg-surface-2/40 p-1">
               {SAMPLE_DOCUMENTS.map((sample) => {
                 const isSelected = sample.id === selectedSampleId;
+                const approxTokens = Math.round(sample.content.length / 4);
                 return (
                   <button
                     key={sample.id}
                     onClick={() => onSelectSample(sample.id)}
                     className={cn(
-                      'flex items-center justify-between px-2.5 py-1.5 rounded text-left transition-colors active-press focus-ring text-xs',
+                      'flex items-center justify-between px-2.5 py-1.5 rounded-control text-left transition-colors active-press focus-ring text-xs border',
                       isSelected
-                        ? 'bg-elevated text-text-primary font-medium'
-                        : 'text-text-secondary hover:text-text-primary hover:bg-elevated/50'
+                        ? 'bg-accent-subtle text-text font-medium border-accent/25 shadow-subtle'
+                        : 'text-text-secondary hover:text-text hover:bg-surface-2/80 border-transparent'
                     )}
                   >
-                    <div className="flex items-center space-x-2 truncate min-w-0">
-                      <FileText className="h-3.5 w-3.5 shrink-0 opacity-70" />
+                    <div className="flex items-center space-x-2 truncate min-w-0 pr-2">
+                      <FileText className={cn('h-3.5 w-3.5 shrink-0', isSelected ? 'text-accent' : 'text-text-tertiary')} />
                       <span className="truncate">{sample.title}</span>
                     </div>
-                    {isSelected && <Check className="h-3.5 w-3.5 text-accent shrink-0 ml-1" />}
+                    <span className="text-2xs font-mono text-text-tertiary shrink-0 tabular-nums">
+                      ~{approxTokens.toLocaleString()} tok
+                    </span>
                   </button>
                 );
               })}
@@ -181,7 +189,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 if (file) onFileUpload(file);
               }}
               className={cn(
-                'rounded-md transition-all',
+                'rounded-control transition-all',
                 isDraggingFile && 'ring-2 ring-accent bg-accent-subtle/20'
               )}
             >
@@ -212,9 +220,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             {/* Active Detected Format Indicator */}
             {detectedFormat && !selectedSampleId && (
-              <div className="p-2 rounded bg-elevated border border-border-subtle flex items-center justify-between text-xs select-none">
+              <div className="p-2 rounded-control bg-surface-2 border border-separator flex items-center justify-between text-xs select-none">
                 <span className="text-text-secondary">Detected format:</span>
-                <span className="px-1.5 py-0.5 rounded bg-surface border border-border-default text-accent font-medium font-mono flex items-center gap-1 text-xs">
+                <span className="px-1.5 py-0.5 rounded-control bg-surface-1 border border-separator text-accent font-medium font-mono flex items-center gap-1 text-xs">
                   <span>{detectedFormat.badge}</span>
                   <span className="text-text-tertiary font-normal">({detectedFormat.label})</span>
                 </span>
@@ -222,142 +230,193 @@ export const Sidebar: React.FC<SidebarProps> = ({
             )}
           </div>
 
-          <div className="h-px bg-border-subtle" />
+          <div className="h-px bg-separator" />
 
           {/* SECTION 2: CHUNKING STRATEGY */}
           <div className="flex flex-col gap-3">
-            <span className="text-[13px] font-semibold text-text-primary">
-              Chunking strategy
-            </span>
+            <button
+              type="button"
+              onClick={() => setIsStrategySectionOpen(!isStrategySectionOpen)}
+              className="flex items-center justify-between text-left group focus-ring rounded-control -mx-1 px-1 py-0.5"
+            >
+              <span className="text-xs font-semibold text-text select-none">
+                Chunking strategy
+              </span>
+              <span className="text-text-tertiary group-hover:text-text transition-colors">
+                {isStrategySectionOpen ? (
+                  <ChevronDown className="h-3.5 w-3.5" />
+                ) : (
+                  <ChevronRight className="h-3.5 w-3.5" />
+                )}
+              </span>
+            </button>
 
-            <Select
-              label="Algorithm"
-              value={config.strategy}
-              onChange={(e) =>
-                onChangeConfig({ ...config, strategy: e.target.value as ChunkingStrategy })
-              }
-              options={[
-                { value: 'recursive', label: 'Recursive Character (LangChain)' },
-                { value: 'fixed', label: 'Fixed Size with Overlap' },
-                { value: 'markdown', label: 'Markdown Header Splitter' },
-                { value: 'sentence', label: 'Sentence / Paragraph Aware' },
-                { value: 'tabular', label: 'Tabular CSV & JSON Records' },
-              ]}
-            />
-
-            {/* Strategy Context Banner */}
-            <div className="text-xs text-text-secondary leading-relaxed px-0.5">
-              {config.strategy === 'recursive' &&
-                'Recursively tries separators (\\n\\n, \\n, " ") to maintain semantic boundary structure.'}
-              {config.strategy === 'fixed' &&
-                'Strict character or token windowing with sliding overlap. Fast and simple.'}
-              {config.strategy === 'markdown' &&
-                'Splits hierarchically along Markdown headers (# H1, ## H2, etc.), preserving section context.'}
-              {config.strategy === 'sentence' &&
-                'Detects sentence termination punctuation (. ! ?) and preserves paragraphs intact.'}
-              {config.strategy === 'tabular' &&
-                'Preserves table columns and row schemas. Emits row-by-row chunks with column headers.'}
-            </div>
-
-            {config.strategy === 'recursive' && (
-              <div className="space-y-1.5">
-                <Input
-                  label="Separators hierarchy"
-                  value={separatorsText}
-                  onChange={(e) => handleSeparatorsChange(e.target.value)}
-                  placeholder='e.g. "\n\n", "\n", " ", ""'
-                  helperText="Precedence order: largest delimiter to smallest"
+            {isStrategySectionOpen && (
+              <div className="flex flex-col gap-3">
+                <Select
+                  label="Algorithm"
+                  value={config.strategy}
+                  onChange={(e) =>
+                    onChangeConfig({ ...config, strategy: e.target.value as ChunkingStrategy })
+                  }
+                  options={[
+                    { value: 'recursive', label: 'Recursive Character (LangChain)' },
+                    { value: 'fixed', label: 'Fixed Size with Overlap' },
+                    { value: 'markdown', label: 'Markdown Header Splitter' },
+                    { value: 'sentence', label: 'Sentence / Paragraph Aware' },
+                    { value: 'tabular', label: 'Tabular CSV & JSON Records' },
+                  ]}
                 />
-                {config.separators && config.separators.length > 0 && (
+
+                {/* Strategy Context Banner */}
+                <div className="text-xs text-text-secondary leading-relaxed px-0.5">
+                  {config.strategy === 'recursive' &&
+                    'Recursively tries separators (\\n\\n, \\n, " ") to maintain semantic boundary structure.'}
+                  {config.strategy === 'fixed' &&
+                    'Strict character or token windowing with sliding overlap. Fast and simple.'}
+                  {config.strategy === 'markdown' &&
+                    'Splits hierarchically along Markdown headers (# H1, ## H2, etc.), preserving section context.'}
+                  {config.strategy === 'sentence' &&
+                    'Detects sentence termination punctuation (. ! ?) and preserves paragraphs intact.'}
+                  {config.strategy === 'tabular' &&
+                    'Preserves table columns and row schemas. Emits row-by-row chunks with column headers.'}
+                </div>
+
+                {config.strategy === 'recursive' && (
+                  <div className="space-y-1.5">
+                    <Input
+                      label="Separators hierarchy"
+                      value={separatorsText}
+                      onChange={(e) => handleSeparatorsChange(e.target.value)}
+                      placeholder='e.g. "\n\n", "\n", " ", ""'
+                      helperText="Precedence order: largest delimiter to smallest"
+                    />
+                    {config.separators && config.separators.length > 0 && (
+                      <button
+                        onClick={handleResetSeparators}
+                        className="text-xs text-accent hover:underline flex items-center gap-1 font-sans transition-colors"
+                      >
+                        <RotateCcw className="h-3 w-3" />
+                        Reset to default separators
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="h-px bg-separator" />
+
+          {/* SECTION 3: UNIT & TOKENIZER */}
+          <div className="flex flex-col gap-3">
+            <button
+              type="button"
+              onClick={() => setIsTokenizerSectionOpen(!isTokenizerSectionOpen)}
+              className="flex items-center justify-between text-left group focus-ring rounded-control -mx-1 px-1 py-0.5"
+            >
+              <span className="text-xs font-semibold text-text select-none">
+                Unit &amp; tokenizer
+              </span>
+              <span className="text-text-tertiary group-hover:text-text transition-colors">
+                {isTokenizerSectionOpen ? (
+                  <ChevronDown className="h-3.5 w-3.5" />
+                ) : (
+                  <ChevronRight className="h-3.5 w-3.5" />
+                )}
+              </span>
+            </button>
+
+            {isTokenizerSectionOpen && (
+              <div className="flex flex-col gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-text-secondary select-none">Measurement unit</label>
+                  <SegmentedControl
+                    options={[
+                      { value: 'tokens', label: 'Tokens (BPE)' },
+                      { value: 'chars', label: 'Characters' },
+                    ]}
+                    value={config.unit}
+                    onChange={(val) => handleUnitToggle(val as ChunkUnit)}
+                    ariaLabel="Measurement unit"
+                  />
+                </div>
+
+                <Select
+                  label="Tokenizer encoding"
+                  value={config.encoding}
+                  onChange={(e) =>
+                    onChangeConfig({ ...config, encoding: e.target.value as TokenizerEncoding })
+                  }
+                  options={[
+                    { value: 'o200k_base', label: 'o200k_base (OpenAI exact)' },
+                    { value: 'cl100k_base', label: 'cl100k_base (OpenAI exact)' },
+                  ]}
+                  helperText="Only OpenAI encodings (o200k_base, cl100k_base) are exact. Claude, Gemini, Llama, and Cohere are estimates."
+                />
+
+                {/* Unified Tokenizer & Cost Comparison Trigger */}
+                {onOpenTokenizerModal && (
                   <button
-                    onClick={handleResetSeparators}
-                    className="text-xs text-accent hover:underline flex items-center gap-1 font-sans"
+                    type="button"
+                    onClick={onOpenTokenizerModal}
+                    onMouseEnter={onPrefetchTokenizerModal}
+                    onFocus={onPrefetchTokenizerModal}
+                    className="w-full mt-1 h-8 px-2.5 rounded-control border border-separator bg-surface-2 hover:bg-surface-3 text-text-secondary hover:text-text text-xs font-sans font-medium flex items-center justify-center space-x-1.5 transition-colors active-press focus-ring"
+                    aria-label="Compare multi-model tokenizers and embedding costs"
                   >
-                    <RotateCcw className="h-3 w-3" />
-                    Reset to default separators
+                    <Cpu className="h-3.5 w-3.5 text-accent" />
+                    <span>Compare models &amp; costs...</span>
                   </button>
                 )}
               </div>
             )}
           </div>
 
-          <div className="h-px bg-border-subtle" />
-
-          {/* SECTION 3: UNIT & TOKENIZER */}
-          <div className="flex flex-col gap-3">
-            <span className="text-[13px] font-semibold text-text-primary">
-              Unit &amp; tokenizer
-            </span>
-
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-text-secondary">Measurement unit</label>
-              <SegmentedControl
-                options={[
-                  { value: 'tokens', label: 'Tokens (BPE)' },
-                  { value: 'chars', label: 'Characters' },
-                ]}
-                value={config.unit}
-                onChange={(val) => handleUnitToggle(val as ChunkUnit)}
-                ariaLabel="Measurement unit"
-              />
-            </div>
-
-            <Select
-              label="Tokenizer encoding"
-              value={config.encoding}
-              onChange={(e) =>
-                onChangeConfig({ ...config, encoding: e.target.value as TokenizerEncoding })
-              }
-              options={[
-                { value: 'o200k_base', label: 'o200k_base (OpenAI exact)' },
-                { value: 'cl100k_base', label: 'cl100k_base (OpenAI exact)' },
-              ]}
-              helperText="Only OpenAI encodings (o200k_base, cl100k_base) are exact. Claude, Gemini, Llama, and Cohere are estimates."
-            />
-
-            {/* Unified Tokenizer & Cost Comparison Trigger */}
-            {onOpenTokenizerModal && (
-              <button
-                type="button"
-                onClick={onOpenTokenizerModal}
-                onMouseEnter={onPrefetchTokenizerModal}
-                onFocus={onPrefetchTokenizerModal}
-                className="w-full mt-1 h-7 px-2.5 rounded border border-border-default bg-elevated hover:bg-surface text-text-secondary hover:text-text-primary text-xs font-sans font-medium flex items-center justify-center space-x-1.5 transition-colors active-press focus-ring"
-                aria-label="Compare multi-model tokenizers and embedding costs"
-              >
-                <Cpu className="h-3.5 w-3.5 text-accent" />
-                <span>Compare models &amp; costs...</span>
-              </button>
-            )}
-          </div>
-
-          <div className="h-px bg-border-subtle" />
+          <div className="h-px bg-separator" />
 
           {/* SECTION 4: SIZE & OVERLAP */}
           <div className="flex flex-col gap-4">
-            <span className="text-[13px] font-semibold text-text-primary">
-              Size &amp; overlap
-            </span>
+            <button
+              type="button"
+              onClick={() => setIsSizeSectionOpen(!isSizeSectionOpen)}
+              className="flex items-center justify-between text-left group focus-ring rounded-control -mx-1 px-1 py-0.5"
+            >
+              <span className="text-xs font-semibold text-text select-none">
+                Size &amp; overlap
+              </span>
+              <span className="text-text-tertiary group-hover:text-text transition-colors">
+                {isSizeSectionOpen ? (
+                  <ChevronDown className="h-3.5 w-3.5" />
+                ) : (
+                  <ChevronRight className="h-3.5 w-3.5" />
+                )}
+              </span>
+            </button>
 
-            <SliderWithInput
-              label="Target chunk size"
-              value={config.chunkSize}
-              min={sizeMin}
-              max={sizeMax}
-              step={sizeStep}
-              unitLabel={isTokens ? 'tok' : 'ch'}
-              onChange={(val) => onChangeConfig({ ...config, chunkSize: val })}
-            />
+            {isSizeSectionOpen && (
+              <div className="flex flex-col gap-4">
+                <SliderWithInput
+                  label="Target chunk size"
+                  value={config.chunkSize}
+                  min={sizeMin}
+                  max={sizeMax}
+                  step={sizeStep}
+                  unitLabel={isTokens ? 'tok' : 'ch'}
+                  onChange={(val) => onChangeConfig({ ...config, chunkSize: val })}
+                />
 
-            <SliderWithInput
-              label="Overlap window"
-              value={config.chunkOverlap}
-              min={overlapMin}
-              max={overlapMax}
-              step={overlapStep}
-              unitLabel={isTokens ? 'tok' : 'ch'}
-              onChange={(val) => onChangeConfig({ ...config, chunkOverlap: val })}
-            />
+                <SliderWithInput
+                  label="Overlap window"
+                  value={config.chunkOverlap}
+                  min={overlapMin}
+                  max={overlapMax}
+                  step={overlapStep}
+                  unitLabel={isTokens ? 'tok' : 'ch'}
+                  onChange={(val) => onChangeConfig({ ...config, chunkOverlap: val })}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
