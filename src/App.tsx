@@ -28,12 +28,15 @@ const prefetchSimilarityHeatmap = () =>
   import('./components/SimilarityHeatmap').then((m) => ({ default: m.SimilarityHeatmap }));
 const prefetchTokenizerModal = () =>
   import('./components/TokenizerComparisonModal').then((m) => ({ default: m.TokenizerComparisonModal }));
+const prefetchLandingPage = () =>
+  import('./components/landing/LandingPage').then((m) => ({ default: m.LandingPage }));
 
 const CommandPalette = React.lazy(prefetchCommandPalette);
 const ComparisonView = React.lazy(prefetchComparisonView);
 const ExportModal = React.lazy(prefetchExportModal);
 const SimilarityHeatmap = React.lazy(prefetchSimilarityHeatmap);
 const TokenizerComparisonModal = React.lazy(prefetchTokenizerModal);
+const LandingPage = React.lazy(prefetchLandingPage);
 
 export const AppContent: React.FC = () => {
   // Load restored session or default sample
@@ -58,7 +61,53 @@ export const AppContent: React.FC = () => {
   const [isExportModalOpen, setIsExportModalOpen] = useState<boolean>(false);
   const [isTokenizerModalOpen, setIsTokenizerModalOpen] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'visualizer' | 'heatmap' | 'editor'>('visualizer');
+  const [currentView, setCurrentView] = useState<'app' | 'landing'>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('view') === 'landing' || window.location.hash === '#landing') {
+        return 'landing';
+      }
+    }
+    return 'app';
+  });
   const { success } = useToast();
+
+  const handleOpenLandingPage = () => {
+    setCurrentView('landing');
+    if (typeof window !== 'undefined' && window.history?.pushState) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('view', 'landing');
+      window.history.pushState({}, '', url.toString());
+    }
+  };
+
+  const handleLaunchAppFromLanding = (sampleId?: string) => {
+    if (sampleId) {
+      handleSelectSample(sampleId);
+    }
+    setCurrentView('app');
+    if (typeof window !== 'undefined' && window.history?.pushState) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('view');
+      if (url.hash === '#landing') {
+        url.hash = '';
+      }
+      window.history.pushState({}, '', url.toString());
+    }
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('view') === 'landing' || window.location.hash === '#landing') {
+        setCurrentView('landing');
+      } else {
+        setCurrentView('app');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Idle prefetching for modal dialogs (Cmd+K and Export)
   useEffect(() => {
@@ -203,6 +252,16 @@ export const AppContent: React.FC = () => {
       ? chunkingResult.chunks[selectedChunkIdx + 1]
       : null;
 
+  if (currentView === 'landing') {
+    return (
+      <ChunkLoadErrorBoundary fallbackTitle="Failed to load Landing Page">
+        <Suspense fallback={<ModalLoadingFallback label="Loading ChunkLens..." />}>
+          <LandingPage onLaunchApp={handleLaunchAppFromLanding} />
+        </Suspense>
+      </ChunkLoadErrorBoundary>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-bg-base text-text-primary font-sans antialiased">
       {/* 52px Unified Header */}
@@ -217,6 +276,7 @@ export const AppContent: React.FC = () => {
         isSidebarOpen={isSidebarOpen}
         onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        onOpenLandingPage={handleOpenLandingPage}
         onPrefetchExport={prefetchExportModal}
         onPrefetchCommandPalette={prefetchCommandPalette}
         onPrefetchTokenizer={prefetchTokenizerModal}

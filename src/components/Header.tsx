@@ -34,6 +34,7 @@ interface HeaderProps {
   isSidebarOpen: boolean;
   onToggleSidebar: () => void;
   onOpenCommandPalette?: () => void;
+  onOpenLandingPage?: () => void;
   onPrefetchExport?: () => void;
   onPrefetchCommandPalette?: () => void;
   onPrefetchTokenizer?: () => void;
@@ -52,6 +53,7 @@ export const Header: React.FC<HeaderProps> = ({
   isSidebarOpen,
   onToggleSidebar,
   onOpenCommandPalette,
+  onOpenLandingPage,
   onPrefetchExport,
   onPrefetchCommandPalette,
   onPrefetchTokenizer,
@@ -414,6 +416,21 @@ export const Header: React.FC<HeaderProps> = ({
                 </button>
 
                 <div className="my-1 border-t border-separator" />
+
+                {/* Product & Pricing Landing Page */}
+                {onOpenLandingPage && (
+                  <button
+                    role="menuitem"
+                    onClick={() => {
+                      onOpenLandingPage();
+                      closeMenuAndReturnFocus();
+                    }}
+                    className="w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center space-x-2 transition-colors focus:bg-surface-2 focus:outline-none"
+                  >
+                    <Layers className="h-3.5 w-3.5 text-accent" />
+                    <span>Product &amp; Pricing</span>
+                  </button>
+                )}
 
                 {/* GitHub link */}
                 <a
