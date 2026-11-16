@@ -141,13 +141,30 @@ export const Header: React.FC<HeaderProps> = ({
           </Tooltip>
 
           {/* App Brand + Version */}
-          <div className="flex items-center space-x-1.5 shrink-0">
-            <div className="h-6 w-6 rounded-control bg-surface-2 border border-separator flex items-center justify-center text-accent shrink-0">
-              <Layers className="h-3.5 w-3.5" />
+          {onOpenLandingPage ? (
+            <Tooltip content="Return to landing page" position="bottom">
+              <button
+                type="button"
+                onClick={onOpenLandingPage}
+                className="flex items-center space-x-1.5 shrink-0 hover:opacity-85 transition-opacity focus-ring rounded-control text-left p-0.5"
+                aria-label="Return to ChunkLens product landing page"
+              >
+                <div className="h-6 w-6 rounded-control bg-surface-2 border border-separator flex items-center justify-center text-accent shrink-0">
+                  <Layers className="h-3.5 w-3.5" />
+                </div>
+                <h1 className="font-semibold text-sm tracking-tight text-text m-0 p-0 inline">ChunkLens</h1>
+                <span className="text-xs font-mono text-text-secondary mr-2 sm:mr-0">{`v${__APP_VERSION__}`}</span>
+              </button>
+            </Tooltip>
+          ) : (
+            <div className="flex items-center space-x-1.5 shrink-0">
+              <div className="h-6 w-6 rounded-control bg-surface-2 border border-separator flex items-center justify-center text-accent shrink-0">
+                <Layers className="h-3.5 w-3.5" />
+              </div>
+              <h1 className="font-semibold text-sm tracking-tight text-text m-0 p-0 inline">ChunkLens</h1>
+              <span className="text-xs font-mono text-text-secondary mr-2 sm:mr-0">{`v${__APP_VERSION__}`}</span>
             </div>
-            <h1 className="font-semibold text-sm tracking-tight text-text m-0 p-0 inline">ChunkLens</h1>
-            <span className="text-xs font-mono text-text-secondary mr-2 sm:mr-0">{`v${__APP_VERSION__}`}</span>
-          </div>
+          )}
 
           <span className="text-separator hidden sm:inline" aria-hidden="true">/</span>
 

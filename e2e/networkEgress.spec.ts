@@ -21,8 +21,8 @@ test.describe('Zero Network Egress & Strict CSP (Item 3.1 Proof)', () => {
       }
     });
 
-    // 1. Load application on production preview server
-    await page.goto('/');
+    // 1. Load application visualizer on production preview server
+    await page.goto('/?view=app');
     await page.waitForLoadState('networkidle');
 
     // Verify CSP meta tag exists in DOM with connect-src 'none'

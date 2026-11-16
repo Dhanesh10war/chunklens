@@ -64,11 +64,15 @@ export const AppContent: React.FC = () => {
   const [currentView, setCurrentView] = useState<'app' | 'landing'>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
+      if (params.get('view') === 'app' || window.location.hash === '#app') {
+        return 'app';
+      }
       if (params.get('view') === 'landing' || window.location.hash === '#landing') {
         return 'landing';
       }
     }
-    return 'app';
+    // Landing page is the default root experience
+    return 'landing';
   });
   const { success } = useToast();
 
@@ -76,7 +80,8 @@ export const AppContent: React.FC = () => {
     setCurrentView('landing');
     if (typeof window !== 'undefined' && window.history?.pushState) {
       const url = new URL(window.location.href);
-      url.searchParams.set('view', 'landing');
+      url.searchParams.delete('view');
+      url.hash = '';
       window.history.pushState({}, '', url.toString());
     }
   };
@@ -88,10 +93,8 @@ export const AppContent: React.FC = () => {
     setCurrentView('app');
     if (typeof window !== 'undefined' && window.history?.pushState) {
       const url = new URL(window.location.href);
-      url.searchParams.delete('view');
-      if (url.hash === '#landing') {
-        url.hash = '';
-      }
+      url.searchParams.set('view', 'app');
+      url.hash = '';
       window.history.pushState({}, '', url.toString());
     }
   };
@@ -99,10 +102,10 @@ export const AppContent: React.FC = () => {
   useEffect(() => {
     const handlePopState = () => {
       const params = new URLSearchParams(window.location.search);
-      if (params.get('view') === 'landing' || window.location.hash === '#landing') {
-        setCurrentView('landing');
-      } else {
+      if (params.get('view') === 'app' || window.location.hash === '#app') {
         setCurrentView('app');
+      } else {
+        setCurrentView('landing');
       }
     };
     window.addEventListener('popstate', handlePopState);
