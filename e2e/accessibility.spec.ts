@@ -160,4 +160,27 @@ test.describe('WCAG 2.2 AA Accessibility Audits', () => {
       assertNoAxeViolations(mobileDrawerResults.violations);
     }
   });
+
+  test('opens empty document workbench setup tab first when launching visualizer from landing page', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/');
+    await page.waitForSelector('header');
+
+    // Click "Launch Visualizer" from the hero
+    const launchBtn = page.getByRole('button', { name: 'Launch Visualizer' }).first();
+    await expect(launchBtn).toBeVisible();
+    await launchBtn.click();
+
+    // Verify URL updated to ?view=app
+    await expect(page).toHaveURL(/\?view=app/);
+
+    // Verify empty state workbench is displayed first
+    const emptyRegion = page.getByRole('region', { name: 'Document setup and sample selection' });
+    await expect(emptyRegion).toBeVisible();
+    await expect(page.getByText('Document Chunking & RAG Cost Workbench')).toBeVisible();
+    await expect(page.getByText('Drop your document here, or click to browse')).toBeVisible();
+
+    // Verify header displays "No document"
+    await expect(page.getByText('No document')).toBeVisible();
+  });
 });

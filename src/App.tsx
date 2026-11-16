@@ -89,7 +89,11 @@ export const AppContent: React.FC = () => {
   const handleLaunchAppFromLanding = (sampleId?: string) => {
     if (sampleId) {
       handleSelectSample(sampleId);
+    } else {
+      // Clear document so Document Chunking & RAG Cost Workbench (EmptyState) appears first
+      handleNewDocument();
     }
+    setActiveTab('visualizer');
     setCurrentView('app');
     if (typeof window !== 'undefined' && window.history?.pushState) {
       const url = new URL(window.location.href);
