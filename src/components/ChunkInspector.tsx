@@ -149,7 +149,7 @@ export const ChunkInspector: React.FC<ChunkInspectorProps> = ({
 
           {/* Navigation & Dismiss */}
           <div className="flex items-center space-x-1">
-            <Tooltip content="Previous chunk (K or Left Arrow)">
+            <Tooltip content="Previous chunk" shortcut="K" position="bottom">
               <button
                 onClick={onSelectPrev}
                 disabled={chunk.index === 0}
@@ -159,7 +159,7 @@ export const ChunkInspector: React.FC<ChunkInspectorProps> = ({
                 <ChevronLeft className="h-3.5 w-3.5" />
               </button>
             </Tooltip>
-            <Tooltip content="Next chunk (J or Right Arrow)">
+            <Tooltip content="Next chunk" shortcut="J" position="bottom">
               <button
                 onClick={onSelectNext}
                 disabled={chunk.index === totalChunks - 1}
@@ -170,7 +170,7 @@ export const ChunkInspector: React.FC<ChunkInspectorProps> = ({
               </button>
             </Tooltip>
             <span className="w-px h-3.5 bg-separator mx-0.5" />
-            <Tooltip content="Close inspector (Esc or ])">
+            <Tooltip content="Close inspector" shortcut="Esc" position="bottom">
               <button
                 onClick={onClose}
                 className="h-6 w-6 rounded-control flex items-center justify-center text-text-secondary hover:text-text hover:bg-surface-2 active-press focus-ring transition-colors"
@@ -301,26 +301,27 @@ export const ChunkInspector: React.FC<ChunkInspectorProps> = ({
               <span className="text-2xs font-semibold text-text-secondary select-none">
                 Content preview
               </span>
-              <button
-                onClick={handleCopy}
-                className="h-6 px-2 rounded-control bg-surface-2 hover:bg-surface-3 border border-separator text-text-secondary hover:text-text flex items-center space-x-1 font-mono text-xs transition-colors active-press focus-ring"
-                title="Copy chunk text (or C)"
-              >
-                {hasCopied ? (
-                  <>
-                    <Check className="h-3 w-3 text-status-success" />
-                    <span>Copied</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-3 w-3" />
-                    <span>Copy</span>
-                    <kbd className="text-2xs px-1 py-0.2 rounded bg-surface-1 dark:bg-surface-3 border border-separator text-text-secondary">
-                      C
-                    </kbd>
-                  </>
-                )}
-              </button>
+              <Tooltip content="Copy chunk text" shortcut="C" position="left">
+                <button
+                  onClick={handleCopy}
+                  className="h-6 px-2 rounded-control bg-surface-2 hover:bg-surface-3 border border-separator text-text-secondary hover:text-text flex items-center space-x-1 font-mono text-xs transition-colors active-press focus-ring"
+                >
+                  {hasCopied ? (
+                    <>
+                      <Check className="h-3 w-3 text-status-success" />
+                      <span>Copied</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-3 w-3" />
+                      <span>Copy</span>
+                      <kbd className="text-2xs px-1 py-0.2 rounded bg-surface-1 dark:bg-surface-3 border border-separator text-text-secondary">
+                        C
+                      </kbd>
+                    </>
+                  )}
+                </button>
+              </Tooltip>
             </div>
             <div
               tabIndex={0}

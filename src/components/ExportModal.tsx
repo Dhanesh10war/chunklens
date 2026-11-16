@@ -3,6 +3,7 @@ import { ChunkMetadata, ChunkingConfig, CodeExportFramework } from '../engine/ty
 import { generateExportCode } from '../exporters/codeExporters';
 import { exportChunksToJson, exportChunksToCsv, downloadFile } from '../exporters/dataExporters';
 import { copyToClipboard } from '../utils/clipboard';
+import { Tooltip } from './ui/Tooltip';
 import { X, Copy, Check, Terminal, FileJson, FileSpreadsheet, Code2, Cpu, Boxes, FileCode } from 'lucide-react';
 import { cn } from '../utils/cn';
 
@@ -108,22 +109,24 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           {/* Dataset Download Action Group */}
           {chunks.length > 0 && (
             <div className="flex items-center gap-1.5 pb-1.5">
-              <button
-                onClick={handleDownloadJson}
-                className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-control text-xs bg-surface-2 hover:bg-surface-3 text-text border border-separator active-press focus-ring transition-colors shadow-subtle"
-                title="Download chunked data as JSON with full metadata"
-              >
-                <FileJson className="h-3.5 w-3.5 text-accent" />
-                <span className="font-mono">JSON</span>
-              </button>
-              <button
-                onClick={handleDownloadCsv}
-                className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-control text-xs bg-surface-2 hover:bg-surface-3 text-text border border-separator active-press focus-ring transition-colors shadow-subtle"
-                title="Download chunked data as CSV spreadsheet"
-              >
-                <FileSpreadsheet className="h-3.5 w-3.5 text-status-success" />
-                <span className="font-mono">CSV</span>
-              </button>
+              <Tooltip content="Download chunked data as JSON with full metadata" position="top">
+                <button
+                  onClick={handleDownloadJson}
+                  className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-control text-xs bg-surface-2 hover:bg-surface-3 text-text border border-separator active-press focus-ring transition-colors shadow-subtle"
+                >
+                  <FileJson className="h-3.5 w-3.5 text-accent" />
+                  <span className="font-mono">JSON</span>
+                </button>
+              </Tooltip>
+              <Tooltip content="Download chunked data as CSV spreadsheet" position="top">
+                <button
+                  onClick={handleDownloadCsv}
+                  className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-control text-xs bg-surface-2 hover:bg-surface-3 text-text border border-separator active-press focus-ring transition-colors shadow-subtle"
+                >
+                  <FileSpreadsheet className="h-3.5 w-3.5 text-status-success" />
+                  <span className="font-mono">CSV</span>
+                </button>
+              </Tooltip>
             </div>
           )}
         </div>

@@ -77,6 +77,9 @@
   --accent-solid-hover: var(--accent-hover);
   --on-accent: #FFFFFF;
 
+  /* Tooltip Stacking (Above drawers, modals, popovers & command palette) */
+  --z-tooltip: 100;
+
   /* Heatmap Color Scale Tokens (Strictly In-Gamut sRGB) */
   --heat-low: oklch(0.96 0.004 270);
   --heat-mid: oklch(0.82 0.07 165);
@@ -157,6 +160,9 @@
   --accent-solid: var(--accent);
   --accent-solid-hover: var(--accent-hover);
   --on-accent: #FFFFFF;
+
+  /* Tooltip Stacking (Above drawers, modals, popovers & command palette) */
+  --z-tooltip: 100;
 
   /* Heatmap Color Scale Tokens (Strictly In-Gamut sRGB) */
   --heat-low: oklch(0.24 0.006 270);

@@ -128,7 +128,7 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="w-full flex items-center justify-between gap-2 lg:gap-3 min-w-0">
         {/* Left Cluster: Sidebar Toggle, Brand + Version, Document Title & Reset */}
         <div className="flex items-center space-x-2 shrink-0 sm:min-w-0">
-          <Tooltip content={isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'} shortcut="[">
+          <Tooltip content={isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'} shortcut="[" position="bottom">
             <button
               onClick={onToggleSidebar}
               className="h-8 w-8 rounded-control flex items-center justify-center text-text-secondary hover:text-text hover:bg-surface-2 transition-colors active-press focus-ring shrink-0"
@@ -151,20 +151,19 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Document Name & Reset */}
           <div className="hidden sm:flex items-center space-x-1.5 min-w-0 max-w-[130px] md:max-w-[180px] min-[1400px]:max-w-[240px]">
-            <span
-              className="text-xs text-text-secondary truncate font-mono"
-              title={documentTitle || 'No document loaded'}
-            >
-              {documentTitle || <span className="text-text-tertiary italic">No document</span>}
-            </span>
+            <Tooltip content={documentTitle || 'No document loaded'} position="bottom">
+              <span className="text-xs text-text-secondary truncate font-mono">
+                {documentTitle || <span className="text-text-tertiary italic">No document</span>}
+              </span>
+            </Tooltip>
             {detectedFormat && (
-              <Tooltip content={`Format: ${detectedFormat.label} · Recommended: ${detectedFormat.recommendedStrategy}`}>
+              <Tooltip content={`Format: ${detectedFormat.label} · Recommended: ${detectedFormat.recommendedStrategy}`} position="bottom">
                 <span className="px-1.5 py-0.5 rounded-control text-xs font-mono font-medium border border-separator bg-surface-2 text-text select-none shrink-0">
                   {detectedFormat.badge}
                 </span>
               </Tooltip>
             )}
-            <Tooltip content="Reset document & settings to defaults">
+            <Tooltip content="Reset document & settings to defaults" position="bottom">
               <button
                 onClick={onResetDocument}
                 className="h-6 px-1.5 rounded-control text-xs text-text-tertiary hover:text-text hover:bg-surface-2 flex items-center space-x-1 active-press focus-ring transition-colors shrink-0"
@@ -218,7 +217,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Quick Actions (Command Palette Search-style Pill) */}
           {onOpenCommandPalette && (
-            <Tooltip content="Open command palette" shortcut="⌘K" wrapperClassName="hidden xl:inline-flex">
+            <Tooltip content="Open command palette" shortcut="⌘K" position="bottom" wrapperClassName="hidden xl:inline-flex">
               <button
                 onClick={onOpenCommandPalette}
                 onMouseEnter={onPrefetchCommandPalette}
@@ -237,7 +236,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Tokenizers Comparison: Icon-only at <1400px, Full above */}
           {onTokenizerClick && (
-            <Tooltip content="Compare multi-model token variance and embedding costs" wrapperClassName="hidden md:inline-flex">
+            <Tooltip content="Compare multi-model token variance and embedding costs" position="bottom" wrapperClassName="hidden md:inline-flex">
               <button
                 onClick={onTokenizerClick}
                 onMouseEnter={onPrefetchTokenizer}
@@ -252,7 +251,7 @@ export const Header: React.FC<HeaderProps> = ({
           )}
 
           {/* Compare Benchmark Mode: Icon-only at <1400px */}
-          <Tooltip content="Side-by-side benchmark comparison" wrapperClassName="hidden md:inline-flex">
+          <Tooltip content="Side-by-side benchmark comparison" position="bottom" wrapperClassName="hidden md:inline-flex">
             <button
               onClick={onToggleCompare}
               className={cn(
@@ -269,7 +268,7 @@ export const Header: React.FC<HeaderProps> = ({
           </Tooltip>
 
           {/* Single Solid Accent Primary Action: Export - Always Visible */}
-          <Tooltip content="Export code implementation and chunk datasets" shortcut="⌘E">
+          <Tooltip content="Export code implementation and chunk datasets" shortcut="⌘E" position="bottom">
             <Button
               variant="primary"
               size="sm"
@@ -285,7 +284,7 @@ export const Header: React.FC<HeaderProps> = ({
           </Tooltip>
 
           {/* Theme Toggle: Kept visible at >= 768px (Amendment E) */}
-          <Tooltip content={isDark ? 'Switch to light mode' : 'Switch to dark mode'} wrapperClassName="hidden md:flex">
+          <Tooltip content={isDark ? 'Switch to light mode' : 'Switch to dark mode'} position="bottom" wrapperClassName="hidden md:flex">
             <button
               onClick={toggleTheme}
               className="h-8 w-8 rounded-control flex items-center justify-center text-text-secondary hover:text-text hover:bg-surface-2 transition-colors active-press focus-ring"
@@ -296,7 +295,7 @@ export const Header: React.FC<HeaderProps> = ({
           </Tooltip>
 
           {/* GitHub Source Link */}
-          <Tooltip content="GitHub repository" wrapperClassName="hidden min-[1400px]:inline-flex">
+          <Tooltip content="GitHub repository" position="bottom" wrapperClassName="hidden min-[1400px]:inline-flex">
             <a
               href="https://github.com/Dhanesh10war/chunklens"
               target="_blank"
@@ -310,7 +309,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Overflow Menu Trigger: Visible when viewport is < 1400px */}
           <div className="relative min-[1400px]:hidden">
-            <Tooltip content="More actions">
+            <Tooltip content="More actions" position="bottom">
               <button
                 ref={overflowTriggerRef}
                 onClick={() => setIsOverflowOpen((prev) => !prev)}

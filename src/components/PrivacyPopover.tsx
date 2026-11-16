@@ -53,7 +53,7 @@ export const PrivacyPopover: React.FC<PrivacyPopoverProps> = ({ className }) => 
   return (
     <div className={cn('relative inline-flex items-center', className)} ref={popoverRef}>
       {/* Trigger Button: Quiet success-tinted pill */}
-      <Tooltip content="Zero network egress · 100% client-side (Click for audit steps)">
+      <Tooltip content="Zero network egress · 100% client-side (Click for audit steps)" position="bottom" disabled={isOpen}>
         <button
           onClick={() => setIsOpen((prev) => !prev)}
           aria-expanded={isOpen}

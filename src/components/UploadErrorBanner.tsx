@@ -3,6 +3,7 @@ import { AlertCircle, X, FolderOpen, Copy, Check } from 'lucide-react';
 import { UploadErrorInfo } from '../hooks/useDocumentUpload';
 import { copyToClipboard } from '../utils/clipboard';
 import { cn } from '../utils/cn';
+import { Tooltip } from './ui/Tooltip';
 
 interface UploadErrorBannerProps {
   error: UploadErrorInfo;
@@ -72,14 +73,15 @@ export const UploadErrorBanner: React.FC<UploadErrorBannerProps> = ({
             </div>
           )}
         </div>
-        <button
-          onClick={onDismiss}
-          className="text-text-tertiary hover:text-text-primary p-0.5 rounded hover:bg-surface focus-ring transition-colors shrink-0"
-          title="Dismiss alert"
-          aria-label="Dismiss"
-        >
-          <X className="h-3.5 w-3.5" />
-        </button>
+        <Tooltip content="Dismiss alert" position="left">
+          <button
+            onClick={onDismiss}
+            className="text-text-tertiary hover:text-text-primary p-0.5 rounded hover:bg-surface focus-ring transition-colors shrink-0"
+            aria-label="Dismiss"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </Tooltip>
       </div>
 
       {onChooseAnotherFile && (

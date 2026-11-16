@@ -3,6 +3,7 @@ import { ChunkingConfig, ChunkingStrategy, ChunkUnit, TokenizerEncoding } from '
 import { executeChunking } from '../engine/chunkers';
 import { SplitSquareVertical, Check } from 'lucide-react';
 import { cn } from '../utils/cn';
+import { Tooltip } from './ui/Tooltip';
 
 interface ComparisonViewProps {
   primaryConfig: ChunkingConfig;
@@ -173,14 +174,15 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({ primaryConfig, r
               <span>avg {resultB.avgTokensPerChunk} tok</span>
               <span className="text-emerald-400">{resultB.executionTimeMs} ms</span>
               {onApplyVariantB && (
-                <button
-                  onClick={() => onApplyVariantB(secondaryConfig)}
-                  className="h-6 flex items-center space-x-1 px-2.5 rounded bg-primary-600/20 border border-primary-500/40 text-primary-300 hover:bg-primary-600/30 text-xs font-sans font-medium active-press focus-ring transition-colors ml-2"
-                  title="Apply Variant B parameters as the active primary configuration"
-                >
-                  <Check className="h-3 w-3" />
-                  <span>Apply as Active</span>
-                </button>
+                <Tooltip content="Apply Variant B parameters as active configuration" position="bottom">
+                  <button
+                    onClick={() => onApplyVariantB(secondaryConfig)}
+                    className="h-6 flex items-center space-x-1 px-2.5 rounded bg-primary-600/20 border border-primary-500/40 text-primary-300 hover:bg-primary-600/30 text-xs font-sans font-medium active-press focus-ring transition-colors ml-2"
+                  >
+                    <Check className="h-3 w-3" />
+                    <span>Apply as Active</span>
+                  </button>
+                </Tooltip>
               )}
             </div>
           </div>

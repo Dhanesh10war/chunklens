@@ -125,6 +125,9 @@ export default {
         modal: 'var(--shadow-modal)',
         'inner-highlight': 'inset 0 1px 0 oklch(1 0 0 / 0.06)',
       },
+      zIndex: {
+        tooltip: 'var(--z-tooltip)',
+      },
     },
   },
   plugins: [],

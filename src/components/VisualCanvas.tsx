@@ -14,6 +14,7 @@ import {
 import { cn } from '../utils/cn';
 import { copyToClipboard } from '../utils/clipboard';
 import { SegmentedControl } from './ui/SegmentedControl';
+import { Tooltip } from './ui/Tooltip';
 import { useToast } from './ui/Toast';
 import { UploadErrorInfo } from '../hooks/useDocumentUpload';
 import { UploadErrorBanner } from './UploadErrorBanner';
@@ -199,27 +200,29 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
 
           {selectedChunk && (
             <div className="flex items-center space-x-1 font-mono text-xs">
-              <button
-                disabled={selectedChunk.index === 0}
-                onClick={handlePrevChunk}
-                className="h-6 w-6 rounded-control bg-surface-2 border border-separator text-text-secondary disabled:opacity-25 hover:text-text hover:bg-surface-3 flex items-center justify-center active-press focus-ring transition-colors"
-                title="Inspect previous chunk (or Left Arrow / K)"
-                aria-label="Previous chunk"
-              >
-                <ChevronLeft className="h-3 w-3" />
-              </button>
+              <Tooltip content="Previous chunk" shortcut="K" position="bottom">
+                <button
+                  disabled={selectedChunk.index === 0}
+                  onClick={handlePrevChunk}
+                  className="h-6 w-6 rounded-control bg-surface-2 border border-separator text-text-secondary disabled:opacity-25 hover:text-text hover:bg-surface-3 flex items-center justify-center active-press focus-ring transition-colors"
+                  aria-label="Previous chunk"
+                >
+                  <ChevronLeft className="h-3 w-3" />
+                </button>
+              </Tooltip>
               <span className="text-accent bg-accent-subtle px-2 py-0.5 rounded-control text-xs tabular-nums font-mono border border-accent/20">
                 #{selectedChunk.index + 1} of {chunks.length} ({selectedChunk.tokenCount} tok)
               </span>
-              <button
-                disabled={selectedChunk.index === chunks.length - 1}
-                onClick={handleNextChunk}
-                className="h-6 w-6 rounded-control bg-surface-2 border border-separator text-text-secondary disabled:opacity-25 hover:text-text hover:bg-surface-3 flex items-center justify-center active-press focus-ring transition-colors"
-                title="Inspect next chunk (or Right Arrow / J)"
-                aria-label="Next chunk"
-              >
-                <ChevronRight className="h-3 w-3" />
-              </button>
+              <Tooltip content="Next chunk" shortcut="J" position="bottom">
+                <button
+                  disabled={selectedChunk.index === chunks.length - 1}
+                  onClick={handleNextChunk}
+                  className="h-6 w-6 rounded-control bg-surface-2 border border-separator text-text-secondary disabled:opacity-25 hover:text-text hover:bg-surface-3 flex items-center justify-center active-press focus-ring transition-colors"
+                  aria-label="Next chunk"
+                >
+                  <ChevronRight className="h-3 w-3" />
+                </button>
+              </Tooltip>
             </div>
           )}
         </div>
@@ -340,31 +343,31 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
                           </span>
                         )}
                         {chunk.isOrphan && (
-                          <span
-                            className="text-xs text-status-warn font-sans font-medium px-1.5 py-0.2 rounded-control bg-status-warn-subtle border border-status-warn/20"
-                            title="Mid-word or unclosed syntax cut"
-                          >
-                            Cut
-                          </span>
+                          <Tooltip content="Mid-word or unclosed syntax cut">
+                            <span className="text-xs text-status-warn font-sans font-medium px-1.5 py-0.2 rounded-control bg-status-warn-subtle border border-status-warn/20">
+                              Cut
+                            </span>
+                          </Tooltip>
                         )}
                       </div>
 
                       {/* Copy Action Button */}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCopyChunk(chunk.id, chunk.text);
-                        }}
-                        className="h-7 w-7 rounded-control hover:bg-surface-2 text-text-tertiary hover:text-text flex items-center justify-center transition-all focus-ring shrink-0"
-                        title="Copy chunk text"
-                        aria-label={`Copy chunk ${chunk.index + 1}`}
-                      >
-                        {copiedId === chunk.id ? (
-                          <Check className="h-3.5 w-3.5 text-status-success" />
-                        ) : (
-                          <Copy className="h-3 w-3" />
-                        )}
-                      </button>
+                      <Tooltip content="Copy chunk text">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCopyChunk(chunk.id, chunk.text);
+                          }}
+                          className="h-7 w-7 rounded-control hover:bg-surface-2 text-text-tertiary hover:text-text flex items-center justify-center transition-all focus-ring shrink-0"
+                          aria-label={`Copy chunk ${chunk.index + 1}`}
+                        >
+                          {copiedId === chunk.id ? (
+                            <Check className="h-3.5 w-3.5 text-status-success" />
+                          ) : (
+                            <Copy className="h-3 w-3" />
+                          )}
+                        </button>
+                      </Tooltip>
                     </div>
 
                     {/* Chunk Text Content (Prose in sans, code in mono) */}
@@ -434,21 +437,22 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
                           />
                         </div>
                       </div>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCopyChunk(chunk.id, chunk.text);
-                        }}
-                        className="h-7 w-7 rounded-control hover:bg-surface-3 text-text-tertiary hover:text-text flex items-center justify-center transition-colors focus-ring"
-                        title="Copy chunk text"
-                        aria-label={`Copy chunk ${chunk.index + 1}`}
-                      >
-                        {copiedId === chunk.id ? (
-                          <Check className="h-3.5 w-3.5 text-status-success" />
-                        ) : (
-                          <Copy className="h-3 w-3" />
-                        )}
-                      </button>
+                      <Tooltip content="Copy chunk text">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCopyChunk(chunk.id, chunk.text);
+                          }}
+                          className="h-7 w-7 rounded-control hover:bg-surface-3 text-text-tertiary hover:text-text flex items-center justify-center transition-colors focus-ring"
+                          aria-label={`Copy chunk ${chunk.index + 1}`}
+                        >
+                          {copiedId === chunk.id ? (
+                            <Check className="h-3.5 w-3.5 text-status-success" />
+                          ) : (
+                            <Copy className="h-3 w-3" />
+                          )}
+                        </button>
+                      </Tooltip>
                     </div>
                   </div>
 

@@ -5,6 +5,7 @@ import { Layers, AlertTriangle, ArrowRight, Info, X } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { useTheme } from '../utils/theme';
 import { getHeatmapCellEntry } from '../utils/heatmapColors';
+import { Tooltip } from './ui/Tooltip';
 
 type HeatmapBucket = 'self' | 'high' | 'moderate' | 'low';
 
@@ -116,105 +117,110 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
           {/* Bucket Swatches (clickable filters) */}
           <div className="flex items-center space-x-1.5 sm:space-x-2">
             {/* Self Swatch */}
-            <button
-              type="button"
-              role="button"
-              aria-pressed={activeBucket === 'self'}
-              onClick={() => setActiveBucket((curr) => (curr === 'self' ? null : 'self'))}
-              className={cn(
-                'flex items-center space-x-1.5 px-2 py-1 rounded-control border transition-all active-press focus-ring select-none text-xs',
-                activeBucket === 'self'
-                  ? 'bg-accent/15 border-accent text-text font-medium ring-1 ring-accent'
-                  : 'bg-surface-2/60 border-separator hover:border-separator/80 text-text-secondary hover:text-text'
-              )}
-              title="Filter self-similarity diagonal cells (click to toggle)"
-            >
-              <span
-                className="w-2.5 h-2.5 rounded-control shrink-0 border border-accent/60 shadow-subtle"
-                style={{ backgroundColor: 'var(--heat-self)' }}
-              />
-              <span>Self</span>
-            </button>
+            <Tooltip content="Filter self-similarity diagonal cells (click to toggle)" position="bottom">
+              <button
+                type="button"
+                role="button"
+                aria-pressed={activeBucket === 'self'}
+                onClick={() => setActiveBucket((curr) => (curr === 'self' ? null : 'self'))}
+                className={cn(
+                  'flex items-center space-x-1.5 px-2 py-1 rounded-control border transition-all active-press focus-ring select-none text-xs',
+                  activeBucket === 'self'
+                    ? 'bg-accent/15 border-accent text-text font-medium ring-1 ring-accent'
+                    : 'bg-surface-2/60 border-separator hover:border-separator/80 text-text-secondary hover:text-text'
+                )}
+              >
+                <span
+                  className="w-2.5 h-2.5 rounded-control shrink-0 border border-accent/60 shadow-subtle"
+                  style={{ backgroundColor: 'var(--heat-self)' }}
+                />
+                <span>Self</span>
+              </button>
+            </Tooltip>
 
             {/* High Swatch */}
-            <button
-              type="button"
-              role="button"
-              aria-pressed={activeBucket === 'high'}
-              onClick={() => setActiveBucket((curr) => (curr === 'high' ? null : 'high'))}
-              className={cn(
-                'flex items-center space-x-1.5 px-2 py-1 rounded-control border transition-all active-press focus-ring select-none text-xs',
-                activeBucket === 'high'
-                  ? 'bg-accent/15 border-accent text-text font-medium ring-1 ring-accent'
-                  : 'bg-surface-2/60 border-separator hover:border-separator/80 text-text-secondary hover:text-text'
-              )}
-              title="Filter high overlap pairs (>=70% similarity, click to toggle)"
-            >
-              <span
-                className="w-2.5 h-2.5 rounded-control shrink-0 border border-separator/40"
-                style={{
-                  backgroundColor: 'var(--heat-high)',
-                  boxShadow: isDark
-                    ? 'inset 0 0 0 1px color-mix(in srgb, var(--heat-text-on-dark) 55%, transparent)'
-                    : 'inset 0 0 0 1px color-mix(in srgb, var(--heat-text-on-light) 55%, transparent)',
-                }}
-              />
-              <span>High (≥70%)</span>
-            </button>
+            <Tooltip content="Filter high overlap pairs (≥70% similarity, click to toggle)" position="bottom">
+              <button
+                type="button"
+                role="button"
+                aria-pressed={activeBucket === 'high'}
+                onClick={() => setActiveBucket((curr) => (curr === 'high' ? null : 'high'))}
+                className={cn(
+                  'flex items-center space-x-1.5 px-2 py-1 rounded-control border transition-all active-press focus-ring select-none text-xs',
+                  activeBucket === 'high'
+                    ? 'bg-accent/15 border-accent text-text font-medium ring-1 ring-accent'
+                    : 'bg-surface-2/60 border-separator hover:border-separator/80 text-text-secondary hover:text-text'
+                )}
+              >
+                <span
+                  className="w-2.5 h-2.5 rounded-control shrink-0 border border-separator/40"
+                  style={{
+                    backgroundColor: 'var(--heat-high)',
+                    boxShadow: isDark
+                      ? 'inset 0 0 0 1px color-mix(in srgb, var(--heat-text-on-dark) 55%, transparent)'
+                      : 'inset 0 0 0 1px color-mix(in srgb, var(--heat-text-on-light) 55%, transparent)',
+                  }}
+                />
+                <span>High (≥70%)</span>
+              </button>
+            </Tooltip>
 
             {/* Moderate Swatch */}
-            <button
-              type="button"
-              role="button"
-              aria-pressed={activeBucket === 'moderate'}
-              onClick={() => setActiveBucket((curr) => (curr === 'moderate' ? null : 'moderate'))}
-              className={cn(
-                'flex items-center space-x-1.5 px-2 py-1 rounded-control border transition-all active-press focus-ring select-none text-xs',
-                activeBucket === 'moderate'
-                  ? 'bg-accent/15 border-accent text-text font-medium ring-1 ring-accent'
-                  : 'bg-surface-2/60 border-separator hover:border-separator/80 text-text-secondary hover:text-text'
-              )}
-              title="Filter moderate similarity (40%-69%, click to toggle)"
-            >
-              <span
-                className="w-2.5 h-2.5 rounded-control shrink-0 border border-separator/40"
-                style={{ backgroundColor: 'var(--heat-mid)' }}
-              />
-              <span>Moderate</span>
-            </button>
+            <Tooltip content="Filter moderate similarity (40%-69%, click to toggle)" position="bottom">
+              <button
+                type="button"
+                role="button"
+                aria-pressed={activeBucket === 'moderate'}
+                onClick={() => setActiveBucket((curr) => (curr === 'moderate' ? null : 'moderate'))}
+                className={cn(
+                  'flex items-center space-x-1.5 px-2 py-1 rounded-control border transition-all active-press focus-ring select-none text-xs',
+                  activeBucket === 'moderate'
+                    ? 'bg-accent/15 border-accent text-text font-medium ring-1 ring-accent'
+                    : 'bg-surface-2/60 border-separator hover:border-separator/80 text-text-secondary hover:text-text'
+                )}
+              >
+                <span
+                  className="w-2.5 h-2.5 rounded-control shrink-0 border border-separator/40"
+                  style={{ backgroundColor: 'var(--heat-mid)' }}
+                />
+                <span>Moderate</span>
+              </button>
+            </Tooltip>
 
             {/* Low/None Swatch */}
-            <button
-              type="button"
-              role="button"
-              aria-pressed={activeBucket === 'low'}
-              onClick={() => setActiveBucket((curr) => (curr === 'low' ? null : 'low'))}
-              className={cn(
-                'flex items-center space-x-1.5 px-2 py-1 rounded-control border transition-all active-press focus-ring select-none text-xs',
-                activeBucket === 'low'
-                  ? 'bg-accent/15 border-accent text-text font-medium ring-1 ring-accent'
-                  : 'bg-surface-2/60 border-separator hover:border-separator/80 text-text-secondary hover:text-text'
-              )}
-              title="Filter low similarity (<40%, click to toggle)"
-            >
-              <span
-                className="w-2.5 h-2.5 rounded-control shrink-0 border border-separator"
-                style={{ backgroundColor: 'var(--heat-low)' }}
-              />
-              <span>Low / None</span>
-            </button>
+            <Tooltip content="Filter low similarity (<40%, click to toggle)" position="bottom">
+              <button
+                type="button"
+                role="button"
+                aria-pressed={activeBucket === 'low'}
+                onClick={() => setActiveBucket((curr) => (curr === 'low' ? null : 'low'))}
+                className={cn(
+                  'flex items-center space-x-1.5 px-2 py-1 rounded-control border transition-all active-press focus-ring select-none text-xs',
+                  activeBucket === 'low'
+                    ? 'bg-accent/15 border-accent text-text font-medium ring-1 ring-accent'
+                    : 'bg-surface-2/60 border-separator hover:border-separator/80 text-text-secondary hover:text-text'
+                )}
+              >
+                <span
+                  className="w-2.5 h-2.5 rounded-control shrink-0 border border-separator"
+                  style={{ backgroundColor: 'var(--heat-low)' }}
+                />
+                <span>Low / None</span>
+              </button>
+            </Tooltip>
           </div>
 
           {/* Continuous Ramp Gradient Bar */}
           <div className="flex items-center space-x-1.5 pl-1 sm:pl-2 border-l border-separator">
             <span className="font-mono text-2xs text-text-tertiary select-none tabular-nums">0%</span>
-            <div
-              className="h-2 w-16 sm:w-24 rounded-full border border-separator/40 shadow-subtle shrink-0"
-              style={{
-                background: 'linear-gradient(to right, var(--heat-low), var(--heat-mid), var(--heat-high))',
-              }}
-              title="Continuous similarity color ramp: Low (0%) -> Mid (~50%) -> High (100%)"
-            />
+            <Tooltip content="Continuous similarity color ramp: Low (0%) -> Mid (~50%) -> High (100%)" position="bottom">
+              <div
+                className="h-2 w-16 sm:w-24 rounded-full border border-separator/40 shadow-subtle shrink-0 cursor-help"
+                style={{
+                  background: 'linear-gradient(to right, var(--heat-low), var(--heat-mid), var(--heat-high))',
+                }}
+              />
+            </Tooltip>
             <span className="font-mono text-2xs text-text-tertiary select-none tabular-nums">100%</span>
           </div>
         </div>

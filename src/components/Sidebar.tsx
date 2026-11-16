@@ -7,6 +7,7 @@ import { Select } from './ui/Select';
 import { Input } from './ui/Input';
 import { SegmentedControl } from './ui/SegmentedControl';
 import { SliderWithInput } from './ui/SliderWithInput';
+import { Tooltip } from './ui/Tooltip';
 import { DetectedFormatInfo } from '../utils/fileFormatDetector';
 import { cn } from '../utils/cn';
 
@@ -135,15 +136,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 Document source
               </span>
               {onNewDocument && (
-                <button
-                  onClick={onNewDocument}
-                  className="inline-flex items-center gap-1 text-xs font-sans text-accent hover:text-accent-hover focus-ring rounded-control px-1.5 py-0.5 transition-colors"
-                  title="Clear document and open empty dropzone"
-                  aria-label="New document: clear canvas"
-                >
-                  <FilePlus className="h-3.5 w-3.5" />
-                  <span>New document</span>
-                </button>
+                <Tooltip content="Clear document and open empty dropzone" position="right">
+                  <button
+                    onClick={onNewDocument}
+                    className="inline-flex items-center gap-1 text-xs font-sans text-accent hover:text-accent-hover focus-ring rounded-control px-1.5 py-0.5 transition-colors"
+                    aria-label="New document: clear canvas"
+                  >
+                    <FilePlus className="h-3.5 w-3.5" />
+                    <span>New document</span>
+                  </button>
+                </Tooltip>
               )}
             </div>
 
