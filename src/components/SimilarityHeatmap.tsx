@@ -3,13 +3,26 @@ import { ChunkMetadata } from '../engine/types';
 import { computeChunkSimilarityMatrix, RedundantPair } from '../engine/embeddings/vectorizer';
 import { Layers, AlertTriangle, ArrowRight, Info, X } from 'lucide-react';
 import { cn } from '../utils/cn';
+import { useTheme } from '../utils/theme';
+import { getHeatmapCellEntry } from '../utils/heatmapColors';
+
+type HeatmapBucket = 'self' | 'high' | 'moderate' | 'low';
+
+function getCellBucket(score: number, isSelf: boolean): HeatmapBucket {
+  if (isSelf) return 'self';
+  if (score >= 0.70) return 'high';
+  if (score >= 0.40) return 'moderate';
+  return 'low';
+}
 
 interface SimilarityHeatmapProps {
   chunks: ChunkMetadata[];
 }
 
 export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) => {
+  const { isDark } = useTheme();
   const [selectedCell, setSelectedCell] = useState<{ row: number; col: number } | null>(null);
+  const [activeBucket, setActiveBucket] = useState<HeatmapBucket | null>(null);
 
   // Compute similarity matrix and metrics
   const similarityData = useMemo(() => {
@@ -45,19 +58,10 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
       }
     : null;
 
-  const getScoreColor = (score: number, isSelf: boolean) => {
-    if (isSelf) return 'bg-accent text-white font-semibold border-accent/40 shadow-subtle';
-    if (score >= 0.7) return 'bg-accent/35 text-text font-medium border-accent/40';
-    if (score >= 0.4) return 'bg-accent/20 text-text border-accent/25';
-    if (score >= 0.15) return 'bg-accent/10 text-text-secondary border-separator';
-    if (score > 0) return 'bg-surface-2/60 text-text-tertiary border-separator/40';
-    return 'bg-surface-1/40 text-text-tertiary/60 border-separator/20';
-  };
-
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-bg text-text">
       {/* Metric Highlights Bar */}
-      <div className="px-4 sm:px-6 py-2.5 border-b border-separator bg-surface-1/40 mac-translucent flex flex-wrap items-center justify-between gap-4 text-xs select-none">
+      <div className="px-4 sm:px-6 py-2.5 border-b border-separator bg-surface-1/40 surface-translucent flex flex-wrap items-center justify-between gap-4 text-xs select-none">
         <div className="flex items-center space-x-4 sm:space-x-6 flex-wrap gap-y-2">
           {/* Average Continuity */}
           <div className="flex items-center space-x-2">
@@ -107,23 +111,111 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
           </div>
         </div>
 
-        {/* Legend */}
-        <div className="flex items-center space-x-3 text-xs text-text-secondary">
-          <div className="flex items-center space-x-1.5">
-            <div className="w-2.5 h-2.5 rounded-control bg-accent border border-accent/50" />
-            <span>Self</span>
+        {/* Interactive Legend with Real Swatches & Gradient Bar */}
+        <div className="flex items-center space-x-3 text-xs text-text-secondary flex-wrap gap-y-2">
+          {/* Bucket Swatches (clickable filters) */}
+          <div className="flex items-center space-x-1.5 sm:space-x-2">
+            {/* Self Swatch */}
+            <button
+              type="button"
+              role="button"
+              aria-pressed={activeBucket === 'self'}
+              onClick={() => setActiveBucket((curr) => (curr === 'self' ? null : 'self'))}
+              className={cn(
+                'flex items-center space-x-1.5 px-2 py-1 rounded-control border transition-all active-press focus-ring select-none text-xs',
+                activeBucket === 'self'
+                  ? 'bg-accent/15 border-accent text-text font-medium ring-1 ring-accent'
+                  : 'bg-surface-2/60 border-separator hover:border-separator/80 text-text-secondary hover:text-text'
+              )}
+              title="Filter self-similarity diagonal cells (click to toggle)"
+            >
+              <span
+                className="w-2.5 h-2.5 rounded-control shrink-0 border border-accent/60 shadow-subtle"
+                style={{ backgroundColor: 'var(--heat-self)' }}
+              />
+              <span>Self</span>
+            </button>
+
+            {/* High Swatch */}
+            <button
+              type="button"
+              role="button"
+              aria-pressed={activeBucket === 'high'}
+              onClick={() => setActiveBucket((curr) => (curr === 'high' ? null : 'high'))}
+              className={cn(
+                'flex items-center space-x-1.5 px-2 py-1 rounded-control border transition-all active-press focus-ring select-none text-xs',
+                activeBucket === 'high'
+                  ? 'bg-accent/15 border-accent text-text font-medium ring-1 ring-accent'
+                  : 'bg-surface-2/60 border-separator hover:border-separator/80 text-text-secondary hover:text-text'
+              )}
+              title="Filter high overlap pairs (>=70% similarity, click to toggle)"
+            >
+              <span
+                className="w-2.5 h-2.5 rounded-control shrink-0 border border-separator/40"
+                style={{
+                  backgroundColor: 'var(--heat-high)',
+                  boxShadow: isDark
+                    ? 'inset 0 0 0 1px color-mix(in srgb, var(--heat-text-on-dark) 55%, transparent)'
+                    : 'inset 0 0 0 1px color-mix(in srgb, var(--heat-text-on-light) 55%, transparent)',
+                }}
+              />
+              <span>High (≥70%)</span>
+            </button>
+
+            {/* Moderate Swatch */}
+            <button
+              type="button"
+              role="button"
+              aria-pressed={activeBucket === 'moderate'}
+              onClick={() => setActiveBucket((curr) => (curr === 'moderate' ? null : 'moderate'))}
+              className={cn(
+                'flex items-center space-x-1.5 px-2 py-1 rounded-control border transition-all active-press focus-ring select-none text-xs',
+                activeBucket === 'moderate'
+                  ? 'bg-accent/15 border-accent text-text font-medium ring-1 ring-accent'
+                  : 'bg-surface-2/60 border-separator hover:border-separator/80 text-text-secondary hover:text-text'
+              )}
+              title="Filter moderate similarity (40%-69%, click to toggle)"
+            >
+              <span
+                className="w-2.5 h-2.5 rounded-control shrink-0 border border-separator/40"
+                style={{ backgroundColor: 'var(--heat-mid)' }}
+              />
+              <span>Moderate</span>
+            </button>
+
+            {/* Low/None Swatch */}
+            <button
+              type="button"
+              role="button"
+              aria-pressed={activeBucket === 'low'}
+              onClick={() => setActiveBucket((curr) => (curr === 'low' ? null : 'low'))}
+              className={cn(
+                'flex items-center space-x-1.5 px-2 py-1 rounded-control border transition-all active-press focus-ring select-none text-xs',
+                activeBucket === 'low'
+                  ? 'bg-accent/15 border-accent text-text font-medium ring-1 ring-accent'
+                  : 'bg-surface-2/60 border-separator hover:border-separator/80 text-text-secondary hover:text-text'
+              )}
+              title="Filter low similarity (<40%, click to toggle)"
+            >
+              <span
+                className="w-2.5 h-2.5 rounded-control shrink-0 border border-separator"
+                style={{ backgroundColor: 'var(--heat-low)' }}
+              />
+              <span>Low / None</span>
+            </button>
           </div>
-          <div className="flex items-center space-x-1.5">
-            <div className="w-2.5 h-2.5 rounded-control bg-accent/35 border border-accent/40" />
-            <span>High (&ge;70%)</span>
-          </div>
-          <div className="flex items-center space-x-1.5">
-            <div className="w-2.5 h-2.5 rounded-control bg-accent/20 border border-accent/25" />
-            <span>Moderate</span>
-          </div>
-          <div className="flex items-center space-x-1.5">
-            <div className="w-2.5 h-2.5 rounded-control bg-surface-2 border border-separator" />
-            <span>Low / None</span>
+
+          {/* Continuous Ramp Gradient Bar */}
+          <div className="flex items-center space-x-1.5 pl-1 sm:pl-2 border-l border-separator">
+            <span className="font-mono text-2xs text-text-tertiary select-none tabular-nums">0%</span>
+            <div
+              className="h-2 w-16 sm:w-24 rounded-full border border-separator/40 shadow-subtle shrink-0"
+              style={{
+                background: 'linear-gradient(to right, var(--heat-low), var(--heat-mid), var(--heat-high))',
+              }}
+              title="Continuous similarity color ramp: Low (0%) -> Mid (~50%) -> High (100%)"
+            />
+            <span className="font-mono text-2xs text-text-tertiary select-none tabular-nums">100%</span>
           </div>
         </div>
       </div>
@@ -131,10 +223,15 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
       {/* Main Workspace: Heatmap Grid & Inspector */}
       <div className="flex-1 flex overflow-hidden">
         {/* Heatmap Matrix Grid Container */}
-        <div className="flex-1 overflow-auto p-4 sm:p-6 flex flex-col">
+        <div
+          tabIndex={0}
+          role="region"
+          aria-label="Similarity matrix grid"
+          className="flex-1 overflow-auto p-4 sm:p-6 flex flex-col focus:outline-none"
+        >
           <div className="inline-block min-w-full">
             {/* Top Column Index Header */}
-            <div className="flex items-center mb-1 pl-12">
+            <div className="flex items-center mb-1 pl-12 sticky top-0 z-10 bg-bg pb-1">
               {chunks.map((_, colIdx) => (
                 <div
                   key={`col-head-${colIdx}`}
@@ -152,7 +249,7 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
                 <div key={`row-${rowIdx}`} className="flex items-center">
                   {/* Row Index Label */}
                   <div
-                    className="w-12 text-right pr-2 font-mono text-xs text-text-tertiary shrink-0 select-none tabular-nums"
+                    className="w-12 text-right pr-2 font-mono text-xs text-text-tertiary shrink-0 select-none tabular-nums sticky left-0 z-10 bg-bg"
                     title={`Chunk #${rowIdx + 1}`}
                   >
                     #{rowIdx + 1}
@@ -166,16 +263,33 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
                         selectedCell?.row === rowIdx && selectedCell?.col === colIdx;
                       const isAdjacent = Math.abs(rowIdx - colIdx) === 1;
 
+                      const entry = isSelf
+                        ? {
+                            backgroundColor: 'var(--heat-self)',
+                            color: '#FFFFFF',
+                            boxShadow: undefined,
+                          }
+                        : getHeatmapCellEntry(score, isDark);
+
+                      const bucket = getCellBucket(score, isSelf);
+                      const isDimmed = activeBucket !== null && bucket !== activeBucket;
+
                       return (
                         <button
                           key={`cell-${rowIdx}-${colIdx}`}
                           onClick={() => setSelectedCell({ row: rowIdx, col: colIdx })}
+                          style={{
+                            backgroundColor: entry.backgroundColor,
+                            color: entry.color,
+                            boxShadow: entry.boxShadow,
+                          }}
                           title={`Chunk #${rowIdx + 1} ↔ Chunk #${colIdx + 1}: ${(score * 100).toFixed(0)}% similarity${
                             isAdjacent ? ' (Adjacent boundary)' : ''
                           }`}
                           className={cn(
-                            'w-10 h-8 rounded-control text-xs font-mono border flex items-center justify-center transition-all select-none active-press focus-ring tabular-nums',
-                            getScoreColor(score, isSelf),
+                            'w-10 h-8 rounded-control text-xs font-mono border flex items-center justify-center select-none tabular-nums font-medium transition-all active-press focus-ring',
+                            'border-separator/30 hover:-translate-y-[1px] hover:outline hover:outline-2 hover:outline-accent hover:outline-offset-1 hover:z-20',
+                            isDimmed && 'opacity-30 hover:opacity-100',
                             isSelected && 'ring-2 ring-accent ring-offset-1 ring-offset-bg z-10',
                             isAdjacent && !isSelf && 'border-dashed'
                           )}
@@ -266,9 +380,9 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
 
         {/* Selected Pair Deep Comparison Drawer */}
         {activePair && (
-          <div className="w-80 md:w-96 border-l border-separator bg-surface-1 mac-translucent flex flex-col overflow-hidden animate-in slide-in-from-right-4 duration-150">
+          <div className="w-80 md:w-96 border-l border-separator bg-surface-1 surface-translucent flex flex-col overflow-hidden animate-in slide-in-from-right-4 duration-150">
             {/* Drawer Header */}
-            <div className="p-3.5 border-b border-separator bg-surface-1/50 mac-translucent flex items-center justify-between">
+            <div className="p-3.5 border-b border-separator bg-surface-1/50 surface-translucent flex items-center justify-between">
               <div>
                 <h4 className="text-xs font-semibold text-text">
                   Chunk #{activePair.row + 1} ↔ Chunk #{activePair.col + 1} Comparison

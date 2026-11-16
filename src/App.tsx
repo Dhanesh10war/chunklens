@@ -205,7 +205,7 @@ export const AppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-bg-base text-text-primary font-sans antialiased">
-      {/* 52px macOS Unified Header */}
+      {/* 52px Unified Header */}
       <Header
         documentTitle={documentTitle}
         detectedFormat={detectedFormat}

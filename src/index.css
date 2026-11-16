@@ -44,15 +44,15 @@
 }
 
 /* ==========================================================================
-   Apple HIG OKLCH Color Tokens: Light (Default root) & Dark ([data-theme="dark"])
+   Design System OKLCH Color Tokens: Light (Default root) & Dark ([data-theme="dark"])
    60-30-10 Split: 60% neutral background, 30% surfaces, 10% accent.
-   Cool neutrals (hue ~270, chroma < 0.01) harmonizing with Apple Blue.
+   Cool neutrals (hue ~270, chroma < 0.01) harmonizing with System Accent.
    ========================================================================== */
 
 :root,
 [data-theme="light"],
 .light {
-  /* Core Apple HIG Surfaces (Light) */
+  /* Core Surfaces (Light) */
   --bg: oklch(0.97 0.002 270);
   --surface-1: oklch(1 0 0);
   --surface-2: oklch(0.955 0.003 270);
@@ -68,14 +68,22 @@
   --separator: oklch(0 0 0 / 0.08);
   --separator-subtle: oklch(0 0 0 / 0.04);
 
-  /* Single System Accent: Apple Blue */
-  --accent: oklch(0.50 0.21 255);          /* 5.5:1 vs surface-1, 5.0:1 vs subtle */
-  --accent-hover: oklch(0.45 0.21 255);
-  --accent-subtle: oklch(0.62 0.21 255 / 0.08);
-  --accent-ring: oklch(0.62 0.21 255);
-  --accent-solid: #4338CA;    /* 7.90:1 contrast vs #FFFFFF (Amendment A) */
-  --accent-solid-hover: #3730A3;
+  /* Unified System Accent (In-gamut sRGB, >= 4.5:1 vs #FFFFFF) */
+  --accent: oklch(0.55 0.15 255);
+  --accent-hover: oklch(0.50 0.15 255);
+  --accent-subtle: oklch(0.55 0.15 255 / 0.10);
+  --accent-ring: var(--accent);
+  --accent-solid: var(--accent);
+  --accent-solid-hover: var(--accent-hover);
   --on-accent: #FFFFFF;
+
+  /* Heatmap Color Scale Tokens (Strictly In-Gamut sRGB) */
+  --heat-low: oklch(0.96 0.004 270);
+  --heat-mid: oklch(0.82 0.07 165);
+  --heat-high: oklch(0.64 0.11 165);
+  --heat-self: var(--accent);
+  --heat-text-on-light: oklch(0.25 0.01 270);
+  --heat-text-on-dark: oklch(0.99 0 0);
 
   /* Muted Semantic Indicators */
   --status-success: oklch(0.60 0.13 145);
@@ -125,7 +133,7 @@
 
 [data-theme="dark"],
 .dark {
-  /* Core Apple HIG Surfaces (Dark) - Designed separately, lighter surfaces for elevation */
+  /* Core Surfaces (Dark) - Lighter surfaces for elevation */
   --bg: oklch(0.15 0.004 270);
   --surface-1: oklch(0.21 0.005 270);
   --surface-2: oklch(0.26 0.006 270);
@@ -141,14 +149,22 @@
   --separator: oklch(1 0 0 / 0.10);
   --separator-subtle: oklch(1 0 0 / 0.05);
 
-  /* Single System Accent: Slightly desaturated for dark mode */
-  --accent: oklch(0.67 0.19 255);          /* 6.4:1 vs dark surfaces */
-  --accent-hover: oklch(0.72 0.19 255);
-  --accent-subtle: oklch(0.67 0.19 255 / 0.14);
-  --accent-ring: oklch(0.67 0.19 255);
-  --accent-solid: #4F46E5;    /* 6.29:1 contrast vs #FFFFFF (Amendment A) */
-  --accent-solid-hover: #4338CA;
+  /* Unified System Accent (In-gamut sRGB, >= 4.5:1 vs #FFFFFF) */
+  --accent: oklch(0.55 0.15 255);
+  --accent-hover: oklch(0.50 0.15 255);
+  --accent-subtle: oklch(0.55 0.15 255 / 0.14);
+  --accent-ring: var(--accent);
+  --accent-solid: var(--accent);
+  --accent-solid-hover: var(--accent-hover);
   --on-accent: #FFFFFF;
+
+  /* Heatmap Color Scale Tokens (Strictly In-Gamut sRGB) */
+  --heat-low: oklch(0.24 0.006 270);
+  --heat-mid: oklch(0.36 0.06 165);
+  --heat-high: oklch(0.48 0.085 165);
+  --heat-self: var(--accent);
+  --heat-text-on-light: oklch(0.18 0.01 270);
+  --heat-text-on-dark: oklch(0.97 0 0);
 
   /* Muted Semantic Indicators */
   --status-success: oklch(0.72 0.12 145);
@@ -207,7 +223,7 @@
   body {
     background-color: var(--bg);
     color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif;
+    font-family: "Inter", system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
@@ -228,14 +244,14 @@ html.theme-transitioning *::after {
   transition-delay: 0s !important;
 }
 
-/* Apple macOS-style Translucent Surface with Solid Fallback */
-.mac-translucent {
+/* Translucent Surface with Solid Fallback */
+.surface-translucent {
   background-color: var(--surface-toolbar);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
 }
 @supports not ((backdrop-filter: blur(20px)) or (-webkit-backdrop-filter: blur(20px))) {
-  .mac-translucent {
+  .surface-translucent {
     background-color: var(--surface-1);
   }
 }
@@ -256,7 +272,7 @@ html.theme-transitioning *::after {
   background: var(--text-tertiary);
 }
 
-/* Apple HIG Interaction and Craft Utilities */
+/* Interaction and Craft Utilities */
 @layer utilities {
   .active-press {
     transition: transform 120ms cubic-bezier(0.2, 0, 0, 1);

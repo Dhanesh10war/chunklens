@@ -108,7 +108,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <aside
       className={cn(
-        'w-full sm:w-[320px] mac-translucent border-r border-separator flex flex-col h-full shrink-0 select-none overflow-y-auto z-20',
+        'w-full sm:w-[320px] surface-translucent border-r border-separator flex flex-col h-full shrink-0 select-none overflow-y-auto z-20',
         className
       )}
     >
@@ -128,7 +128,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         <div className="p-4 flex flex-col gap-5 text-xs">
-          {/* SECTION 1: SOURCE (macOS Source List) */}
+          {/* SECTION 1: SOURCE */}
           <div className="flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-text select-none">
@@ -147,7 +147,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               )}
             </div>
 
-            {/* Sample Corpora Selection - macOS Source List Items */}
+            {/* Sample Corpora Selection */}
             <div className="flex flex-col gap-0.5 border border-separator rounded-card bg-surface-2/40 p-1">
               {SAMPLE_DOCUMENTS.map((sample) => {
                 const isSelected = sample.id === selectedSampleId;

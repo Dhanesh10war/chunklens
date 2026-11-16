@@ -274,7 +274,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       id: 'setting-toggle-theme',
       category: 'Panels & Settings',
       title: isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme',
-      subtitle: 'Apple HIG macOS Appearance',
+      subtitle: 'Theme Appearance',
       icon: isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />,
       action: () => {
         toggleTheme();
@@ -341,11 +341,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-xl rounded-panel bg-surface-1 mac-translucent border border-separator shadow-modal overflow-hidden flex flex-col max-h-[75vh]"
+        className="w-full max-w-xl rounded-panel bg-surface-1 surface-translucent border border-separator shadow-modal overflow-hidden flex flex-col max-h-[75vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Input Bar */}
-        <div className="h-12 px-4 border-b border-separator flex items-center space-x-3 bg-surface-1/50 mac-translucent">
+        <div className="h-12 px-4 border-b border-separator flex items-center space-x-3 bg-surface-1/50 surface-translucent">
           <Search className="h-4 w-4 text-text-tertiary shrink-0" />
           <input
             ref={inputRef}

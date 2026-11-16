@@ -63,7 +63,7 @@ export function SegmentedControl<T extends string>({
     );
   }
 
-  // Apple HIG pill-style track in surface-2 with raised white (light) or surface-3 (dark) thumb
+  // Pill-style track in surface-2 with raised white (light) or surface-3 (dark) thumb
   const sizeClasses = size === 'sm' ? 'h-7 p-0.5 text-xs' : 'h-8 p-0.5 text-xs';
 
   return (

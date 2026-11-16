@@ -191,7 +191,7 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
       )}
 
       {/* Sub-header Toolbar: View Switcher & Stepper */}
-      <div className="h-10 px-3 sm:px-6 border-b border-separator bg-surface-1/40 mac-translucent flex items-center justify-between text-xs select-none shrink-0">
+      <div className="h-10 px-3 sm:px-6 border-b border-separator bg-surface-1/40 surface-translucent flex items-center justify-between text-xs select-none shrink-0">
         <div className="flex items-center space-x-3">
           <span className="text-text-secondary font-mono text-xs tabular-nums hidden sm:inline">
             {chunks.length} chunks generated

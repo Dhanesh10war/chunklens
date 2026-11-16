@@ -61,7 +61,7 @@ export const MetricsBar: React.FC<MetricsBarProps> = ({
           : undefined
       }
     >
-      {/* Desktop View (>=1280px): Apple HIG Metric Tiles Grid */}
+      {/* Desktop View (>=1280px): Metric Tiles Grid */}
       <div className="hidden xl:grid grid-cols-5 gap-2.5">
         {/* Tile 1: Chunks */}
         <div className="bg-surface-1 border border-separator rounded-card p-2.5 flex flex-col justify-between shadow-subtle transition-colors">
@@ -187,7 +187,7 @@ export const MetricsBar: React.FC<MetricsBarProps> = ({
         </div>
       </div>
 
-      {/* Responsive View (<1280px): Compact Apple HIG Tiles */}
+      {/* Responsive View (<1280px): Compact Tiles */}
       <div className="xl:hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 text-xs">
         {/* Metric 1: Chunks */}
         <div className="bg-surface-1 border border-separator rounded-card p-2 flex flex-col justify-between">

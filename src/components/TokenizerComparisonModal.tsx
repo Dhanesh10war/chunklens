@@ -59,13 +59,13 @@ export const TokenizerComparisonModal: React.FC<TokenizerComparisonModalProps> =
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-150">
       <div
-        className="bg-surface-1 mac-translucent border border-separator rounded-panel max-w-4xl w-full max-h-[90vh] flex flex-col shadow-modal overflow-hidden"
+        className="bg-surface-1 surface-translucent border border-separator rounded-panel max-w-4xl w-full max-h-[90vh] flex flex-col shadow-modal overflow-hidden"
         role="dialog"
         aria-modal="true"
         aria-labelledby="tokenizer-modal-title"
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-separator bg-surface-1/50 mac-translucent">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-separator bg-surface-1/50 surface-translucent">
           <div className="flex items-center space-x-3">
             <div className="p-2 rounded-control bg-surface-2 text-accent border border-separator">
               <Cpu className="h-5 w-5" />
@@ -424,7 +424,7 @@ export const TokenizerComparisonModal: React.FC<TokenizerComparisonModalProps> =
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 border-t border-separator bg-surface-1/50 mac-translucent flex items-center justify-between text-xs">
+        <div className="px-6 py-3 border-t border-separator bg-surface-1/50 surface-translucent flex items-center justify-between text-xs">
           <span className="text-text-secondary font-mono text-xs">
             ChunkLens Multi-Model Engine • 100% Client-Side Ingestion Analysis
           </span>

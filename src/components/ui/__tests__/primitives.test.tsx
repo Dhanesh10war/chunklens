@@ -11,7 +11,7 @@ describe('UI Primitives (SSR markup & accessibility)', () => {
     it('renders with children and applies variant styles', () => {
       const html = renderToString(<Button variant="primary">Export</Button>);
       expect(html).toContain('Export');
-      expect(html).toContain('bg-[var(--accent-solid)]');
+      expect(html).toContain('bg-accent');
       expect(html).toContain('focus-ring');
       expect(html).toContain('active-press');
     });
@@ -138,46 +138,51 @@ describe('UI Primitives (SSR markup & accessibility)', () => {
       return 0.2126 * sRGBtoLin(r) + 0.7152 * sRGBtoLin(g) + 0.0722 * sRGBtoLin(b);
     }
 
-    function contrastRatio(hex1: string, hex2: string): number {
-      const [r1, g1, b1] = parseHex(hex1);
-      const [r2, g2, b2] = parseHex(hex2);
-      const L1 = relativeLuminance(r1, g1, b1);
-      const L2 = relativeLuminance(r2, g2, b2);
-      const lighter = Math.max(L1, L2);
-      const darker = Math.min(L1, L2);
-      return (lighter + 0.05) / (darker + 0.05);
+    function oklchToRgbLin(l: number, c: number, h: number): [number, number, number] {
+      const hRad = (h * Math.PI) / 180;
+      const a = c * Math.cos(hRad);
+      const b = c * Math.sin(hRad);
+      const l_ = l + 0.3963377774 * a + 0.2158037573 * b;
+      const m_ = l - 0.1055613458 * a - 0.0638541728 * b;
+      const s_ = l - 0.0894841775 * a - 1.2914855480 * b;
+      const lLin = l_ * l_ * l_;
+      const mLin = m_ * m_ * m_;
+      const sLin = s_ * s_ * s_;
+      const rLin = +4.0767416621 * lLin - 3.3077115913 * mLin + 0.2309699292 * sLin;
+      const gLin = -1.2684380046 * lLin + 2.6097574011 * mLin - 0.3413193965 * sLin;
+      const bLin = -0.0041960863 * lLin - 0.7034186147 * mLin + 1.7076147010 * sLin;
+      return [Math.max(0, Math.min(1, rLin)), Math.max(0, Math.min(1, gLin)), Math.max(0, Math.min(1, bLin))];
     }
 
-    it('verifies primary button split tokens in index.css satisfy WCAG AA >= 4.5:1 (Amendment A)', () => {
+    it('verifies unified accent tokens in index.css satisfy WCAG AA >= 4.5:1 against on-accent', () => {
       const fs = require('fs');
       const path = require('path');
       const cssPath = path.resolve(__dirname, '../../../index.css');
       const css = fs.readFileSync(cssPath, 'utf8');
 
-      // Extract --accent-solid and --on-accent for root (light) and .dark
-      const lightAccentMatch = css.match(/--accent-solid:\s*(#[0-9A-Fa-f]{6});/);
-      const darkAccentMatch = css.match(/\.dark\s*\{[\s\S]*?--accent-solid:\s*(#[0-9A-Fa-f]{6});/);
+      // Extract --accent and --on-accent for root (light) and .dark
+      const lightAccentMatch = css.match(/--accent:\s*oklch\(\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*\);/);
+      const darkAccentMatch = css.match(/\.dark\s*\{[\s\S]*?--accent:\s*oklch\(\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*\);/);
       const onAccentMatch = css.match(/--on-accent:\s*(#[0-9A-Fa-f]{6});/);
 
       expect(lightAccentMatch).not.toBeNull();
       expect(darkAccentMatch).not.toBeNull();
       expect(onAccentMatch).not.toBeNull();
 
-      const lightAccent = lightAccentMatch![1];
-      const darkAccent = darkAccentMatch![1];
-      const onAccent = onAccentMatch![1];
+      const [lL, cL, hL] = [parseFloat(lightAccentMatch![1]), parseFloat(lightAccentMatch![2]), parseFloat(lightAccentMatch![3])];
+      const [lD, cD, hD] = [parseFloat(darkAccentMatch![1]), parseFloat(darkAccentMatch![2]), parseFloat(darkAccentMatch![3])];
 
-      const lightRatio = contrastRatio(lightAccent, onAccent);
-      const darkRatio = contrastRatio(darkAccent, onAccent);
+      const yLightAccent = 0.2126 * oklchToRgbLin(lL, cL, hL)[0] + 0.7152 * oklchToRgbLin(lL, cL, hL)[1] + 0.0722 * oklchToRgbLin(lL, cL, hL)[2];
+      const yDarkAccent = 0.2126 * oklchToRgbLin(lD, cD, hD)[0] + 0.7152 * oklchToRgbLin(lD, cD, hD)[1] + 0.0722 * oklchToRgbLin(lD, cD, hD)[2];
 
-      // Assert exact mathematically verified ratios
-      // Light: #4338CA vs #FFFFFF -> 7.90:1 (exceeds WCAG AA 4.5:1)
+      const [rW, gW, bW] = parseHex(onAccentMatch![1]);
+      const yWhite = relativeLuminance(rW, gW, bW);
+
+      const lightRatio = (Math.max(yWhite, yLightAccent) + 0.05) / (Math.min(yWhite, yLightAccent) + 0.05);
+      const darkRatio = (Math.max(yWhite, yDarkAccent) + 0.05) / (Math.min(yWhite, yDarkAccent) + 0.05);
+
       expect(lightRatio).toBeGreaterThanOrEqual(4.5);
-      expect(lightRatio).toBeCloseTo(7.90, 1);
-
-      // Dark: #4F46E5 vs #FFFFFF -> 6.29:1 (exceeds WCAG AA 4.5:1)
       expect(darkRatio).toBeGreaterThanOrEqual(4.5);
-      expect(darkRatio).toBeCloseTo(6.29, 1);
     });
 
     it('enforces 12px text floor with zero sub-12px Tailwind classes across src/ (Amendment B)', () => {

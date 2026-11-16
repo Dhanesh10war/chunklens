@@ -57,9 +57,9 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-150">
-      <div className="bg-surface-1 mac-translucent border border-separator rounded-panel w-full max-w-3xl overflow-hidden shadow-modal">
+      <div className="bg-surface-1 surface-translucent border border-separator rounded-panel w-full max-w-3xl overflow-hidden shadow-modal">
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-separator bg-surface-1/50 mac-translucent">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-separator bg-surface-1/50 surface-translucent">
           <div className="flex items-center space-x-2.5">
             <div className="p-1.5 rounded-control bg-surface-2 border border-separator text-accent">
               <Terminal className="h-4 w-4" />
@@ -158,7 +158,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="px-5 py-3 border-t border-separator bg-surface-1/50 mac-translucent flex flex-wrap items-center justify-between gap-2 text-xs text-text-secondary">
+        <div className="px-5 py-3 border-t border-separator bg-surface-1/50 surface-translucent flex flex-wrap items-center justify-between gap-2 text-xs text-text-secondary">
           <span className="font-mono text-text-secondary">
             Target: <span className="text-text font-medium">{config.strategy}</span> •{' '}
             <span className="tabular-nums text-text font-medium">{config.chunkSize}</span> {config.unit} •{' '}

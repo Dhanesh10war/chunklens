@@ -124,7 +124,7 @@ export const Header: React.FC<HeaderProps> = ({
   }, [isOverflowOpen]);
 
   return (
-    <header className="h-[52px] border-b border-separator mac-translucent sticky top-0 z-30 select-none flex items-center px-3 sm:px-4">
+    <header className="h-[52px] border-b border-separator surface-translucent sticky top-0 z-30 select-none flex items-center px-3 sm:px-4">
       <div className="w-full flex items-center justify-between gap-2 lg:gap-3 min-w-0">
         {/* Left Cluster: Sidebar Toggle, Brand + Version, Document Title & Reset */}
         <div className="flex items-center space-x-2 shrink-0 sm:min-w-0">
@@ -159,7 +159,7 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
             {detectedFormat && (
               <Tooltip content={`Format: ${detectedFormat.label} · Recommended: ${detectedFormat.recommendedStrategy}`}>
-                <span className="px-1.5 py-0.5 rounded-control text-xs font-mono font-medium border border-separator bg-surface-2 text-accent select-none shrink-0">
+                <span className="px-1.5 py-0.5 rounded-control text-xs font-mono font-medium border border-separator bg-surface-2 text-text select-none shrink-0">
                   {detectedFormat.badge}
                 </span>
               </Tooltip>
@@ -177,7 +177,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Center: Segmented Control Tabs (macOS Unified Toolbar Style) */}
+        {/* Center: Segmented Control Tabs */}
         {activeTab && onChangeTab && (
           <div className="hidden md:flex items-center justify-center shrink-0">
             <SegmentedControl
@@ -333,7 +333,7 @@ export const Header: React.FC<HeaderProps> = ({
                 role="menu"
                 aria-label="More actions menu"
                 onKeyDown={handleMenuKeyDown}
-                className="absolute right-0 top-full mt-1.5 w-56 rounded-card mac-translucent border border-separator shadow-modal py-1 z-50 focus:outline-none"
+                className="absolute right-0 top-full mt-1.5 w-56 rounded-card surface-translucent border border-separator shadow-modal py-1 z-50 focus:outline-none"
               >
                 {/* Compare Mode (at <768px) */}
                 <button

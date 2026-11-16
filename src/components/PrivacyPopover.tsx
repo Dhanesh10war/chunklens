@@ -52,7 +52,7 @@ export const PrivacyPopover: React.FC<PrivacyPopoverProps> = ({ className }) => 
 
   return (
     <div className={cn('relative inline-flex items-center', className)} ref={popoverRef}>
-      {/* Trigger Button: Quiet success-tinted pill per Apple HIG */}
+      {/* Trigger Button: Quiet success-tinted pill */}
       <Tooltip content="Zero network egress · 100% client-side (Click for audit steps)">
         <button
           onClick={() => setIsOpen((prev) => !prev)}
@@ -71,7 +71,7 @@ export const PrivacyPopover: React.FC<PrivacyPopoverProps> = ({ className }) => 
         <div
           role="dialog"
           aria-label="Privacy & Zero Network Egress Verification"
-          className="absolute top-full right-0 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 mt-2 w-80 sm:w-96 rounded-card mac-translucent border border-separator shadow-modal p-4 z-50 text-xs font-sans text-text-secondary animate-in fade-in duration-100"
+          className="absolute top-full right-0 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 mt-2 w-80 sm:w-96 rounded-card surface-translucent border border-separator shadow-modal p-4 z-50 text-xs font-sans text-text-secondary animate-in fade-in duration-100"
         >
           {/* Header */}
           <div className="flex items-center justify-between pb-2.5 border-b border-separator">

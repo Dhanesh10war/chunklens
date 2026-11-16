@@ -8,7 +8,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Apple HIG Core Surfaces & Neutrals
+        // Core Surfaces & Neutrals
         bg: 'var(--bg)',
         'surface-1': 'var(--surface-1)',
         'surface-2': 'var(--surface-2)',
@@ -27,15 +27,25 @@ export default {
           tertiary: 'var(--text-tertiary)',
         },
 
-        // Apple System Accent (Blue)
+        // Unified System Accent
         accent: {
           DEFAULT: 'var(--accent)',
           hover: 'var(--accent-hover)',
           subtle: 'var(--accent-subtle)',
           ring: 'var(--accent-ring)',
-          solid: 'var(--accent-solid)',
-          'solid-hover': 'var(--accent-solid-hover)',
+          solid: 'var(--accent)',
+          'solid-hover': 'var(--accent-hover)',
           'on-solid': 'var(--on-accent)',
+        },
+
+        // Heatmap Tokens
+        heat: {
+          low: 'var(--heat-low)',
+          mid: 'var(--heat-mid)',
+          high: 'var(--heat-high)',
+          self: 'var(--heat-self)',
+          'text-light': 'var(--heat-text-on-light)',
+          'text-dark': 'var(--heat-text-on-dark)',
         },
 
         // Muted Semantic Status Indicators
@@ -92,8 +102,8 @@ export default {
         semibold: '600',
       },
       fontFamily: {
-        sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"Inter"', 'system-ui', 'sans-serif'],
-        mono: ['"SF Mono"', 'ui-monospace', '"JetBrains Mono"', 'Menlo', 'monospace'],
+        sans: ['"Inter"', 'system-ui', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       borderRadius: {
         none: '0',
