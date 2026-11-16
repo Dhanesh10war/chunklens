@@ -50,20 +50,27 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({
     <header className="sticky top-0 z-40 surface-translucent border-b border-separator select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
         {/* Logo & Brand */}
-        <button
-          type="button"
-          onClick={() => handleTabClick('overview')}
-          className="flex items-center space-x-2.5 shrink-0 focus-ring rounded-control text-left"
-          aria-label="ChunkLens Home Overview"
-        >
-          <div className="h-7 w-7 rounded-control bg-surface-2 border border-separator flex items-center justify-center text-accent shrink-0 shadow-subtle">
-            <Layers className="h-4 w-4" />
+        <div className="flex items-center space-x-2 shrink-0">
+          <button
+            type="button"
+            onClick={() => handleTabClick('overview')}
+            className="flex items-center space-x-2.5 shrink-0 focus-ring rounded-control text-left"
+            aria-label="ChunkLens Home Overview"
+          >
+            <div className="h-7 w-7 rounded-control bg-surface-2 border border-separator flex items-center justify-center text-accent shrink-0 shadow-subtle">
+              <Layers className="h-4 w-4" />
+            </div>
+            <span className="font-semibold text-sm tracking-tight text-text">ChunkLens</span>
+            <span className="text-2xs font-mono text-text-tertiary px-1.5 py-0.5 rounded-control bg-surface-2 border border-separator hidden sm:inline">
+              v0.3.0
+            </span>
+          </button>
+
+          <div className="hidden lg:inline-flex items-center space-x-1.5 px-2 py-0.5 rounded-full bg-surface-2 border border-separator text-2xs font-mono text-text-tertiary">
+            <span className="h-1.5 w-1.5 rounded-full bg-status-success inline-block animate-pulse" />
+            <span>Zero Egress</span>
           </div>
-          <span className="font-semibold text-sm tracking-tight text-text">ChunkLens</span>
-          <span className="text-2xs font-mono text-text-tertiary px-1.5 py-0.5 rounded-control bg-surface-2 border border-separator hidden sm:inline">
-            v0.3.0
-          </span>
-        </button>
+        </div>
 
         {/* Nav Links (Desktop) */}
         <nav

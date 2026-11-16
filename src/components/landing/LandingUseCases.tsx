@@ -233,17 +233,17 @@ export const LandingUseCases: React.FC<LandingUseCasesProps> = ({ onLaunchApp })
 
       {/* Bottom Proof Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-        <div className="p-6 rounded-card border border-separator bg-surface-1">
+        <div className="p-6 rounded-card border border-separator bg-surface-1 card-interactive">
           <div className="text-3xl font-bold text-accent font-mono mb-1">0%</div>
           <div className="text-xs font-semibold text-text mb-1">Data Egress</div>
           <div className="text-2xs text-text-secondary">Confidential files remain on client hardware</div>
         </div>
-        <div className="p-6 rounded-card border border-separator bg-surface-1">
-          <div className="text-3xl font-bold text-status-success font-mono mb-1">94.2%</div>
+        <div className="p-6 rounded-card border border-separator bg-surface-1 card-interactive">
+          <div className="text-3xl font-bold text-status-success-text font-mono mb-1">94.2%</div>
           <div className="text-xs font-semibold text-text mb-1">Boundary Continuity</div>
           <div className="text-2xs text-text-secondary">Measured topical coherence across partitions</div>
         </div>
-        <div className="p-6 rounded-card border border-separator bg-surface-1">
+        <div className="p-6 rounded-card border border-separator bg-surface-1 card-interactive">
           <div className="text-3xl font-bold text-text font-mono mb-1">38%</div>
           <div className="text-xs font-semibold text-text mb-1">Vector Storage Saved</div>
           <div className="text-2xs text-text-secondary">Eliminating redundant overlapping tokens</div>

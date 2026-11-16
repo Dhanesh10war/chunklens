@@ -50,7 +50,7 @@ export const LandingSecurity: React.FC<LandingSecurityProps> = ({ onLaunchApp })
 
       {/* 3 Core Security Pillars */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-        <div className="p-6 rounded-card border border-separator bg-surface-1 shadow-subtle flex flex-col justify-between">
+        <div className="p-6 rounded-card border border-separator bg-surface-1 shadow-subtle flex flex-col justify-between card-interactive">
           <div>
             <div className="h-10 w-10 rounded-control bg-status-success-subtle border border-status-success/25 flex items-center justify-center text-status-success mb-4">
               <ServerOff className="h-5 w-5" />
@@ -65,7 +65,7 @@ export const LandingSecurity: React.FC<LandingSecurityProps> = ({ onLaunchApp })
           </div>
         </div>
 
-        <div className="p-6 rounded-card border border-separator bg-surface-1 shadow-subtle flex flex-col justify-between">
+        <div className="p-6 rounded-card border border-separator bg-surface-1 shadow-subtle flex flex-col justify-between card-interactive">
           <div>
             <div className="h-10 w-10 rounded-control bg-accent-subtle border border-accent/25 flex items-center justify-center text-accent mb-4">
               <Cpu className="h-5 w-5" />
@@ -80,7 +80,7 @@ export const LandingSecurity: React.FC<LandingSecurityProps> = ({ onLaunchApp })
           </div>
         </div>
 
-        <div className="p-6 rounded-card border border-separator bg-surface-1 shadow-subtle flex flex-col justify-between">
+        <div className="p-6 rounded-card border border-separator bg-surface-1 shadow-subtle flex flex-col justify-between card-interactive">
           <div>
             <div className="h-10 w-10 rounded-control bg-surface-2 border border-separator flex items-center justify-center text-text mb-4">
               <EyeOff className="h-5 w-5" />
@@ -149,25 +149,25 @@ export const LandingSecurity: React.FC<LandingSecurityProps> = ({ onLaunchApp })
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-          <div className="p-4 rounded-control bg-surface-1 border border-separator">
+          <div className="p-4 rounded-control bg-surface-1 border border-separator card-interactive">
             <div className="font-semibold text-text mb-1">SOC 2 Type II</div>
             <div className="text-2xs text-text-secondary leading-relaxed">
               Data processing boundary remains strictly on your client workstation.
             </div>
           </div>
-          <div className="p-4 rounded-control bg-surface-1 border border-separator">
+          <div className="p-4 rounded-control bg-surface-1 border border-separator card-interactive">
             <div className="font-semibold text-text mb-1">HIPAA Compatible</div>
             <div className="text-2xs text-text-secondary leading-relaxed">
               Zero Protected Health Information (PHI) is ever transmitted over the wire.
             </div>
           </div>
-          <div className="p-4 rounded-control bg-surface-1 border border-separator">
+          <div className="p-4 rounded-control bg-surface-1 border border-separator card-interactive">
             <div className="font-semibold text-text mb-1">GDPR / CCPA</div>
             <div className="text-2xs text-text-secondary leading-relaxed">
               No personal data collected, stored, or processed on remote infrastructure.
             </div>
           </div>
-          <div className="p-4 rounded-control bg-surface-1 border border-separator">
+          <div className="p-4 rounded-control bg-surface-1 border border-separator card-interactive">
             <div className="font-semibold text-text mb-1">Air-Gapped Friendly</div>
             <div className="text-2xs text-text-secondary leading-relaxed">
               Fully functional behind enterprise corporate firewalls and VPNs with zero network access.

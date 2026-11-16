@@ -145,7 +145,7 @@ console.log(\`Generated \${docs.length} partitions.\`);`,
 
       {/* Parameter Optimization Guide */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
-        <div className="p-6 rounded-card border border-separator bg-surface-1 shadow-subtle">
+        <div className="p-6 rounded-card border border-separator bg-surface-1 shadow-subtle card-interactive">
           <div className="h-10 w-10 rounded-control bg-accent-subtle border border-accent/25 flex items-center justify-center text-accent mb-4">
             <Sliders className="h-5 w-5" />
           </div>
@@ -166,7 +166,7 @@ console.log(\`Generated \${docs.length} partitions.\`);`,
           </ul>
         </div>
 
-        <div className="p-6 rounded-card border border-separator bg-surface-1 shadow-subtle">
+        <div className="p-6 rounded-card border border-separator bg-surface-1 shadow-subtle card-interactive">
           <div className="h-10 w-10 rounded-control bg-surface-2 border border-separator flex items-center justify-center text-text mb-4">
             <Keyboard className="h-5 w-5" />
           </div>

@@ -8,6 +8,7 @@ import {
   Activity,
   Code2,
   FileText,
+  Sparkles,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { cn } from '../../utils/cn';
@@ -18,12 +19,13 @@ interface LandingFeaturesProps {
 
 export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp }) => {
   const [selectedSplitter, setSelectedSplitter] = useState<'recursive' | 'character' | 'token' | 'markdown'>('recursive');
+  const [selectedModel, setSelectedModel] = useState<'cl100k' | 'o200k' | 'p50k'>('cl100k');
 
   const splitterDetails = {
     recursive: {
       title: 'Recursive Character Splitter',
       bestFor: 'General documentation, articles, and mixed prose',
-      delimiters: `["\\n\\n", "\\n", " ", ""]`,
+      delimiters: '["\\n\\n", "\\n", " ", ""]',
       description:
         'Recursively traverses an array of delimiters from highest semantic hierarchy (double newline for paragraphs) down to single characters. Keeps related thoughts grouped together until forced to partition by size.',
       sampleOutput: [
@@ -35,7 +37,7 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
     character: {
       title: 'Fixed Character Splitter',
       bestFor: 'Raw unformatted text feeds or fixed-size legacy ingest buffers',
-      delimiters: `Fixed step size (e.g. 1,000 characters)`,
+      delimiters: 'Fixed step size (e.g. 1,000 characters)',
       description:
         'Slices text at uniform character offsets regardless of natural linguistic boundaries. Simple and fast, but frequently splits words and clauses mid-sentence.',
       sampleOutput: [
@@ -47,7 +49,7 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
     token: {
       title: 'Exact BPE Token Splitter',
       bestFor: 'Hard model context limits and exact embedding API cost planning',
-      delimiters: `Byte-Pair Encoding tokens (cl100k, o200k, p50k)`,
+      delimiters: 'Byte-Pair Encoding tokens (cl100k, o200k, p50k)',
       description:
         'Measures tokens directly using client-side WebAssembly TikToken BPE encoders. Guarantees that no chunk will exceed your LLM embedding model limit.',
       sampleOutput: [
@@ -70,7 +72,26 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
     },
   };
 
+  const modelTokenBreakdowns = {
+    cl100k: {
+      name: 'cl100k_base (GPT-4, text-embedding-3)',
+      tokenCount: 7,
+      tokens: ['def', ' authenticate', '_user', '(token', ':', ' str', ') -> bool:'],
+    },
+    o200k: {
+      name: 'o200k_base (GPT-4o, omni models)',
+      tokenCount: 5,
+      tokens: ['def authenticate', '_user(', 'token:', ' str) ->', ' bool:'],
+    },
+    p50k: {
+      name: 'p50k_base (text-davinci-003, code-davinci)',
+      tokenCount: 9,
+      tokens: ['def', ' auth', 'ent', 'icate', '_user', '(', 'token', ': str', ') -> bool:'],
+    },
+  };
+
   const activeData = splitterDetails[selectedSplitter];
+  const activeModelData = modelTokenBreakdowns[selectedModel];
 
   return (
     <div className="py-12 px-4 sm:px-6 max-w-6xl mx-auto font-sans">
@@ -80,7 +101,7 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
           <Cpu className="h-3 w-3" />
           <span>Core Splitting Architecture</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-text mb-4">
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-text mb-4 title-tracking">
           Four Purpose-Built Splitters. Zero Guesswork.
         </h1>
         <p className="text-sm sm:text-base text-text-secondary leading-relaxed font-sans">
@@ -103,7 +124,7 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
               type="button"
               onClick={() => setSelectedSplitter(tab.id as typeof selectedSplitter)}
               className={cn(
-                'px-4 py-2 rounded-control text-xs font-medium transition-all flex items-center space-x-2 focus-ring',
+                'px-4 py-2 rounded-control text-xs font-medium transition-all flex items-center space-x-2 focus-ring card-interactive',
                 selectedSplitter === tab.id
                   ? 'bg-accent text-white shadow-card font-semibold'
                   : 'bg-surface-1 text-text-secondary hover:text-text hover:bg-surface-2 border border-separator'
@@ -183,9 +204,78 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
         </div>
       </div>
 
+      {/* INTERACTIVE BPE TOKENIZER VARIANCE INSPECTOR */}
+      <div className="mb-16 p-6 sm:p-8 rounded-card border border-separator bg-surface-1 shadow-subtle">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-separator">
+          <div>
+            <div className="inline-flex items-center space-x-1.5 text-2xs font-mono text-accent mb-1 font-semibold">
+              <Sparkles className="h-3 w-3" />
+              <span>Interactive Token Inspector</span>
+            </div>
+            <h3 className="text-xl font-bold text-text">Multi-Model BPE Tokenizer Variance</h3>
+            <p className="text-xs text-text-secondary mt-1">
+              Observe how the exact same code string yields different token partitions across model architectures.
+            </p>
+          </div>
+
+          {/* Model Switcher Pills */}
+          <div className="flex items-center space-x-1.5 bg-surface-2 p-1 rounded-control border border-separator text-xs font-mono">
+            {[
+              { id: 'cl100k', label: 'cl100k' },
+              { id: 'o200k', label: 'o200k' },
+              { id: 'p50k', label: 'p50k' },
+            ].map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => setSelectedModel(m.id as typeof selectedModel)}
+                className={cn(
+                  'px-2.5 py-1 rounded font-medium transition-all active-press',
+                  selectedModel === m.id
+                    ? 'bg-accent text-white shadow-subtle font-semibold'
+                    : 'text-text-secondary hover:text-text'
+                )}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="p-4 rounded-control bg-surface-2 border border-separator space-y-4 font-mono text-xs">
+          <div className="flex items-center justify-between text-2xs text-text-tertiary">
+            <span>Model: <strong className="text-text">{activeModelData.name}</strong></span>
+            <span>Token Count: <strong className="text-accent">{activeModelData.tokenCount} tokens</strong></span>
+          </div>
+
+          {/* Token Visualizer Chips */}
+          <div className="flex flex-wrap gap-1.5 p-3 rounded bg-surface-1 border border-separator">
+            {activeModelData.tokens.map((tok, i) => (
+              <span
+                key={i}
+                className={cn(
+                  'px-2 py-1 rounded text-2xs font-mono font-medium border select-none',
+                  i % 3 === 0
+                    ? 'bg-accent-subtle text-accent border-accent/25'
+                    : i % 3 === 1
+                    ? 'bg-status-success-subtle text-status-success-text border-status-success/25'
+                    : 'bg-surface-2 text-text border-separator'
+                )}
+              >
+                {tok}
+              </span>
+            ))}
+          </div>
+
+          <div className="text-2xs text-text-secondary font-sans leading-relaxed">
+            Character counts lie: a fixed 1,000 character limit creates wide token swings depending on punctuation, code syntax, and vocabulary compression. ChunkLens tokenizes client-side using real BPE tables.
+          </div>
+        </div>
+      </div>
+
       {/* Deep-Dive: Boundary Continuity Mathematics */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
-        <div className="p-6 rounded-card border border-separator bg-surface-1 shadow-subtle">
+        <div className="p-6 rounded-card border border-separator bg-surface-1 shadow-subtle card-interactive">
           <div className="h-10 w-10 rounded-control bg-accent-subtle border border-accent/25 flex items-center justify-center text-accent mb-4">
             <Activity className="h-5 w-5" />
           </div>
@@ -198,21 +288,21 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
           </div>
           <ul className="space-y-2 text-xs text-text-secondary">
             <li className="flex items-start space-x-2">
-              <Check className="h-3.5 w-3.5 text-status-success shrink-0 mt-0.5" />
+              <Check className="h-3.5 w-3.5 text-status-success-text shrink-0 mt-0.5" />
               <span><strong>&gt;40% (Smooth Flow):</strong> Seamless topical progression across partition boundaries.</span>
             </li>
             <li className="flex items-start space-x-2">
-              <Check className="h-3.5 w-3.5 text-status-warn shrink-0 mt-0.5" />
+              <Check className="h-3.5 w-3.5 text-status-warn-text shrink-0 mt-0.5" />
               <span><strong>20%–40% (Moderate Flow):</strong> Typical natural transitions between subsections.</span>
             </li>
             <li className="flex items-start space-x-2">
-              <Check className="h-3.5 w-3.5 text-status-error shrink-0 mt-0.5" />
+              <Check className="h-3.5 w-3.5 text-status-error-text shrink-0 mt-0.5" />
               <span><strong>&lt;20% (Abrupt Jump):</strong> Significant topical discontinuity or potential mid-sentence severance.</span>
             </li>
           </ul>
         </div>
 
-        <div className="p-6 rounded-card border border-separator bg-surface-1 shadow-subtle">
+        <div className="p-6 rounded-card border border-separator bg-surface-1 shadow-subtle card-interactive">
           <div className="h-10 w-10 rounded-control bg-status-warn-subtle border border-status-warn/25 flex items-center justify-center text-status-warn mb-4">
             <SplitSquareVertical className="h-5 w-5" />
           </div>
@@ -225,15 +315,15 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
           </div>
           <ul className="space-y-2 text-xs text-text-secondary">
             <li className="flex items-start space-x-2">
-              <Check className="h-3.5 w-3.5 text-status-success shrink-0 mt-0.5" />
+              <Check className="h-3.5 w-3.5 text-status-success-text shrink-0 mt-0.5" />
               <span><strong>Redundancy Alert:</strong> Flags chunk pairs sharing &gt;70% semantic overlap in real time.</span>
             </li>
             <li className="flex items-start space-x-2">
-              <Check className="h-3.5 w-3.5 text-status-success shrink-0 mt-0.5" />
+              <Check className="h-3.5 w-3.5 text-status-success-text shrink-0 mt-0.5" />
               <span><strong>Similarity Heatmap:</strong> Full N x N matrix with interactive bucket filtering.</span>
             </li>
             <li className="flex items-start space-x-2">
-              <Check className="h-3.5 w-3.5 text-status-success shrink-0 mt-0.5" />
+              <Check className="h-3.5 w-3.5 text-status-success-text shrink-0 mt-0.5" />
               <span><strong>Optimal Step Tuning:</strong> Guides you to the exact overlap threshold where context is preserved without redundancy.</span>
             </li>
           </ul>

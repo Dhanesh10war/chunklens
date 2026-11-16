@@ -75,7 +75,7 @@ export const EarlyAccessModal: React.FC<EarlyAccessModalProps> = ({
               </div>
 
               <div className="flex items-center space-x-2 text-2xs text-text-tertiary">
-                <ShieldCheck className="h-3.5 w-3.5 text-status-success shrink-0" />
+                <ShieldCheck className="h-3.5 w-3.5 text-status-success-text shrink-0" />
                 <span>Zero spam. You will only receive early beta access credentials.</span>
               </div>
 
