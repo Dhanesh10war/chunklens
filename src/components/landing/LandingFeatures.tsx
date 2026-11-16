@@ -289,7 +289,7 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
           <ul className="space-y-2 text-xs text-text-secondary">
             <li className="flex items-start space-x-2">
               <Check className="h-3.5 w-3.5 text-status-success-text shrink-0 mt-0.5" />
-              <span><strong>&gt;40% (Smooth Flow):</strong> Seamless topical progression across partition boundaries.</span>
+              <span><strong>&gt;40% (Smooth Flow):</strong> Natural topical progression across partition boundaries.</span>
             </li>
             <li className="flex items-start space-x-2">
               <Check className="h-3.5 w-3.5 text-status-warn-text shrink-0 mt-0.5" />
