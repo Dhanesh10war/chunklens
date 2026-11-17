@@ -183,4 +183,40 @@ test.describe('WCAG 2.2 AA Accessibility Audits', () => {
     // Verify header displays "No document"
     await expect(page.getByText('No document')).toBeVisible();
   });
+
+  test('evaluates landing page tab navigation and accessibility across all tabs at 1440px and 375px', async ({ page }) => {
+    // 1. Desktop 1440x900 - test each tab navigation & WCAG compliance
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/');
+    await page.waitForSelector('header');
+
+    const mainNav = page.getByRole('navigation', { name: 'Main landing navigation' });
+    const tabLabels = ['Features & Engine', 'Use Cases', 'Zero-Egress Security', 'Docs & API', 'Overview'];
+
+    for (const label of tabLabels) {
+      const tabButton = mainNav.getByRole('button', { name: label, exact: true });
+      if (await tabButton.isVisible()) {
+        await tabButton.click();
+        await page.waitForTimeout(200);
+        const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+        assertNoAxeViolations(results.violations);
+      }
+    }
+
+    // 2. Mobile 375x812 - test mobile menu drawer accessibility
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.waitForTimeout(200);
+
+    const openMenuBtn = page.getByRole('button', { name: 'Open menu' });
+    if (await openMenuBtn.isVisible()) {
+      await openMenuBtn.click();
+      await page.waitForTimeout(200);
+      const menuResults = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+      assertNoAxeViolations(menuResults.violations);
+
+      const closeMenuBtn = page.getByRole('button', { name: 'Close menu' });
+      await closeMenuBtn.click();
+      await page.waitForTimeout(200);
+    }
+  });
 });

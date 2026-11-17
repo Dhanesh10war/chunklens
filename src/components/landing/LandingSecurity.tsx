@@ -133,7 +133,12 @@ export const LandingSecurity: React.FC<LandingSecurityProps> = ({ onLaunchApp })
               )}
             </button>
           </div>
-          <pre className="overflow-x-auto whitespace-pre leading-relaxed select-all text-2xs sm:text-xs">
+          <pre
+            tabIndex={0}
+            role="region"
+            aria-label="CSP Verification Shell Command"
+            className="overflow-x-auto whitespace-pre leading-relaxed select-all text-2xs sm:text-xs focus-ring rounded"
+          >
             {curlTest}
           </pre>
         </div>

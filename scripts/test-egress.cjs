@@ -135,6 +135,10 @@ async function runEgressTest() {
     await client.send('Page.reload');
     await new Promise((r) => setTimeout(r, 2500));
 
+    console.log('[Egress Test] Navigating to app visualizer view (?view=app)...');
+    await client.send('Page.navigate', { url: `${PREVIEW_URL}?view=app` });
+    await new Promise((r) => setTimeout(r, 2500));
+
     // Verify CSP meta tag exists in DOM
     const evalResult = await client.send('Runtime.evaluate', {
       expression: 'document.querySelector("meta[http-equiv=\'Content-Security-Policy\']")?.getAttribute("content") || ""',

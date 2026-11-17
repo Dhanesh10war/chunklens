@@ -107,13 +107,14 @@ async function testPdfInMode(mode = 'preview') {
 
   const chromePort = mode === 'preview' ? 9355 : 9356;
   const userDataDir = `/tmp/cdp-pdf-${mode}-${Date.now()}`;
+  const appUrl = `${targetUrl}?view=app`;
   const chromeProc = spawn(CHROME_PATH, [
     '--headless=new',
     `--remote-debugging-port=${chromePort}`,
     `--user-data-dir=${userDataDir}`,
     '--no-sandbox',
     '--disable-gpu',
-    targetUrl,
+    appUrl,
   ]);
 
   await new Promise((r) => setTimeout(r, 1800));

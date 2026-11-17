@@ -162,7 +162,7 @@ export const LandingUseCases: React.FC<LandingUseCasesProps> = ({ onLaunchApp })
 
             {/* Problem & Risk */}
             <div className="p-4 rounded-control bg-status-warn-subtle border border-status-warn/25 space-y-2">
-              <div className="flex items-center space-x-2 text-status-warn text-xs font-semibold">
+              <div className="flex items-center space-x-2 text-status-warn-text text-xs font-semibold">
                 <AlertTriangle className="h-4 w-4 shrink-0" />
                 <span>The Boundary Failure Mode</span>
               </div>

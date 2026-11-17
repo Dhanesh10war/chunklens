@@ -69,9 +69,9 @@
   --separator-subtle: oklch(0 0 0 / 0.04);
 
   /* Unified System Accent (In-gamut sRGB, >= 4.5:1 vs #FFFFFF) */
-  --accent: oklch(0.55 0.15 255);
-  --accent-hover: oklch(0.50 0.15 255);
-  --accent-subtle: oklch(0.55 0.15 255 / 0.10);
+  --accent: oklch(0.50 0.16 255);
+  --accent-hover: oklch(0.45 0.16 255);
+  --accent-subtle: oklch(0.50 0.16 255 / 0.10);
   --accent-ring: var(--accent);
   --accent-solid: var(--accent);
   --accent-solid-hover: var(--accent-hover);

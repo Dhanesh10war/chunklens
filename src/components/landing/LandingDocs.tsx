@@ -138,7 +138,12 @@ console.log(\`Generated \${docs.length} partitions.\`);`,
         </div>
 
         {/* Code Block */}
-        <pre className="p-4 rounded-control bg-surface-2 border border-separator font-mono text-2xs sm:text-xs text-text-secondary overflow-x-auto leading-relaxed select-all">
+        <pre
+          tabIndex={0}
+          role="region"
+          aria-label="Code example snippet"
+          className="p-4 rounded-control bg-surface-2 border border-separator font-mono text-2xs sm:text-xs text-text-secondary overflow-x-auto leading-relaxed select-all focus-ring"
+        >
           {codeSnippets[activeTab]}
         </pre>
       </div>
