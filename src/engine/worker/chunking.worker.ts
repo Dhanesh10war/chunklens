@@ -9,7 +9,8 @@ export interface ChunkWorkerRequest {
 
 export interface ChunkWorkerResponse {
   id: number;
-  result: ChunkingResult;
+  result?: ChunkingResult;
+  error?: string;
   durationMs: number;
 }
 
@@ -32,6 +33,16 @@ self.onmessage = (event: MessageEvent<ChunkWorkerRequest>) => {
 
     self.postMessage(response);
   } catch (error) {
-    console.error('Worker chunking execution failed:', error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    const durationMs = Math.round((performance.now() - start) * 10) / 10;
+    console.error('Worker chunking execution failed:', errorMsg);
+
+    const errorResponse: ChunkWorkerResponse = {
+      id,
+      error: errorMsg,
+      durationMs,
+    };
+
+    self.postMessage(errorResponse);
   }
 };

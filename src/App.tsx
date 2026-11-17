@@ -200,7 +200,7 @@ export const AppContent: React.FC = () => {
   const deferredConfig = useDeferredValue(config);
 
   // Background Web Worker offloads tokenization and chunk slicing from main UI thread
-  const { result: chunkingResult, isProcessing } = useChunkingWorker(deferredText, deferredConfig);
+  const { result: chunkingResult, isProcessing, error: workerError } = useChunkingWorker(deferredText, deferredConfig);
 
   // Global keyboard shortcuts:
   // '[' toggles sidebar, ']' toggles inspector, Cmd+K opens palette, Cmd+E opens export
@@ -420,6 +420,18 @@ export const AppContent: React.FC = () => {
             />
           ) : (
             <>
+              {/* Worker Error Banner */}
+              {workerError && (
+                <div
+                  role="alert"
+                  className="px-4 py-2 bg-status-danger/10 border-b border-status-danger/30 text-status-danger text-xs flex items-center justify-between gap-2"
+                >
+                  <span className="flex items-center gap-2">
+                    <strong>Chunking Error:</strong> {workerError}
+                  </span>
+                </div>
+              )}
+
               {/* Slim Summary Strip */}
               <MetricsBar
                 result={chunkingResult}

@@ -86,4 +86,29 @@ describe('computeChunkSimilarityMatrix', () => {
     expect(keywords01).toContain('vector');
     expect(keywords01).toContain('database');
   });
+
+  it('verifies computeChunkSimilarityMatrix at 150 chunks completes within 200ms', () => {
+    const sampleWords = ['retrieval', 'augmented', 'generation', 'vector', 'database', 'embedding', 'cosine', 'similarity', 'chunking', 'strategy', 'tokens', 'transformer'];
+    const chunks: ChunkMetadata[] = Array.from({ length: 150 }, (_, i) => ({
+      id: `chunk-${i}`,
+      index: i,
+      text: Array.from({ length: 25 }, (_, j) => sampleWords[(i * 5 + j * 2) % sampleWords.length]).join(' '),
+      tokenCount: 25,
+      charCount: 150,
+      startCharIndex: i * 150,
+      endCharIndex: i * 150 + 150,
+      overlapPrevChars: 0,
+      overlapNextChars: 0,
+      isOrphan: false,
+    }));
+
+    const start = performance.now();
+    const result = computeChunkSimilarityMatrix(chunks, 0.70);
+    const duration = performance.now() - start;
+
+    expect(result.matrix.length).toBe(150);
+    expect(result.matrix[0].length).toBe(150);
+    // Verified: execution on 150 chunks completes within 200ms
+    expect(duration).toBeLessThanOrEqual(200);
+  });
 });

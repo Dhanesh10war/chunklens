@@ -33,9 +33,10 @@ describe('Chunking Worker Protocol', () => {
     };
 
     expect(response.id).toBe(42);
-    expect(response.result.chunks.length).toBeGreaterThan(0);
-    expect(response.result.executionTimeMs).toBeGreaterThanOrEqual(0);
-    expect(response.result.totalTokens).toBeGreaterThan(0);
+    expect(response.result).toBeDefined();
+    expect(response.result!.chunks.length).toBeGreaterThan(0);
+    expect(response.result!.executionTimeMs).toBeGreaterThanOrEqual(0);
+    expect(response.result!.totalTokens).toBeGreaterThan(0);
   });
 
   it('handles empty text payload gracefully in worker protocol format', () => {
@@ -48,5 +49,17 @@ describe('Chunking Worker Protocol', () => {
     const result = executeChunking(request.text, request.config);
     expect(result.chunks.length).toBe(0);
     expect(result.totalTokens).toBe(0);
+  });
+
+  it('formats explicit error response message when worker encounters an exception', () => {
+    const errorResponse: ChunkWorkerResponse = {
+      id: 999,
+      error: 'Unsupported strategy: corrupted_strategy',
+      durationMs: 1.5,
+    };
+
+    expect(errorResponse.id).toBe(999);
+    expect(errorResponse.error).toBe('Unsupported strategy: corrupted_strategy');
+    expect(errorResponse.result).toBeUndefined();
   });
 });

@@ -72,4 +72,31 @@ describe('SimilarityHeatmap', () => {
     expect(html).toContain('background-color:var(--heat-self)');
     expect(html).toContain('color:#FFFFFF');
   });
+
+  it('caps matrix computation at 150 chunks and displays responsive notice and continuity sparkline', () => {
+    // Generate 160 mock chunks to trigger the 150 cap
+    const largeChunks: ChunkMetadata[] = Array.from({ length: 160 }, (_, i) => ({
+      id: `chunk-${i}`,
+      index: i,
+      text: `Chunk content number ${i} with information about topic ${i % 10}.`,
+      startCharIndex: i * 50,
+      endCharIndex: i * 50 + 45,
+      charCount: 45,
+      tokenCount: 10,
+      overlapPrevChars: 0,
+      overlapNextChars: 0,
+      isOrphan: false,
+    }));
+
+    const html = renderToString(<SimilarityHeatmap chunks={largeChunks} />);
+
+    // Verify capping user notice
+    expect(html).toContain('Heatmap capped at 150 chunks for responsiveness; showing adjacent-neighbor continuity');
+    expect(html).toMatch(/150.*×.*150/);
+    expect(html).toContain('capped from 160');
+
+    // Verify adjacent-neighbor continuity sparkline
+    expect(html).toContain('Adjacent-Neighbor Boundary Continuity');
+    expect(html).toContain('aria-label="Adjacent-neighbor continuity sparkline"');
+  });
 });

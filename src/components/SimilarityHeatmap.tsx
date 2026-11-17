@@ -1,6 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { ChunkMetadata } from '../engine/types';
-import { computeChunkSimilarityMatrix, RedundantPair } from '../engine/embeddings/vectorizer';
+import {
+  computeChunkSimilarityMatrix,
+  computeAdjacentContinuity,
+  RedundantPair,
+} from '../engine/embeddings/vectorizer';
 import { Layers, AlertTriangle, ArrowRight, Info, X } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { useTheme } from '../utils/theme';
@@ -8,6 +12,8 @@ import { getHeatmapCellEntry } from '../utils/heatmapColors';
 import { Tooltip } from './ui/Tooltip';
 
 type HeatmapBucket = 'self' | 'high' | 'moderate' | 'low';
+
+const MAX_HEATMAP_CHUNKS = 150;
 
 function getCellBucket(score: number, isSelf: boolean): HeatmapBucket {
   if (isSelf) return 'self';
@@ -25,15 +31,33 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
   const [selectedCell, setSelectedCell] = useState<{ row: number; col: number } | null>(null);
   const [activeBucket, setActiveBucket] = useState<HeatmapBucket | null>(null);
 
-  // Compute similarity matrix and metrics
-  const similarityData = useMemo(() => {
-    return computeChunkSimilarityMatrix(chunks, 0.70);
-  }, [chunks]);
-
-  const { matrix, adjacentSimilarities, averageContinuity, redundantPairs, sharedKeywordsMatrix } =
-    similarityData;
-
   const N = chunks.length;
+  const isCapped = N > MAX_HEATMAP_CHUNKS;
+
+  // Cap cross-similarity matrix at 150 chunks to guarantee main-thread task <= 200ms
+  const displayChunks = useMemo(
+    () => (isCapped ? chunks.slice(0, MAX_HEATMAP_CHUNKS) : chunks),
+    [chunks, isCapped]
+  );
+
+  // Compute similarity matrix for the displayed chunk subset
+  const similarityData = useMemo(() => {
+    return computeChunkSimilarityMatrix(displayChunks, 0.70);
+  }, [displayChunks]);
+
+  // Compute adjacent-neighbor continuity across the entire document in O(N) linear time
+  const fullContinuity = useMemo(() => {
+    if (!isCapped) return null;
+    return computeAdjacentContinuity(chunks);
+  }, [chunks, isCapped]);
+
+  const { matrix, redundantPairs, sharedKeywordsMatrix } = similarityData;
+  const adjacentSimilarities = fullContinuity
+    ? fullContinuity.adjacentSimilarities
+    : similarityData.adjacentSimilarities;
+  const averageContinuity = fullContinuity
+    ? fullContinuity.averageContinuity
+    : similarityData.averageContinuity;
 
   if (N === 0) {
     return (
@@ -41,7 +65,7 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
         <Layers className="h-10 w-10 text-text-tertiary mb-3" />
         <h3 className="text-sm font-semibold text-text">No Chunks Available</h3>
         <p className="text-xs text-text-secondary max-w-sm mt-1">
-          Upload or select a corpus to compute the semantic similarity heatmap and boundary continuity matrix.
+          Upload or select a corpus to compute the lexical similarity heatmap and boundary continuity matrix.
         </p>
       </div>
     );
@@ -50,8 +74,8 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
   // Selected pair details for side inspector
   const activePair = selectedCell
     ? {
-        chunkA: chunks[selectedCell.row],
-        chunkB: chunks[selectedCell.col],
+        chunkA: displayChunks[selectedCell.row],
+        chunkB: displayChunks[selectedCell.col],
         score: matrix[selectedCell.row]?.[selectedCell.col] ?? 0,
         sharedKeywords: sharedKeywordsMatrix[`${selectedCell.row}-${selectedCell.col}`] || [],
         row: selectedCell.row,
@@ -107,7 +131,8 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
           <div className="flex items-center space-x-2 text-text-tertiary font-mono text-xs">
             <span>Matrix:</span>
             <span className="text-text-secondary tabular-nums">
-              {N} × {N} ({N * N} cells)
+              {displayChunks.length} × {displayChunks.length} ({displayChunks.length * displayChunks.length} cells)
+              {isCapped && ` (capped from ${N})`}
             </span>
           </div>
         </div>
@@ -226,6 +251,58 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
         </div>
       </div>
 
+      {/* Capping user notice when document exceeds 150 chunks */}
+      {isCapped && (
+        <div className="mx-4 sm:mx-6 mt-3 px-3.5 py-2 rounded-control bg-status-warn-subtle border border-status-warn/30 text-xs text-status-warn-text flex items-center justify-between gap-3 animate-in fade-in">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-status-warn" />
+            <span>
+              <strong>Heatmap capped at 150 chunks for responsiveness; showing adjacent-neighbor continuity.</strong> (Document contains {N} chunks; pairwise cross-similarity matrix is restricted to the first 150 chunks).
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Adjacent-neighbor continuity sparkline for transitions across all chunks */}
+      {adjacentSimilarities.length > 0 && (
+        <div className="px-4 sm:px-6 pt-3 pb-1">
+          <div className="p-2.5 rounded-control bg-surface-1/50 border border-separator">
+            <div className="flex items-center justify-between text-xs mb-1.5">
+              <span className="font-medium text-text flex items-center gap-1.5">
+                <span>Adjacent-Neighbor Boundary Continuity</span>
+                <span className="text-text-tertiary font-mono text-2xs">({adjacentSimilarities.length} transitions across {N} chunks)</span>
+              </span>
+              <span className="font-mono text-xs tabular-nums text-text-secondary">
+                Avg: <strong className="text-text">{(averageContinuity * 100).toFixed(1)}%</strong>
+              </span>
+            </div>
+            <div
+              className="h-6 flex items-end gap-[1px] w-full overflow-hidden bg-surface-2/40 rounded-sm p-0.5"
+              role="img"
+              aria-label="Adjacent-neighbor continuity sparkline"
+            >
+              {adjacentSimilarities.map((sim, idx) => (
+                <div
+                  key={`spark-${idx}`}
+                  className="flex-1 min-w-[2px] rounded-t-sm transition-all hover:opacity-100"
+                  style={{
+                    height: `${Math.max(12, Math.round(sim * 100))}%`,
+                    backgroundColor:
+                      sim >= 0.70
+                        ? 'var(--heat-high)'
+                        : sim >= 0.40
+                        ? 'var(--heat-mid)'
+                        : 'var(--heat-low)',
+                    opacity: 0.85,
+                  }}
+                  title={`Chunk #${idx + 1} -> Chunk #${idx + 2}: ${(sim * 100).toFixed(1)}% boundary continuity`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Workspace: Heatmap Grid & Inspector */}
       <div className="flex-1 flex overflow-hidden">
         {/* Heatmap Matrix Grid Container */}
@@ -238,7 +315,7 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
           <div className="inline-block min-w-full">
             {/* Top Column Index Header */}
             <div className="flex items-center mb-1 pl-12 sticky top-0 z-10 bg-bg pb-1">
-              {chunks.map((_, colIdx) => (
+              {displayChunks.map((_, colIdx) => (
                 <div
                   key={`col-head-${colIdx}`}
                   className="w-10 text-center font-mono text-xs text-text-tertiary shrink-0 select-none tabular-nums"

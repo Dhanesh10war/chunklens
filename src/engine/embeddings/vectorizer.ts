@@ -172,3 +172,86 @@ export function computeChunkSimilarityMatrix(
     sharedKeywordsMatrix,
   };
 }
+
+/**
+ * Computes adjacent-neighbor lexical continuity in O(N) linear time.
+ * Compares only sequential neighbors (chunk[i] with chunk[i+1]), suitable
+ * for large documents with thousands of chunks without freezing the main thread.
+ */
+export function computeAdjacentContinuity(chunks: ChunkMetadata[]): {
+  adjacentSimilarities: number[];
+  averageContinuity: number;
+} {
+  const N = chunks.length;
+  if (N <= 1) {
+    return { adjacentSimilarities: [], averageContinuity: 1.0 };
+  }
+
+  // Tokenize chunks
+  const tokenized = chunks.map((c) => tokenizeText(c.text));
+  const docFreq = new Map<string, number>();
+
+  for (const docTokens of tokenized) {
+    const seen = new Set<string>();
+    for (const t of docTokens) {
+      if (!seen.has(t)) {
+        seen.add(t);
+        docFreq.set(t, (docFreq.get(t) || 0) + 1);
+      }
+    }
+  }
+
+  // Build TF-IDF vectors
+  const vectors = tokenized.map((docTokens) => {
+    if (docTokens.length === 0) return new Map<string, number>();
+
+    const termFreq = new Map<string, number>();
+    for (const t of docTokens) {
+      termFreq.set(t, (termFreq.get(t) || 0) + 1);
+    }
+
+    const weights = new Map<string, number>();
+    let sumSq = 0;
+
+    for (const [token, count] of termFreq.entries()) {
+      const tf = count / docTokens.length;
+      const df = docFreq.get(token) || 1;
+      const idf = Math.log((N + 1) / (df + 1)) + 1;
+      const w = tf * idf;
+      weights.set(token, w);
+      sumSq += w * w;
+    }
+
+    const norm = Math.sqrt(sumSq) || 1e-9;
+    const normalized = new Map<string, number>();
+    for (const [token, weight] of weights.entries()) {
+      normalized.set(token, weight / norm);
+    }
+    return normalized;
+  });
+
+  const adjacentSimilarities: number[] = [];
+  for (let i = 0; i < N - 1; i++) {
+    const vecA = vectors[i];
+    const vecB = vectors[i + 1];
+    let dot = 0;
+    for (const [token, weightA] of vecA.entries()) {
+      const weightB = vecB.get(token);
+      if (weightB) {
+        dot += weightA * weightB;
+      }
+    }
+    adjacentSimilarities.push(Math.max(0, Math.min(1, Math.round(dot * 1000) / 1000)));
+  }
+
+  const averageContinuity =
+    adjacentSimilarities.length > 0
+      ? Math.round(
+          (adjacentSimilarities.reduce((sum, val) => sum + val, 0) /
+            adjacentSimilarities.length) *
+            1000
+        ) / 1000
+      : 1.0;
+
+  return { adjacentSimilarities, averageContinuity };
+}
