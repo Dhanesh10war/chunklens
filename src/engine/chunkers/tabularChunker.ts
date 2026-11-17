@@ -1,6 +1,6 @@
 import { ChunkMetadata, ChunkingConfig } from '../types';
 import { countTokens } from '../tokenizers/tokenizer';
-import { createLengthFn, findChunkIndices } from './utils';
+import { createLengthFn } from './utils';
 
 /**
  * Tabular & CSV Document Chunker with Schema Retention
@@ -44,7 +44,25 @@ function chunkDelimitedRows(
   config: ChunkingConfig,
   lengthFn: (t: string) => number
 ): ChunkMetadata[] {
-  const lines = fullText.split(/\r?\n/).filter((line) => line.trim().length > 0);
+  interface TabularLine {
+    text: string;
+    start: number;
+    end: number;
+  }
+
+  const lineRegex = /[^\r\n]+/g;
+  const lines: TabularLine[] = [];
+  let match: RegExpExecArray | null;
+  while ((match = lineRegex.exec(fullText)) !== null) {
+    if (match[0].trim().length > 0) {
+      lines.push({
+        text: match[0],
+        start: match.index,
+        end: match.index + match[0].length,
+      });
+    }
+  }
+
   if (lines.length === 0) return [];
 
   const headerLine = lines[0];
@@ -52,26 +70,25 @@ function chunkDelimitedRows(
 
   // If only header line exists, return it as single chunk
   if (dataRows.length === 0) {
-    const chunkText = headerLine;
-    const { startCharIndex, endCharIndex } = findChunkIndices(fullText, chunkText, 0);
+    const chunkText = headerLine.text;
     return [
       {
         id: 'tabular-chunk-0',
         index: 0,
         text: chunkText,
-        startCharIndex,
-        endCharIndex,
+        startCharIndex: headerLine.start,
+        endCharIndex: headerLine.end,
         charCount: chunkText.length,
         tokenCount: countTokens(chunkText, config.encoding),
         overlapPrevChars: 0,
         overlapNextChars: 0,
         isOrphan: false,
-        sectionHeader: `Schema: ${headerLine.slice(0, 50)}`,
+        sectionHeader: `Schema: ${headerLine.text.slice(0, 50)}`,
       },
     ];
   }
 
-  const headerWeight = lengthFn(headerLine + '\n');
+  const headerWeight = lengthFn(headerLine.text + '\n');
   const targetChunkSize = Math.max(headerWeight + 1, config.chunkSize);
   const targetOverlap = config.chunkOverlap;
 
@@ -81,17 +98,17 @@ function chunkDelimitedRows(
     endRowIndex: number;
   }> = [];
 
-  let currentRows: string[] = [];
+  let currentRows: TabularLine[] = [];
   let currentWeight = headerWeight;
   let startRowIdx = 0;
 
   for (let i = 0; i < dataRows.length; i++) {
     const row = dataRows[i];
-    const rowWeight = lengthFn(row + '\n');
+    const rowWeight = lengthFn(row.text + '\n');
 
     // Check if adding this row exceeds target chunk size
     if (currentRows.length > 0 && currentWeight + rowWeight > targetChunkSize) {
-      const chunkText = `${headerLine}\n${currentRows.join('\n')}`;
+      const chunkText = `${headerLine.text}\n${currentRows.map((r) => r.text).join('\n')}`;
       rawChunks.push({
         text: chunkText,
         startRowIndex: startRowIdx,
@@ -99,13 +116,13 @@ function chunkDelimitedRows(
       });
 
       // Calculate overlap rows from the end of currentRows
-      const overlapRows: string[] = [];
+      const overlapRows: TabularLine[] = [];
       let overlapWeight = 0;
 
       if (targetOverlap > 0) {
         for (let r = currentRows.length - 1; r >= 0; r--) {
           const candidateRow = currentRows[r];
-          const candidateWeight = lengthFn(candidateRow + '\n');
+          const candidateWeight = lengthFn(candidateRow.text + '\n');
           if (overlapRows.length === 0 || overlapWeight + candidateWeight <= targetOverlap) {
             overlapRows.unshift(candidateRow);
             overlapWeight += candidateWeight;
@@ -116,7 +133,7 @@ function chunkDelimitedRows(
       }
 
       currentRows = [...overlapRows, row];
-      currentWeight = headerWeight + lengthFn(currentRows.join('\n') + '\n');
+      currentWeight = headerWeight + lengthFn(currentRows.map((r) => r.text).join('\n') + '\n');
       startRowIdx = i - overlapRows.length;
     } else {
       currentRows.push(row);
@@ -126,7 +143,7 @@ function chunkDelimitedRows(
 
   // Push final chunk if rows remain
   if (currentRows.length > 0) {
-    const chunkText = `${headerLine}\n${currentRows.join('\n')}`;
+    const chunkText = `${headerLine.text}\n${currentRows.map((r) => r.text).join('\n')}`;
     rawChunks.push({
       text: chunkText,
       startRowIndex: startRowIdx,
@@ -134,15 +151,12 @@ function chunkDelimitedRows(
     });
   }
 
-  // Build ChunkMetadata objects
-  let searchCursor = 0;
+  // Build ChunkMetadata objects using cumulative line positions
   return rawChunks.map((chunk, idx) => {
-    // Find approximate char position in original document
-    const firstRow = dataRows[chunk.startRowIndex] || headerLine;
-    const { startCharIndex } = findChunkIndices(fullText, firstRow, searchCursor);
-    const lastRow = dataRows[chunk.endRowIndex] || headerLine;
-    const { endCharIndex, nextCursor } = findChunkIndices(fullText, lastRow, startCharIndex);
-    searchCursor = nextCursor;
+    const firstRow = dataRows[chunk.startRowIndex];
+    const lastRow = dataRows[chunk.endRowIndex];
+    const startCharIndex = firstRow ? firstRow.start : headerLine.start;
+    const endCharIndex = lastRow ? lastRow.end : headerLine.end;
 
     // Calculate overlap with adjacent chunks
     const prevChunk = rawChunks[idx - 1];
@@ -176,7 +190,7 @@ function chunkDelimitedRows(
       overlapPrevChars,
       overlapNextChars,
       isOrphan: false,
-      sectionHeader: `Schema: ${headerLine.slice(0, 40)}${headerLine.length > 40 ? '...' : ''} (Rows ${chunk.startRowIndex + 1}–${chunk.endRowIndex + 1})`,
+      sectionHeader: `Schema: ${headerLine.text.slice(0, 40)}${headerLine.text.length > 40 ? '...' : ''} (Rows ${chunk.startRowIndex + 1}–${chunk.endRowIndex + 1})`,
     };
   });
 }

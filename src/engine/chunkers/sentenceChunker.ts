@@ -1,9 +1,80 @@
 import { ChunkMetadata, ChunkingConfig } from '../types';
 import { countTokens } from '../tokenizers/tokenizer';
-import { createLengthFn, findChunkIndices, detectOrphan, splitOversizedText } from './utils';
+import { createLengthFn, detectOrphan, splitOversizedSpan } from './utils';
 
-// Common abbreviations that shouldn't trigger sentence splits
-const ABBREVIATIONS = ['e.g.', 'i.e.', 'etc.', 'vs.', 'dr.', 'mr.', 'mrs.', 'ms.', 'prof.', 'inc.', 'ltd.', 'corp.', 'u.s.', 'u.k.'];
+const ABBREVIATIONS = new Set([
+  'e.g.',
+  'i.e.',
+  'etc.',
+  'vs.',
+  'dr.',
+  'mr.',
+  'mrs.',
+  'ms.',
+  'prof.',
+  'inc.',
+  'ltd.',
+  'corp.',
+  'u.s.',
+  'u.k.',
+]);
+
+interface SentenceSpan {
+  start: number;
+  end: number;
+}
+
+/**
+ * Identifies sentence spans with exact source character indices,
+ * preserving verbatim source whitespace between sentences.
+ */
+function findSentenceSpans(text: string): SentenceSpan[] {
+  const spans: SentenceSpan[] = [];
+  let sentStart = 0;
+  let i = 0;
+
+  while (i < text.length) {
+    const ch = text[i];
+    if (ch === '.' || ch === '?' || ch === '!') {
+      // Find end of punctuation cluster (e.g. '...' or '?!!')
+      let pEnd = i + 1;
+      while (pEnd < text.length && (text[pEnd] === '.' || text[pEnd] === '?' || text[pEnd] === '!')) {
+        pEnd++;
+      }
+
+      // Check if following character is whitespace or end of string
+      const isFollowedByWhitespace = pEnd === text.length || /\s/.test(text[pEnd]);
+
+      if (isFollowedByWhitespace) {
+        // Extract preceding word to check against abbreviations
+        const sliceBefore = text.slice(sentStart, pEnd).trim();
+        const lastWord = sliceBefore.split(/\s+/).pop()?.toLowerCase() || '';
+
+        if (!ABBREVIATIONS.has(lastWord)) {
+          // Genuine sentence boundary: include trailing whitespace to partition the text
+          let nextStart = pEnd;
+          while (nextStart < text.length && /\s/.test(text[nextStart])) {
+            nextStart++;
+          }
+
+          spans.push({ start: sentStart, end: nextStart });
+          sentStart = nextStart;
+          i = nextStart;
+          continue;
+        }
+      }
+      i = pEnd;
+    } else {
+      i++;
+    }
+  }
+
+  if (sentStart < text.length) {
+    spans.push({ start: sentStart, end: text.length });
+  }
+
+  return spans;
+}
 
 export function chunkSentence(text: string, config: ChunkingConfig): ChunkMetadata[] {
   if (!text || text.trim().length === 0) return [];
@@ -12,118 +83,91 @@ export function chunkSentence(text: string, config: ChunkingConfig): ChunkMetada
   const safeOverlap = Math.min(chunkOverlap, Math.max(0, chunkSize - 1));
   const lengthFn = createLengthFn(unit, encoding);
 
-  // Split into sentences and paragraphs while respecting abbreviations
-  const rawSegments = text.split(/\n+/).flatMap((line) => {
-    const trimmed = line.trim();
-    if (!trimmed) return [];
+  // 1. Segment text into contiguous sentence spans that partition the source
+  const rawSentenceSpans = findSentenceSpans(text);
+  if (rawSentenceSpans.length === 0) return [];
 
-    // Tokenize line into sentence candidates
-    const sentences: string[] = [];
-    let current = '';
-    const words = trimmed.split(/(\s+)/);
-
-    for (let i = 0; i < words.length; i++) {
-      const w = words[i];
-      current += w;
-
-      const lowerTrimmed = current.trim().toLowerCase();
-      const isAbbr = ABBREVIATIONS.some((abbr) => lowerTrimmed.endsWith(abbr));
-
-      if (!isAbbr && /[.!?]$/.test(current.trim()) && i + 1 < words.length) {
-        sentences.push(current.trim());
-        current = '';
-      }
-    }
-
-    if (current.trim()) {
-      sentences.push(current.trim());
-    }
-
-    return sentences;
-  });
-
-  const rawChunks: string[] = [];
-  let currentGroup: string[] = [];
-  let currentGroupLen = 0;
-
-  for (const sentence of rawSegments) {
-    const sLen = lengthFn(sentence);
-
+  // 2. Subdivide any oversized sentences into sub-spans
+  const atomicSpans: SentenceSpan[] = [];
+  for (const s of rawSentenceSpans) {
+    const sLen = lengthFn(text.slice(s.start, s.end));
     if (sLen > chunkSize) {
-      // Sentence itself exceeds chunkSize: flush buffer then subdivide oversized sentence
-      if (currentGroup.length > 0) {
-        rawChunks.push(currentGroup.join(' '));
-        currentGroup = [];
-        currentGroupLen = 0;
+      const sub = splitOversizedSpan(text, s.start, s.end, chunkSize, safeOverlap, unit, encoding);
+      for (const item of sub) {
+        atomicSpans.push({ start: item.start, end: item.end });
       }
+    } else {
+      atomicSpans.push(s);
+    }
+  }
 
-      const subChunks = splitOversizedText(sentence, chunkSize, safeOverlap, unit, encoding);
-      rawChunks.push(...subChunks);
+  // 3. Merge contiguous sentence spans into chunks <= chunkSize with safeOverlap
+  const chunkSpans: SentenceSpan[] = [];
+  let currentGroup: SentenceSpan[] = [];
+
+  const getGroupLen = (group: SentenceSpan[]) => {
+    if (group.length === 0) return 0;
+    return lengthFn(text.slice(group[0].start, group[group.length - 1].end));
+  };
+
+  for (const span of atomicSpans) {
+    if (currentGroup.length === 0) {
+      currentGroup.push(span);
       continue;
     }
 
-    if (currentGroupLen + sLen + (currentGroup.length > 0 ? 1 : 0) <= chunkSize) {
-      currentGroup.push(sentence);
-      currentGroupLen += sLen + (currentGroup.length > 1 ? 1 : 0);
+    const candidate = [...currentGroup, span];
+    if (getGroupLen(candidate) <= chunkSize) {
+      currentGroup = candidate;
     } else {
-      if (currentGroup.length > 0) {
-        rawChunks.push(currentGroup.join(' '));
+      // Flush currentGroup
+      chunkSpans.push({
+        start: currentGroup[0].start,
+        end: currentGroup[currentGroup.length - 1].end,
+      });
 
-        // Retain trailing sentences that fit into safeOverlap
-        const nextGroup: string[] = [];
-        let nextGroupLen = 0;
-        for (let i = currentGroup.length - 1; i >= 0; i--) {
-          const s = currentGroup[i];
-          const len = lengthFn(s);
-          if (nextGroupLen + len + (nextGroup.length > 0 ? 1 : 0) <= safeOverlap) {
-            nextGroup.unshift(s);
-            nextGroupLen += len + (nextGroup.length > 1 ? 1 : 0);
-          } else {
-            break;
-          }
+      // Retain trailing sentences for overlap
+      const nextGroup: SentenceSpan[] = [];
+      for (let i = currentGroup.length - 1; i >= 0; i--) {
+        const testOverlap = [currentGroup[i], ...nextGroup];
+        if (getGroupLen(testOverlap) <= safeOverlap) {
+          nextGroup.unshift(currentGroup[i]);
+        } else {
+          break;
         }
-        currentGroup = nextGroup;
-        currentGroupLen = nextGroupLen;
       }
 
-      currentGroup.push(sentence);
-      currentGroupLen += sLen + (currentGroup.length > 1 ? 1 : 0);
+      currentGroup = [...nextGroup, span];
     }
   }
 
   if (currentGroup.length > 0) {
-    rawChunks.push(currentGroup.join(' '));
+    chunkSpans.push({
+      start: currentGroup[0].start,
+      end: currentGroup[currentGroup.length - 1].end,
+    });
   }
 
-  // Map into structured ChunkMetadata with precise offsets
-  let searchCursor = 0;
-  return rawChunks.map((chunkText, idx) => {
-    const { startCharIndex, endCharIndex, nextCursor } = findChunkIndices(text, chunkText, searchCursor);
-    searchCursor = nextCursor;
+  // 4. Construct final ChunkMetadata with exact source character slices
+  return chunkSpans.map((span, idx) => {
+    const chunkText = text.slice(span.start, span.end);
+    const prevSpan = chunkSpans[idx - 1];
+    const nextSpan = chunkSpans[idx + 1];
 
-    let actualOverlapChars = 0;
-    if (idx > 0) {
-      const prevChunk = rawChunks[idx - 1];
-      const maxPossible = Math.min(prevChunk.length, chunkText.length);
-      for (let len = maxPossible; len > 0; len--) {
-        if (prevChunk.endsWith(chunkText.slice(0, len))) {
-          actualOverlapChars = len;
-          break;
-        }
-      }
-    }
+    const overlapPrevChars = prevSpan ? Math.max(0, prevSpan.end - span.start) : 0;
+    const overlapNextChars = nextSpan ? Math.max(0, span.end - nextSpan.start) : 0;
 
     return {
-      id: `sent-${idx}`,
+      id: `sentence-${idx}`,
       index: idx,
       text: chunkText,
-      startCharIndex,
-      endCharIndex,
+      startCharIndex: span.start,
+      endCharIndex: span.end,
       charCount: chunkText.length,
       tokenCount: countTokens(chunkText, encoding),
-      overlapPrevChars: actualOverlapChars > 0 ? actualOverlapChars : (idx > 0 ? safeOverlap : 0),
-      overlapNextChars: idx < rawChunks.length - 1 ? safeOverlap : 0,
-      isOrphan: detectOrphan(text, startCharIndex),
+      overlapPrevChars,
+      overlapNextChars,
+      isOrphan: detectOrphan(text, span.start),
     };
   });
 }

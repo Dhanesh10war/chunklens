@@ -1,8 +1,13 @@
 import { ChunkMetadata, ChunkingConfig } from '../types';
 import { countTokens } from '../tokenizers/tokenizer';
-import { createLengthFn, findChunkIndices, detectOrphan, splitOversizedText } from './utils';
+import { createLengthFn, detectOrphan, splitOversizedSpan } from './utils';
 
 const DEFAULT_SEPARATORS = ['\n\n', '\n', '. ', ' ', ''];
+
+interface Span {
+  start: number;
+  end: number;
+}
 
 export function chunkRecursive(text: string, config: ChunkingConfig): ChunkMetadata[] {
   if (!text || text.trim().length === 0) return [];
@@ -10,124 +15,158 @@ export function chunkRecursive(text: string, config: ChunkingConfig): ChunkMetad
   const { chunkSize, chunkOverlap, unit, encoding } = config;
   const safeOverlap = Math.min(chunkOverlap, Math.max(0, chunkSize - 1));
   const separators = config.separators && config.separators.length > 0 ? config.separators : DEFAULT_SEPARATORS;
-
   const lengthFn = createLengthFn(unit, encoding);
 
-  // Split recursively using separators
-  function splitText(currentText: string, currentSeparators: string[]): string[] {
-    const finalChunks: string[] = [];
-    if (!currentText) return finalChunks;
+  /**
+   * Recursively splits a [start, end] span into sub-spans using separator hierarchy,
+   * guaranteeing that every sub-span is an exact slice of source text.
+   */
+  function splitSpan(start: number, end: number, currentSeparators: string[]): Span[] {
+    if (start >= end) return [];
 
-    // Pick separator
+    const spanText = text.slice(start, end);
+    const spanLen = lengthFn(spanText);
+
+    if (spanLen <= chunkSize) {
+      return [{ start, end }];
+    }
+
+    // Pick the first matching separator
     let separator = currentSeparators[currentSeparators.length - 1];
-    let newSeparators: string[] = [];
+    let nextSeparators: string[] = [];
 
     for (let i = 0; i < currentSeparators.length; i++) {
       const s = currentSeparators[i];
-      if (s === '' || currentText.includes(s)) {
+      if (s === '' || spanText.includes(s)) {
         separator = s;
-        newSeparators = currentSeparators.slice(i + 1);
+        nextSeparators = currentSeparators.slice(i + 1);
         break;
       }
     }
 
-    const splits = separator === '' ? currentText.split('') : currentText.split(separator);
-    const goodSplits: string[] = [];
-
-    for (const s of splits) {
-      if (s) {
-        goodSplits.push(s);
-      }
+    if (separator === '') {
+      // Split character-by-character or token-by-token
+      const oversized = splitOversizedSpan(text, start, end, chunkSize, safeOverlap, unit, encoding);
+      return oversized.map((o) => ({ start: o.start, end: o.end }));
     }
 
-    // Merge splits back into chunks <= chunkSize
-    let currentDoc: string[] = [];
-    let totalLen = 0;
+    // Split spanText by separator into segments
+    const pieces: Span[] = [];
+    let searchIdx = 0;
 
-    for (const piece of goodSplits) {
-      const pieceLen = lengthFn(piece);
-
-      if (totalLen + pieceLen + (currentDoc.length > 0 ? lengthFn(separator) : 0) <= chunkSize) {
-        currentDoc.push(piece);
-        totalLen += pieceLen + (currentDoc.length > 1 ? lengthFn(separator) : 0);
-      } else {
-        if (currentDoc.length > 0) {
-          const doc = currentDoc.join(separator);
-          if (doc.trim()) {
-            finalChunks.push(doc);
-          }
-          // Handle overlap: retain trailing items from currentDoc that fit within safeOverlap
-          while (
-            currentDoc.length > 0 &&
-            (totalLen > safeOverlap || totalLen + pieceLen + (currentDoc.length > 0 ? lengthFn(separator) : 0) > chunkSize)
-          ) {
-            const popped = currentDoc.shift();
-            if (popped) {
-              totalLen -= lengthFn(popped) + (currentDoc.length > 0 ? lengthFn(separator) : 0);
-            }
-          }
+    while (searchIdx < spanText.length) {
+      const matchIdx = spanText.indexOf(separator, searchIdx);
+      if (matchIdx === -1) {
+        if (searchIdx < spanText.length) {
+          pieces.push({ start: start + searchIdx, end });
         }
+        break;
+      }
 
-        if (pieceLen > chunkSize) {
-          // Piece itself is too large, recurse with remaining separators
-          if (newSeparators.length > 0) {
-            const subChunks = splitText(piece, newSeparators);
-            finalChunks.push(...subChunks);
-          } else {
-            // No more separators: strictly split using oversized utility respecting unit (tokens or chars)
-            const subChunks = splitOversizedText(piece, chunkSize, safeOverlap, unit, encoding);
-            finalChunks.push(...subChunks);
-          }
+      if (matchIdx > searchIdx) {
+        pieces.push({ start: start + searchIdx, end: start + matchIdx });
+      }
+
+      searchIdx = matchIdx + separator.length;
+    }
+
+    // If no pieces were created (e.g. text consists only of separators)
+    if (pieces.length === 0) {
+      return [{ start, end }];
+    }
+
+    // Recurse on any piece that still exceeds chunkSize
+    const result: Span[] = [];
+    for (const piece of pieces) {
+      const pLen = lengthFn(text.slice(piece.start, piece.end));
+      if (pLen > chunkSize) {
+        if (nextSeparators.length > 0) {
+          result.push(...splitSpan(piece.start, piece.end, nextSeparators));
         } else {
-          currentDoc.push(piece);
-          totalLen += pieceLen + (currentDoc.length > 1 ? lengthFn(separator) : 0);
+          const oversized = splitOversizedSpan(text, piece.start, piece.end, chunkSize, safeOverlap, unit, encoding);
+          result.push(...oversized.map((o) => ({ start: o.start, end: o.end })));
         }
+      } else {
+        result.push(piece);
       }
     }
 
-    if (currentDoc.length > 0) {
-      const remaining = currentDoc.join(separator);
-      if (remaining.trim()) {
-        finalChunks.push(remaining);
-      }
-    }
-
-    return finalChunks;
+    return result;
   }
 
-  const rawChunks = splitText(text, separators);
+  // 1. Obtain atomic sub-spans that partition the source text
+  const atomicPieces = splitSpan(0, text.length, separators);
+  if (atomicPieces.length === 0) return [];
 
-  // Map into structured ChunkMetadata with precise offsets
-  let searchCursor = 0;
-  return rawChunks.map((chunkStr, idx) => {
-    const { startCharIndex, endCharIndex, nextCursor } = findChunkIndices(text, chunkStr, searchCursor);
-    searchCursor = nextCursor;
+  // 2. Merge contiguous sub-spans into chunks up to chunkSize, preserving safeOverlap
+  const rawSpans: Span[] = [];
+  let currentGroup: Span[] = [];
 
-    // Calculate actual overlap with previous chunk if any
-    let actualOverlapChars = 0;
-    if (idx > 0) {
-      const prevChunk = rawChunks[idx - 1];
-      // Check common overlap length
-      const maxPossibleOverlap = Math.min(prevChunk.length, chunkStr.length);
-      for (let len = maxPossibleOverlap; len > 0; len--) {
-        if (prevChunk.endsWith(chunkStr.slice(0, len))) {
-          actualOverlapChars = len;
+  const getGroupLen = (group: Span[]) => {
+    if (group.length === 0) return 0;
+    return lengthFn(text.slice(group[0].start, group[group.length - 1].end));
+  };
+
+  for (const piece of atomicPieces) {
+    if (currentGroup.length === 0) {
+      currentGroup.push(piece);
+      continue;
+    }
+
+    const testGroup = [...currentGroup, piece];
+    const testLen = getGroupLen(testGroup);
+
+    if (testLen <= chunkSize) {
+      currentGroup = testGroup;
+    } else {
+      // Flush currentGroup
+      rawSpans.push({
+        start: currentGroup[0].start,
+        end: currentGroup[currentGroup.length - 1].end,
+      });
+
+      // Retain trailing pieces for overlap
+      const nextGroup: Span[] = [];
+      for (let i = currentGroup.length - 1; i >= 0; i--) {
+        const candidateGroup = [currentGroup[i], ...nextGroup];
+        if (getGroupLen(candidateGroup) <= safeOverlap) {
+          nextGroup.unshift(currentGroup[i]);
+        } else {
           break;
         }
       }
+
+      currentGroup = [...nextGroup, piece];
     }
+  }
+
+  if (currentGroup.length > 0) {
+    rawSpans.push({
+      start: currentGroup[0].start,
+      end: currentGroup[currentGroup.length - 1].end,
+    });
+  }
+
+  // 3. Build final ChunkMetadata with exact source character slices
+  return rawSpans.map((span, idx) => {
+    const chunkText = text.slice(span.start, span.end);
+    const prevSpan = rawSpans[idx - 1];
+    const nextSpan = rawSpans[idx + 1];
+
+    const overlapPrevChars = prevSpan ? Math.max(0, prevSpan.end - span.start) : 0;
+    const overlapNextChars = nextSpan ? Math.max(0, span.end - nextSpan.start) : 0;
 
     return {
       id: `recursive-${idx}`,
       index: idx,
-      text: chunkStr,
-      startCharIndex,
-      endCharIndex,
-      charCount: chunkStr.length,
-      tokenCount: countTokens(chunkStr, encoding),
-      overlapPrevChars: actualOverlapChars > 0 ? actualOverlapChars : (idx > 0 ? safeOverlap : 0),
-      overlapNextChars: idx < rawChunks.length - 1 ? safeOverlap : 0,
-      isOrphan: detectOrphan(text, startCharIndex),
+      text: chunkText,
+      startCharIndex: span.start,
+      endCharIndex: span.end,
+      charCount: chunkText.length,
+      tokenCount: countTokens(chunkText, encoding),
+      overlapPrevChars,
+      overlapNextChars,
+      isOrphan: detectOrphan(text, span.start),
     };
   });
 }

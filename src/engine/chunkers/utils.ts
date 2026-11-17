@@ -89,3 +89,67 @@ export function splitOversizedText(
 
   return chunks;
 }
+
+/**
+ * Splits an oversized slice of text into sub-spans, returning exact character start and end offsets.
+ */
+export function splitOversizedSpan(
+  fullText: string,
+  start: number,
+  end: number,
+  chunkSize: number,
+  chunkOverlap: number,
+  unit: ChunkUnit,
+  encoding: TokenizerEncoding
+): Array<{ start: number; end: number; text: string }> {
+  const spanText = fullText.slice(start, end);
+  if (!spanText) return [];
+
+  const safeOverlap = Math.min(chunkOverlap, Math.max(0, chunkSize - 1));
+  const step = Math.max(1, chunkSize - safeOverlap);
+
+  if (unit === 'characters') {
+    const spans: Array<{ start: number; end: number; text: string }> = [];
+    let relStart = 0;
+    while (relStart < spanText.length) {
+      const relEnd = Math.min(relStart + chunkSize, spanText.length);
+      const subStart = start + relStart;
+      const subEnd = start + relEnd;
+      spans.push({
+        start: subStart,
+        end: subEnd,
+        text: fullText.slice(subStart, subEnd),
+      });
+      relStart += step;
+      if (relEnd >= spanText.length) break;
+    }
+    return spans;
+  }
+
+  // Token-based
+  const enc = getTokenizer(encoding);
+  const tokens = enc.encode(spanText);
+  if (tokens.length <= chunkSize) {
+    return [{ start, end, text: spanText }];
+  }
+
+  const spans: Array<{ start: number; end: number; text: string }> = [];
+  let tokenStart = 0;
+
+  while (tokenStart < tokens.length) {
+    const tokenEnd = Math.min(tokenStart + chunkSize, tokens.length);
+    const relStart = enc.decode(tokens.slice(0, tokenStart)).length;
+    const relEnd = enc.decode(tokens.slice(0, tokenEnd)).length;
+    const subStart = start + relStart;
+    const subEnd = start + relEnd;
+    spans.push({
+      start: subStart,
+      end: subEnd,
+      text: fullText.slice(subStart, subEnd),
+    });
+    tokenStart += step;
+    if (tokenEnd >= tokens.length) break;
+  }
+
+  return spans;
+}

@@ -3,9 +3,7 @@ import {
   exportChunksToJson,
   exportChunksToCsv,
   exportChunksToHtml,
-  sanitizeCsvCell,
   sanitizeCsvValue,
-  escapeHtml,
 } from '../dataExporters';
 import { ChunkMetadata, ChunkingConfig } from '../../engine/types';
 

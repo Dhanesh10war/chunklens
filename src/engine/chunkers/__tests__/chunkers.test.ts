@@ -208,7 +208,7 @@ describe('ChunkLens Core Engine', () => {
       });
     });
 
-    it('properly encloses fences even when code block is oversized', () => {
+    it('preserves exact source fidelity without inventing synthetic fences on oversized code blocks', () => {
       const longCode = `# Code\n\n\`\`\`python\nline_1 = 1\nline_2 = 2\nline_3 = 3\nline_4 = 4\nline_5 = 5\n\`\`\``;
       const config: ChunkingConfig = {
         strategy: 'markdown',
@@ -221,10 +221,10 @@ describe('ChunkLens Core Engine', () => {
       const chunks = chunkMarkdown(longCode, config);
       expect(chunks.length).toBeGreaterThan(1);
       chunks.forEach((chunk) => {
-        if (chunk.text.includes('```')) {
-          const opens = (chunk.text.match(/```/g) || []).length;
-          expect(opens % 2).toBe(0);
-        }
+        // Core invariant: chunk text exists verbatim in source and matches start/end offsets
+        expect(chunk.startCharIndex).toBeGreaterThanOrEqual(0);
+        expect(chunk.endCharIndex).toBeGreaterThan(chunk.startCharIndex);
+        expect(longCode.slice(chunk.startCharIndex, chunk.endCharIndex)).toBe(chunk.text);
       });
     });
   });

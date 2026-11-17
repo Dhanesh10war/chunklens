@@ -1,6 +1,6 @@
 import { ChunkMetadata, ChunkingConfig } from '../types';
 import { countTokens, getTokenizer } from '../tokenizers/tokenizer';
-import { findChunkIndices, detectOrphan } from './utils';
+import { detectOrphan } from './utils';
 
 export function chunkFixed(text: string, config: ChunkingConfig): ChunkMetadata[] {
   if (!text || text.trim().length === 0) return [];
@@ -47,15 +47,13 @@ export function chunkFixed(text: string, config: ChunkingConfig): ChunkMetadata[
     const tokens = enc.encode(text);
     let tokenStart = 0;
     let index = 0;
-    let searchCursor = 0;
 
     while (tokenStart < tokens.length) {
       const tokenEnd = Math.min(tokenStart + chunkSize, tokens.length);
       const chunkTokens = tokens.slice(tokenStart, tokenEnd);
-      const chunkText = enc.decode(chunkTokens);
-
-      const { startCharIndex, endCharIndex, nextCursor } = findChunkIndices(text, chunkText, searchCursor);
-      searchCursor = nextCursor;
+      const startCharIndex = enc.decode(tokens.slice(0, tokenStart)).length;
+      const endCharIndex = enc.decode(tokens.slice(0, tokenEnd)).length;
+      const chunkText = text.slice(startCharIndex, endCharIndex);
 
       let actualOverlapChars = 0;
       if (index > 0) {
