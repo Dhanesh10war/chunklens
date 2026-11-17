@@ -105,13 +105,13 @@ export const LandingUseCases: React.FC<LandingUseCasesProps> = ({ onLaunchApp })
       <div className="text-center max-w-3xl mx-auto mb-14">
         <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-control bg-accent-subtle text-accent text-2xs font-mono font-semibold mb-3 border border-accent/25">
           <Briefcase className="h-3 w-3" />
-          <span>Enterprise Production Verticals</span>
+          <span>Production RAG Verticals</span>
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-text mb-4">
           Engineered for High-Stakes RAG Workflows
         </h1>
         <p className="text-sm sm:text-base text-text-secondary leading-relaxed font-sans">
-          One bad chunk boundary in production can cause legal liability, erroneous financial guidance, or security bugs. See how leading teams calibrate ChunkLens for their domains.
+          One bad chunk boundary in production can cause legal liability, erroneous financial guidance, or security bugs. See how developers calibrate ChunkLens for their domains.
         </p>
       </div>
 

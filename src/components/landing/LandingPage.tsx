@@ -9,7 +9,6 @@ import { LandingFeatures } from './LandingFeatures';
 import { LandingUseCases } from './LandingUseCases';
 import { LandingSecurity } from './LandingSecurity';
 import { LandingDocs } from './LandingDocs';
-import { EarlyAccessModal } from './EarlyAccessModal';
 
 interface LandingPageProps {
   onLaunchApp: (sampleId?: string) => void;
@@ -25,8 +24,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
     }
     return 'overview';
   });
-
-  const [earlyAccessTier, setEarlyAccessTier] = useState<string | null>(null);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -52,10 +49,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
     }
   };
 
-  const handleOpenEarlyAccess = (tierName: string) => {
-    setEarlyAccessTier(tierName);
-  };
-
   return (
     <div className="min-h-screen bg-bg text-text font-sans antialiased selection:bg-accent/20 selection:text-text flex flex-col">
       {/* 1. Global Multi-page Navbar */}
@@ -70,7 +63,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
         {activeTab === 'overview' && (
           <LandingOverview
             onLaunchApp={onLaunchApp}
-            onOpenEarlyAccess={handleOpenEarlyAccess}
             onNavigatePage={(page) => handleSelectTab(page as LandingPageTab)}
           />
         )}
@@ -99,7 +91,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
                   <Layers className="h-3.5 w-3.5" />
                 </div>
                 <span className="font-semibold text-sm tracking-tight text-text">ChunkLens</span>
-                <span className="text-2xs font-mono text-text-tertiary">v0.3.0</span>
+                <span className="text-2xs font-mono text-text-tertiary">v{__APP_VERSION__}</span>
               </div>
               <p className="text-xs text-text-secondary leading-relaxed font-sans">
                 Interactive client-side document chunking visualizer &amp; token budget optimizer for modern RAG pipelines.
@@ -131,7 +123,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
                     onClick={() => handleSelectTab('features')}
                     className="min-h-[28px] py-1 inline-flex items-center hover:text-text transition-colors focus-ring rounded"
                   >
-                    Splitting Engines
+                    Splitter Engines
                   </button>
                 </li>
                 <li>
@@ -140,14 +132,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
                     onClick={() => handleSelectTab('use-cases')}
                     className="min-h-[28px] py-1 inline-flex items-center hover:text-text transition-colors focus-ring rounded"
                   >
-                    Enterprise Verticals
+                    Use Cases
                   </button>
                 </li>
                 <li>
                   <button
                     type="button"
                     onClick={() => onLaunchApp()}
-                    className="min-h-[28px] py-1 inline-flex items-center hover:text-text text-accent font-medium transition-colors focus-ring rounded"
+                    className="min-h-[28px] py-1 inline-flex items-center text-accent font-medium hover:underline focus-ring rounded"
                   >
                     Launch Visualizer &rarr;
                   </button>
@@ -178,13 +170,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
                   </button>
                 </li>
                 <li>
-                  <button
-                    type="button"
-                    onClick={() => handleOpenEarlyAccess('Pro Developer Tier')}
+                  <a
+                    href="https://github.com/Dhanesh10war/chunklens/discussions"
+                    target="_blank"
+                    rel="noreferrer"
                     className="min-h-[28px] py-1 inline-flex items-center hover:text-text transition-colors focus-ring rounded"
                   >
-                    Early Access Priority Waitlist
-                  </button>
+                    Roadmap &amp; Discussions
+                  </a>
                 </li>
               </ul>
             </div>
@@ -217,13 +210,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
           </div>
         </div>
       </footer>
-
-      {/* Early Access Waitlist Modal (Frozen Tiers) */}
-      <EarlyAccessModal
-        isOpen={Boolean(earlyAccessTier)}
-        onClose={() => setEarlyAccessTier(null)}
-        tierName={earlyAccessTier || 'Pro Developer'}
-      />
     </div>
   );
 };

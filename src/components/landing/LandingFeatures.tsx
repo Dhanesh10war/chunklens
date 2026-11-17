@@ -9,6 +9,7 @@ import {
   Code2,
   FileText,
   Sparkles,
+  Table,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { cn } from '../../utils/cn';
@@ -18,8 +19,8 @@ interface LandingFeaturesProps {
 }
 
 export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp }) => {
-  const [selectedSplitter, setSelectedSplitter] = useState<'recursive' | 'character' | 'token' | 'markdown'>('recursive');
-  const [selectedModel, setSelectedModel] = useState<'cl100k' | 'o200k' | 'p50k'>('cl100k');
+  const [selectedSplitter, setSelectedSplitter] = useState<'recursive' | 'character' | 'token' | 'markdown' | 'tabular'>('recursive');
+  const [selectedModel, setSelectedModel] = useState<'cl100k' | 'o200k'>('cl100k');
 
   const splitterDetails = {
     recursive: {
@@ -27,11 +28,11 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
       bestFor: 'General documentation, articles, and mixed prose',
       delimiters: '["\\n\\n", "\\n", " ", ""]',
       description:
-        'Recursively traverses an array of delimiters from highest semantic hierarchy (double newline for paragraphs) down to single characters. Keeps related thoughts grouped together until forced to partition by size.',
+        'Recursively traverses an array of delimiters from highest structural hierarchy (double newline for paragraphs) down to single characters. Keeps related thoughts grouped together until forced to partition by size.',
       sampleOutput: [
-        { id: 1, title: 'Chunk #1 · 245 tok', text: '### 1. Vector Database Architectures\nModern RAG applications depend heavily on high-throughput vector indexes such as HNSW or IVF-PQ...', continuity: '38.4%' },
-        { id: 2, title: 'Chunk #2 · 280 tok', text: 'When queries are executed against the index, cosine similarity or dot product metrics calculate the closest match across the embedding space...', continuity: '42.1%' },
-        { id: 3, title: 'Chunk #3 · 210 tok', text: 'Careful tuning of chunk overlap ensures that facts spanning across boundaries are not severed during retrieval...', continuity: '36.5%' },
+        { id: 1, title: 'Chunk #1 · ~245 tok', text: '### 1. Vector Database Architectures\nModern RAG applications depend heavily on high-throughput vector indexes such as HNSW or IVF-PQ...' },
+        { id: 2, title: 'Chunk #2 · ~280 tok', text: 'When queries are executed against the index, cosine similarity or dot product metrics calculate the closest match across the embedding space...' },
+        { id: 3, title: 'Chunk #3 · ~210 tok', text: 'Careful tuning of chunk overlap ensures that facts spanning across boundaries are not severed during retrieval...' },
       ],
     },
     character: {
@@ -41,21 +42,21 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
       description:
         'Slices text at uniform character offsets regardless of natural linguistic boundaries. Simple and fast, but frequently splits words and clauses mid-sentence.',
       sampleOutput: [
-        { id: 1, title: 'Chunk #1 · 195 tok', text: '### 1. Vector Database Architectures\nModern RAG applications depend heavily on high-throughput vector indexes such as HNSW or IVF-PQ. When queries are executed', continuity: '18.2%' },
-        { id: 2, title: 'Chunk #2 · 205 tok', text: 'against the index, cosine similarity or dot product metrics calculate the closest match across the embedding space. Careful tuning of chunk overlap ensures', continuity: '19.4%' },
-        { id: 3, title: 'Chunk #3 · 190 tok', text: 'that facts spanning across boundaries are not severed during retrieval...', continuity: '15.1%' },
+        { id: 1, title: 'Chunk #1 · ~195 tok', text: '### 1. Vector Database Architectures\nModern RAG applications depend heavily on high-throughput vector indexes such as HNSW or IVF-PQ. When queries are executed' },
+        { id: 2, title: 'Chunk #2 · ~205 tok', text: 'against the index, cosine similarity or dot product metrics calculate the closest match across the embedding space. Careful tuning of chunk overlap ensures' },
+        { id: 3, title: 'Chunk #3 · ~190 tok', text: 'that facts spanning across boundaries are not severed during retrieval...' },
       ],
     },
     token: {
       title: 'Exact BPE Token Splitter',
       bestFor: 'Hard model context limits and exact embedding API cost planning',
-      delimiters: 'Byte-Pair Encoding tokens (cl100k, o200k, p50k)',
+      delimiters: 'Byte-Pair Encoding tokens (cl100k_base, o200k_base)',
       description:
         'Measures tokens directly using client-side WebAssembly TikToken BPE encoders. Guarantees that no chunk will exceed your LLM embedding model limit.',
       sampleOutput: [
-        { id: 1, title: 'Chunk #1 · 256 tok (Exact)', text: '### 1. Vector Database Architectures\nModern RAG applications depend heavily on high-throughput vector indexes such as HNSW...', continuity: '34.0%' },
-        { id: 2, title: 'Chunk #2 · 256 tok (Exact)', text: 'When queries are executed against the index, cosine similarity or dot product metrics calculate the closest match...', continuity: '39.8%' },
-        { id: 3, title: 'Chunk #3 · 142 tok (Remainder)', text: 'Careful tuning of chunk overlap ensures that facts spanning across boundaries are not severed during retrieval...', continuity: '31.2%' },
+        { id: 1, title: 'Chunk #1 · 256 tok (Exact)', text: '### 1. Vector Database Architectures\nModern RAG applications depend heavily on high-throughput vector indexes such as HNSW...' },
+        { id: 2, title: 'Chunk #2 · 256 tok (Exact)', text: 'When queries are executed against the index, cosine similarity or dot product metrics calculate the closest match...' },
+        { id: 3, title: 'Chunk #3 · 142 tok (Remainder)', text: 'Careful tuning of chunk overlap ensures that facts spanning across boundaries are not severed during retrieval...' },
       ],
     },
     markdown: {
@@ -65,28 +66,34 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
       description:
         'Aware of Markdown syntax trees. Preserves table rows, prevents breaking inside code fences, and keeps sections under their relevant header tags.',
       sampleOutput: [
-        { id: 1, title: 'Chunk #1 · 260 tok', text: '### 1. Vector Database Architectures\nModern RAG applications depend heavily on high-throughput vector indexes such as HNSW or IVF-PQ...', continuity: '41.2%' },
-        { id: 2, title: 'Chunk #2 · 315 tok', text: '```python\n# Vector Store Ingestion\nresults = store.similarity_search(query, k=4)\n```\nWhen queries are executed against the index...', continuity: '44.5%' },
-        { id: 3, title: 'Chunk #3 · 185 tok', text: '### 2. Overlap Strategies\nCareful tuning of chunk overlap ensures that facts spanning across boundaries are not severed...', continuity: '35.0%' },
+        { id: 1, title: 'Chunk #1 · ~260 tok', text: '### 1. Vector Database Architectures\nModern RAG applications depend heavily on high-throughput vector indexes such as HNSW or IVF-PQ...' },
+        { id: 2, title: 'Chunk #2 · ~315 tok', text: '```python\n# Vector Store Ingestion\nresults = store.similarity_search(query, k=4)\n```\nWhen queries are executed against the index...' },
+        { id: 3, title: 'Chunk #3 · ~185 tok', text: '### 2. Overlap Strategies\nCareful tuning of chunk overlap ensures that facts spanning across boundaries are not severed...' },
+      ],
+    },
+    tabular: {
+      title: 'Tabular & CSV Splitter',
+      bestFor: 'CSV, TSV, product catalogs, and tabular database dumps',
+      delimiters: 'Row boundaries with preserved column headers',
+      description:
+        'Slices tabular data row-by-row while automatically repeating the CSV/TSV header row across every chunk so downstream models retain schema context.',
+      sampleOutput: [
+        { id: 1, title: 'Chunk #1 · Rows 1–25', text: 'id,name,role,department\n101,Alice,ML Engineer,AI Platform\n102,Bob,Data Scientist,Analytics...' },
+        { id: 2, title: 'Chunk #2 · Rows 26–50', text: 'id,name,role,department\n126,Carol,Backend Dev,Infrastructure\n127,Dave,Frontend Dev,Product...' },
       ],
     },
   };
 
   const modelTokenBreakdowns = {
     cl100k: {
-      name: 'cl100k_base (GPT-4, text-embedding-3)',
+      name: 'cl100k_base (Exact: GPT-4, text-embedding-3)',
       tokenCount: 7,
       tokens: ['def', ' authenticate', '_user', '(token', ':', ' str', ') -> bool:'],
     },
     o200k: {
-      name: 'o200k_base (GPT-4o, omni models)',
+      name: 'o200k_base (Exact: GPT-4o)',
       tokenCount: 5,
       tokens: ['def authenticate', '_user(', 'token:', ' str) ->', ' bool:'],
-    },
-    p50k: {
-      name: 'p50k_base (text-davinci-003, code-davinci)',
-      tokenCount: 9,
-      tokens: ['def', ' auth', 'ent', 'icate', '_user', '(', 'token', ': str', ') -> bool:'],
     },
   };
 
@@ -102,10 +109,10 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
           <span>Core Splitting Architecture</span>
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-text mb-4 title-tracking">
-          Four Purpose-Built Splitters. Zero Guesswork.
+          Five Purpose-Built Strategies. Zero Guesswork.
         </h1>
         <p className="text-sm sm:text-base text-text-secondary leading-relaxed font-sans">
-          Different documents require distinct partitioning algorithms. ChunkLens models your exact production pipeline client-side so you can observe how text flows before saving to vector stores.
+          Different documents require distinct partitioning algorithms. ChunkLens executes your exact production pipeline client-side so you can observe how text flows before saving to vector stores.
         </p>
       </div>
 
@@ -118,6 +125,7 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
             { id: 'character', label: 'Fixed Character', icon: <FileText className="h-3.5 w-3.5" /> },
             { id: 'token', label: 'Exact BPE Tokenizer', icon: <Cpu className="h-3.5 w-3.5" /> },
             { id: 'markdown', label: 'Markdown & Heading', icon: <Code2 className="h-3.5 w-3.5" /> },
+            { id: 'tabular', label: 'Tabular & CSV', icon: <Table className="h-3.5 w-3.5" /> },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -142,7 +150,7 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
             {/* Left Column: Algorithm Specs */}
             <div className="lg:col-span-5 space-y-5">
               <div>
-                <span className="text-2xs font-mono text-accent font-semibold">Active Algorithm</span>
+                <span className="text-2xs font-mono text-accent font-semibold">Active Strategy</span>
                 <h3 className="text-xl font-bold text-text mt-0.5">{activeData.title}</h3>
               </div>
 
@@ -157,7 +165,12 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
                 </div>
                 <div>
                   <span className="text-text-tertiary font-mono text-2xs block mb-1">Delimiters / Logic:</span>
-                  <code className="text-2xs font-mono bg-surface-2 px-2 py-1 rounded-control border border-separator text-text-secondary block overflow-x-auto">
+                  <code
+                    tabIndex={0}
+                    role="region"
+                    aria-label="Splitter delimiters"
+                    className="text-2xs font-mono bg-surface-2 px-2 py-1 rounded-control border border-separator text-text-secondary block overflow-x-auto focus-ring"
+                  >
                     {activeData.delimiters}
                   </code>
                 </div>
@@ -179,8 +192,8 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
             {/* Right Column: Simulated Chunks Output */}
             <div className="lg:col-span-7 bg-surface-2/40 rounded-panel border border-separator p-4 sm:p-5 space-y-3">
               <div className="flex items-center justify-between text-2xs font-mono text-text-tertiary pb-2 border-b border-separator">
-                <span>Simulated Output Partitions</span>
-                <span>Sequential Boundary Continuity</span>
+                <span>Illustration: Sample Partitions</span>
+                <span>Structural Preview</span>
               </div>
 
               {activeData.sampleOutput.map((chunk) => (
@@ -190,8 +203,8 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
                 >
                   <div className="flex items-center justify-between mb-1.5 text-2xs font-mono">
                     <span className="font-semibold text-text">{chunk.title}</span>
-                    <span className="px-1.5 py-0.5 rounded-control bg-accent-subtle text-accent border border-accent/25">
-                      Flow: {chunk.continuity}
+                    <span className="px-1.5 py-0.5 rounded-control bg-surface-2 text-text-secondary border border-separator">
+                      Illustration
                     </span>
                   </div>
                   <p className="text-xs text-text-secondary font-mono leading-relaxed line-clamp-2">
@@ -204,26 +217,25 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
         </div>
       </div>
 
-      {/* INTERACTIVE BPE TOKENIZER VARIANCE INSPECTOR */}
+      {/* INTERACTIVE BPE TOKENIZER VARIANCE INSPECTOR (ILLUSTRATION) */}
       <div className="mb-16 p-6 sm:p-8 rounded-card border border-separator bg-surface-1 shadow-subtle">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-separator">
           <div>
             <div className="inline-flex items-center space-x-1.5 text-2xs font-mono text-accent mb-1 font-semibold">
               <Sparkles className="h-3 w-3" />
-              <span>Interactive Token Inspector</span>
+              <span>Token Inspector (Illustration)</span>
             </div>
-            <h3 className="text-xl font-bold text-text">Multi-Model BPE Tokenizer Variance</h3>
+            <h3 className="text-xl font-bold text-text">OpenAI BPE Tokenizer Variance</h3>
             <p className="text-xs text-text-secondary mt-1">
-              Observe how the exact same code string yields different token partitions across model architectures.
+              Exact token counts computed client-side via TikToken (o200k_base, cl100k_base). Non-OpenAI models are calibrated estimates.
             </p>
           </div>
 
           {/* Model Switcher Pills */}
           <div className="flex items-center space-x-1.5 bg-surface-2 p-1 rounded-control border border-separator text-xs font-mono">
             {[
-              { id: 'cl100k', label: 'cl100k' },
-              { id: 'o200k', label: 'o200k' },
-              { id: 'p50k', label: 'p50k' },
+              { id: 'cl100k', label: 'cl100k_base' },
+              { id: 'o200k', label: 'o200k_base' },
             ].map((m) => (
               <button
                 key={m.id}
@@ -255,10 +267,8 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
                 key={i}
                 className={cn(
                   'px-2 py-1 rounded text-2xs font-mono font-medium border select-none',
-                  i % 3 === 0
+                  i % 2 === 0
                     ? 'bg-accent-subtle text-accent border-accent/25'
-                    : i % 3 === 1
-                    ? 'bg-status-success-subtle text-status-success-text border-status-success/25'
                     : 'bg-surface-2 text-text border-separator'
                 )}
               >
@@ -273,58 +283,60 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
         </div>
       </div>
 
-      {/* Deep-Dive: Boundary Continuity Mathematics */}
+      {/* Continuity & Redundancy Mechanics */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
         <div className="p-6 rounded-card border border-separator bg-surface-1 shadow-subtle card-interactive">
           <div className="h-10 w-10 rounded-control bg-accent-subtle border border-accent/25 flex items-center justify-center text-accent mb-4">
             <Activity className="h-5 w-5" />
           </div>
-          <h3 className="text-lg font-bold text-text mb-2">Boundary Continuity Scoring</h3>
+          <h3 className="text-lg font-bold text-text mb-2">Lexical Continuity Scoring</h3>
           <p className="text-xs text-text-secondary leading-relaxed mb-4">
-            ChunkLens calculates consecutive partition similarity to measure semantic transition smoothness.
+            ChunkLens calculates consecutive partition similarity using lexical TF-IDF cosine metrics to measure topic transition across chunk boundaries.
           </p>
-          <div className="p-3 rounded-control bg-surface-2 border border-separator font-mono text-2xs text-text-secondary mb-4 overflow-x-auto">
+          <div
+            tabIndex={0}
+            role="region"
+            aria-label="Continuity formula"
+            className="p-3 rounded-control bg-surface-2 border border-separator font-mono text-2xs text-text-secondary mb-4 overflow-x-auto focus-ring"
+          >
             Continuity(Chunk A, Chunk B) = CosineSim(TF-IDF(A), TF-IDF(B))
           </div>
           <ul className="space-y-2 text-xs text-text-secondary">
             <li className="flex items-start space-x-2">
               <Check className="h-3.5 w-3.5 text-status-success-text shrink-0 mt-0.5" />
-              <span><strong>&gt;40% (Smooth Flow):</strong> Seamless topical progression across partition boundaries.</span>
+              <span><strong>Adjacent Term Overlap:</strong> Inspect shared vocabulary between chunk N and chunk N+1.</span>
             </li>
             <li className="flex items-start space-x-2">
-              <Check className="h-3.5 w-3.5 text-status-warn-text shrink-0 mt-0.5" />
-              <span><strong>20%–40% (Moderate Flow):</strong> Typical natural transitions between subsections.</span>
-            </li>
-            <li className="flex items-start space-x-2">
-              <Check className="h-3.5 w-3.5 text-status-error-text shrink-0 mt-0.5" />
-              <span><strong>&lt;20% (Abrupt Jump):</strong> Significant topical discontinuity or potential mid-sentence severance.</span>
+              <Check className="h-3.5 w-3.5 text-status-success-text shrink-0 mt-0.5" />
+              <span><strong>Vocabulary Shifting:</strong> Spot where sections shift topics or sever natural paragraphs.</span>
             </li>
           </ul>
         </div>
 
         <div className="p-6 rounded-card border border-separator bg-surface-1 shadow-subtle card-interactive">
-          <div className="h-10 w-10 rounded-control bg-status-warn-subtle border border-status-warn/25 flex items-center justify-center text-status-warn mb-4">
+          <div className="h-10 w-10 rounded-control bg-status-warn-subtle border border-status-warn/25 flex items-center justify-center text-status-warn-text mb-4">
             <SplitSquareVertical className="h-5 w-5" />
           </div>
-          <h3 className="text-lg font-bold text-text mb-2">High Overlap Warning Engine</h3>
+          <h3 className="text-lg font-bold text-text mb-2">Overlap Redundancy Analysis</h3>
           <p className="text-xs text-text-secondary leading-relaxed mb-4">
-            Blind chunk overlaps frequently result in near-duplicate partitions that waste vector storage and pollute top-k results.
+            Large chunk overlaps create redundant tokens that duplicate information and waste vector database storage.
           </p>
-          <div className="p-3 rounded-control bg-surface-2 border border-separator font-mono text-2xs text-text-secondary mb-4 overflow-x-auto">
-            Overlap Ratio = OverlapTokens / TargetChunkTokens &gt; 35%
+          <div
+            tabIndex={0}
+            role="region"
+            aria-label="Overlap ratio formula"
+            className="p-3 rounded-control bg-surface-2 border border-separator font-mono text-2xs text-text-secondary mb-4 overflow-x-auto focus-ring"
+          >
+            Overlap Ratio = OverlapTokens / TargetChunkTokens
           </div>
           <ul className="space-y-2 text-xs text-text-secondary">
             <li className="flex items-start space-x-2">
               <Check className="h-3.5 w-3.5 text-status-success-text shrink-0 mt-0.5" />
-              <span><strong>Redundancy Alert:</strong> Flags chunk pairs sharing &gt;70% semantic overlap in real time.</span>
+              <span><strong>Heatmap Inspection:</strong> Interactive N x N lexical similarity matrix across all chunks.</span>
             </li>
             <li className="flex items-start space-x-2">
               <Check className="h-3.5 w-3.5 text-status-success-text shrink-0 mt-0.5" />
-              <span><strong>Similarity Heatmap:</strong> Full N x N matrix with interactive bucket filtering.</span>
-            </li>
-            <li className="flex items-start space-x-2">
-              <Check className="h-3.5 w-3.5 text-status-success-text shrink-0 mt-0.5" />
-              <span><strong>Optimal Step Tuning:</strong> Guides you to the exact overlap threshold where context is preserved without redundancy.</span>
+              <span><strong>Cost Tuning:</strong> Find the minimum overlap required to maintain context without bloat.</span>
             </li>
           </ul>
         </div>

@@ -16,13 +16,13 @@ import {
   Layers,
   AlertTriangle,
   FileCheck,
+  Github,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { cn } from '../../utils/cn';
 
 interface LandingOverviewProps {
   onLaunchApp: (sampleId?: string) => void;
-  onOpenEarlyAccess: (tierName: string) => void;
   onNavigatePage: (page: string) => void;
 }
 
@@ -49,14 +49,14 @@ const MINI_SAMPLES: Record<
     label: 'Financial Performance 10-Q',
     tag: 'Financial Disclosure',
     sampleId: 'financial-10k-q3',
-    text: `Operating Income for Q3 reached $14.2M, representing a 28% year-over-year increase compared to $11.1M in Q3 of the prior fiscal year.
+    text: `Operating Income for Q3 reached $14.2M, representing an increase compared to $11.1M in Q3 of the prior fiscal year.
 
-Gross Margin expanded by 180 basis points to 74.2%, driven by enterprise customer expansion and automated infrastructure efficiencies.
+Gross Margin expanded, driven by customer expansion and automated infrastructure efficiencies.
 
 Free Cash Flow generated during the nine months ended September 30 was $38.6M, compared to $22.4M for the same period last year.`,
     blindSplits: [
-      `Operating Income for Q3 reached $14.2M, representing a 28% year-over-year increase compared to $11.1M in Q3 of the prior fiscal year.\n\nGross Margin expanded by 180 basis points to 74`,
-      `.2%, driven by enterprise customer expansion and automated infrastructure efficiencies.\n\nFree Cash Flow generated during the nine months ended September 30 was $38.6M, comp`,
+      `Operating Income for Q3 reached $14.2M, representing an increase compared to $11.1M in Q3 of the prior fiscal year.\n\nGross Margin expanded, driven by customer expansion and automated infrastructure efficiencies.`,
+      `Free Cash Flow generated during the nine months ended September 30 was $38.6M, comp`,
       `ared to $22.4M for the same period last year.`,
     ],
   },
@@ -68,7 +68,7 @@ Free Cash Flow generated during the nine months ended September 30 was $38.6M, c
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 
-app = FastAPI(title="Semantic Retrieval API")
+app = FastAPI(title="Vector Retrieval API")
 vector_store = Chroma(collection_name="docs", embedding_function=OpenAIEmbeddings())
 
 @app.post("/query")
@@ -76,7 +76,7 @@ async def retrieve_context(query: str, top_k: int = 4):
     results = vector_store.similarity_search_with_score(query, k=top_k)
     return [{"chunk": doc.page_content, "score": score} for doc, score in results]`,
     blindSplits: [
-      `from fastapi import FastAPI, HTTPException\nfrom langchain_chroma import Chroma\nfrom langchain_openai import OpenAIEmbeddings\n\napp = FastAPI(title="Semantic Retrieval API")\nvector_store = Chroma(coll`,
+      `from fastapi import FastAPI, HTTPException\nfrom langchain_chroma import Chroma\nfrom langchain_openai import OpenAIEmbeddings\n\napp = FastAPI(title="Vector Retrieval API")\nvector_store = Chroma(coll`,
       `ection_name="docs", embedding_function=OpenAIEmbeddings())\n\n@app.post("/query")\nasync def retrieve_context(query: str, top_k: int = 4):\n    results = vector_store.similarity_search_with_score(query, k=top_k)\n    return [{"ch`,
       `unk": doc.page_content, "score": score} for doc, score in results]`,
     ],
@@ -85,19 +85,19 @@ async def retrieve_context(query: str, top_k: int = 4):
 
 export const LandingOverview: React.FC<LandingOverviewProps> = ({
   onLaunchApp,
-  onOpenEarlyAccess,
   onNavigatePage,
 }) => {
   // Interactive Mini-Chunker state
   const [selectedSampleKey, setSelectedSampleKey] = useState<string>('legal');
   const [miniChunkSize, setMiniChunkSize] = useState<number>(220);
-  const [splitterMode, setSplitterMode] = useState<'semantic' | 'blind'>('semantic');
+  const [splitterMode, setSplitterMode] = useState<'recursive' | 'blind'>('recursive');
   const [hoveredChunkIdx, setHoveredChunkIdx] = useState<number | null>(null);
 
-  // Interactive ROI Calculator state
-  const [monthlyDocs, setMonthlyDocs] = useState<number>(2500);
-  const [avgDocTokens, setAvgDocTokens] = useState<number>(10000);
-  const [overlapPct, setOverlapPct] = useState<number>(20);
+  // Honest Cost Formula Calculator state (no defaults for price)
+  const [monthlyDocs, setMonthlyDocs] = useState<number>(1000);
+  const [avgDocTokens, setAvgDocTokens] = useState<number>(5000);
+  const [overlapPct, setOverlapPct] = useState<number>(15);
+  const [pricePerMillionInput, setPricePerMillionInput] = useState<string>('');
 
   // Interactive Mini Heatmap hover state
   const [hoveredCell, setHoveredCell] = useState<{ r: number; c: number; score: number } | null>(null);
@@ -107,21 +107,21 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
 
   const activeSample = MINI_SAMPLES[selectedSampleKey];
 
-  // Calculate live chunks in Mini-Chunker
+  // Calculate live chunks in Mini-Chunker (Labeled as Illustration)
   const miniChunks = useMemo(() => {
     if (splitterMode === 'blind') {
       return activeSample.blindSplits.map((text, idx) => ({
         id: `blind-${idx + 1}`,
         text,
         approxTokens: Math.round(text.length / 4),
-        continuity: idx === 0 ? 'Start' : '14.2%',
+        status: 'Severed mid-word/boundary',
         isSevered: true,
       }));
     }
 
     const raw = activeSample.text;
     const paragraphs = raw.split('\n\n').filter((p) => p.trim().length > 0);
-    const result: { id: string; text: string; approxTokens: number; continuity: string; isSevered: boolean }[] = [];
+    const result: { id: string; text: string; approxTokens: number; status: string; isSevered: boolean }[] = [];
 
     let current = '';
     let idx = 1;
@@ -132,7 +132,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
           id: `c-${idx++}`,
           text: current.trim(),
           approxTokens: Math.round(current.length / 4),
-          continuity: idx === 2 ? '94.2%' : '88.5%',
+          status: 'Paragraph Boundary Preserved',
           isSevered: false,
         });
         current = p;
@@ -146,7 +146,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
         id: `c-${idx++}`,
         text: current.trim(),
         approxTokens: Math.round(current.length / 4),
-        continuity: idx === 1 ? 'Start' : '91.0%',
+        status: 'Paragraph Boundary Preserved',
         isSevered: false,
       });
     }
@@ -154,30 +154,39 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
     return result;
   }, [selectedSampleKey, miniChunkSize, splitterMode, activeSample]);
 
-  // Calculate ROI Token Savings
-  const savingsData = useMemo(() => {
-    const totalTokensPerMonth = monthlyDocs * avgDocTokens;
-    const overlapTokensPerMonth = totalTokensPerMonth * (overlapPct / 100);
-    const annualWastedTokens = overlapTokensPerMonth * 12;
+  // Transparent Step-by-Step Cost Calculations
+  const costCalculation = useMemo(() => {
+    const baseTokens = monthlyDocs * avgDocTokens;
+    const overlapTokens = Math.round(baseTokens * (overlapPct / 100));
+    const totalIngestedTokens = baseTokens + overlapTokens;
+    const priceNum = parseFloat(pricePerMillionInput);
+    const hasPrice = !isNaN(priceNum) && priceNum > 0;
 
-    // Vector DB & Embedding blended storage cost (~$0.07 / 1M tokens annually)
-    const annualWastedSpend = (annualWastedTokens / 1_000_000) * 0.07;
-    const potentialAnnualSavings = annualWastedSpend * 0.42;
+    const baseCostMonthly = hasPrice ? (baseTokens / 1_000_000) * priceNum : null;
+    const overlapCostMonthly = hasPrice ? (overlapTokens / 1_000_000) * priceNum : null;
+    const totalCostMonthly = hasPrice ? (totalIngestedTokens / 1_000_000) * priceNum : null;
+    const totalCostAnnual = totalCostMonthly !== null ? totalCostMonthly * 12 : null;
+    const overlapCostAnnual = overlapCostMonthly !== null ? overlapCostMonthly * 12 : null;
 
     return {
-      totalTokensPerMonth,
-      annualWastedTokens,
-      annualWastedSpend,
-      potentialAnnualSavings,
+      baseTokens,
+      overlapTokens,
+      totalIngestedTokens,
+      priceNum: hasPrice ? priceNum : null,
+      baseCostMonthly,
+      overlapCostMonthly,
+      totalCostMonthly,
+      totalCostAnnual,
+      overlapCostAnnual,
     };
-  }, [monthlyDocs, avgDocTokens, overlapPct]);
+  }, [monthlyDocs, avgDocTokens, overlapPct, pricePerMillionInput]);
 
   // Mini Heatmap 4x4 matrix values
   const miniHeatmapData = [
-    [100, 42, 18, 6],
-    [42, 100, 34, 12],
-    [18, 34, 100, 28],
-    [6, 12, 28, 100],
+    [100, 38, 14, 8],
+    [38, 100, 42, 12],
+    [14, 42, 100, 28],
+    [8, 12, 28, 100],
   ];
 
   return (
@@ -190,7 +199,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
             <span className="h-2 w-2 rounded-full bg-status-success inline-block animate-pulse" />
             <span className="font-medium text-text">100% Client-Side · Zero Network Egress</span>
             <span className="text-separator hidden sm:inline">|</span>
-            <span className="text-2xs text-text-secondary font-mono hidden sm:inline">Air-Gapped Privacy</span>
+            <span className="text-2xs text-text-secondary font-mono hidden sm:inline">Zero Server Upload</span>
           </div>
 
           {/* Main Headline */}
@@ -201,8 +210,8 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
 
           {/* Subheadline */}
           <p className="text-sm sm:text-lg text-text-secondary max-w-2xl mx-auto mb-8 leading-relaxed font-sans">
-            Eliminate context boundary hallucinations and cut 30%–50% of wasted vector store token costs before ingestion.
-            Tune splitters, token budgets, and boundary continuity in real time on your machine.
+            Eliminate severed context boundaries and unoptimized token waste before saving to vector stores.
+            Tune chunk strategies, token limits, and boundary continuity in real time on your machine.
           </p>
 
           {/* Primary Action Buttons */}
@@ -235,11 +244,11 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
             </div>
             <div className="flex items-center justify-center space-x-1.5">
               <Check className="h-3.5 w-3.5 text-status-success-text" />
-              <span>5 BPE Tokenizers</span>
+              <span>Exact BPE Tokenizers</span>
             </div>
             <div className="flex items-center justify-center space-x-1.5">
               <Check className="h-3.5 w-3.5 text-status-success-text" />
-              <span>4 RAG Splitters</span>
+              <span>5 Chunking Strategies</span>
             </div>
             <div className="flex items-center justify-center space-x-1.5">
               <Check className="h-3.5 w-3.5 text-status-success-text" />
@@ -249,7 +258,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
         </div>
       </section>
 
-      {/* 2. DYNAMIC INTERACTIVE MINI-CHUNKER & COMPARISON WORKBENCH */}
+      {/* 2. INTERACTIVE PLAYGROUND SIMULATION (ILLUSTRATION) */}
       <section className="py-14 px-4 sm:px-6 bg-surface-2/40 border-y border-separator">
         <div className="max-w-5xl mx-auto">
           {/* Header & Controls Cluster */}
@@ -257,7 +266,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
             <div>
               <div className="inline-flex items-center space-x-1.5 text-2xs font-mono text-accent mb-1 font-semibold">
                 <Sparkles className="h-3 w-3" />
-                <span>Interactive Playground</span>
+                <span>Illustration: Playground Simulation</span>
               </div>
               <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-text">
                 Live Document Chunking Simulation
@@ -269,16 +278,16 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
               <div className="flex items-center p-1 rounded-control bg-surface-1 border border-separator text-xs">
                 <button
                   type="button"
-                  onClick={() => setSplitterMode('semantic')}
+                  onClick={() => setSplitterMode('recursive')}
                   className={cn(
                     'px-3 py-1 rounded-control font-medium transition-all active-press flex items-center space-x-1.5',
-                    splitterMode === 'semantic'
+                    splitterMode === 'recursive'
                       ? 'bg-accent text-white shadow-subtle font-semibold'
                       : 'text-text-secondary hover:text-text'
                   )}
                 >
                   <Layers className="h-3.5 w-3.5" />
-                  <span>Semantic Split</span>
+                  <span>Recursive Split</span>
                 </button>
                 <button
                   type="button"
@@ -291,7 +300,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
                   )}
                 >
                   <AlertTriangle className="h-3.5 w-3.5" />
-                  <span>Blind Split</span>
+                  <span>Fixed Character Split</span>
                 </button>
               </div>
 
@@ -344,14 +353,9 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
                 </span>
                 <span className="text-separator">|</span>
                 <span className="text-text-tertiary">
-                  Boundary Health:{' '}
-                  <strong
-                    className={cn(
-                      'font-semibold',
-                      splitterMode === 'semantic' ? 'text-status-success-text' : 'text-status-warn-text'
-                    )}
-                  >
-                    {splitterMode === 'semantic' ? '94.2% (Smooth Flow)' : '14.2% (Severed Thought)'}
+                  Strategy:{' '}
+                  <strong className="text-text font-semibold">
+                    {splitterMode === 'recursive' ? 'Recursive Paragraph Delimiters' : 'Fixed Character Slicing'}
                   </strong>
                 </span>
               </div>
@@ -389,20 +393,20 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
                           ~{chunk.approxTokens} tok
                         </span>
                       </div>
-                      <p className="text-xs text-text-secondary font-sans leading-relaxed line-clamp-3">
+                      <p className="text-xs text-text-secondary font-mono leading-relaxed line-clamp-3">
                         {chunk.text}
                       </p>
                     </div>
 
                     <div className="mt-3 pt-2 border-t border-separator/60 flex items-center justify-between text-2xs font-mono text-text-tertiary">
-                      <span>Boundary: {chunk.isSevered ? 'Fractured' : 'Safe'}</span>
+                      <span>Status:</span>
                       <span
                         className={cn(
                           'font-semibold',
                           chunk.isSevered ? 'text-status-warn-text' : 'text-status-success-text'
                         )}
                       >
-                        {chunk.continuity}
+                        {chunk.status}
                       </span>
                     </div>
                   </div>
@@ -429,31 +433,31 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
         </div>
       </section>
 
-      {/* 3. DYNAMIC FEATURE: INTERACTIVE ROI & COST WASTE CALCULATOR */}
+      {/* 3. COST & OVERLAP TOKEN FORMULA CALCULATOR (TRANSPARENT STEPS) */}
       <section className="py-16 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center max-w-xl mx-auto mb-10">
             <div className="inline-flex items-center space-x-1.5 text-2xs font-mono text-accent mb-1 font-semibold">
               <Calculator className="h-3.5 w-3.5" />
-              <span>Cost Optimization Calculator</span>
+              <span>Step-by-Step Cost Calculator</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-text mb-2">
-              Calculate Your RAG Ingestion Waste
+              Embedding Ingestion Cost Formula
             </h2>
             <p className="text-xs sm:text-sm text-text-secondary">
-              See how much your organization spends storing unoptimized, redundant duplicate tokens in vector databases.
+              Calculate exact token volume and embedding expenditure with full transparency into every arithmetic step.
             </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-            {/* Input Sliders (7 cols) */}
-            <div className="lg:col-span-7 rounded-card border border-separator bg-surface-1 shadow-subtle p-6 flex flex-col justify-between">
+            {/* Input Controls (7 cols) */}
+            <div className="lg:col-span-7 rounded-card border border-separator bg-surface-1 shadow-subtle p-6 flex flex-col justify-between space-y-6">
               <div className="space-y-6">
-                {/* Slider 1: Monthly Documents */}
+                {/* Input 1: Monthly Documents */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label htmlFor="roi-docs-slider" className="text-xs font-semibold text-text">
-                      Documents Ingested Monthly
+                      Monthly Ingested Documents
                     </label>
                     <span className="font-mono text-xs font-bold text-accent tabular-nums">
                       {monthlyDocs.toLocaleString()} docs
@@ -462,25 +466,25 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
                   <input
                     id="roi-docs-slider"
                     type="range"
-                    min="200"
-                    max="20000"
-                    step="200"
+                    min="100"
+                    max="10000"
+                    step="100"
                     value={monthlyDocs}
                     onChange={(e) => setMonthlyDocs(Number(e.target.value))}
                     className="w-full accent-accent cursor-pointer"
                   />
                   <div className="flex justify-between text-2xs font-mono text-text-tertiary mt-1">
-                    <span>200</span>
+                    <span>100</span>
+                    <span>5,000</span>
                     <span>10,000</span>
-                    <span>20,000+</span>
                   </div>
                 </div>
 
-                {/* Slider 2: Average Doc Length */}
+                {/* Input 2: Average Doc Length */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label htmlFor="roi-tokens-slider" className="text-xs font-semibold text-text">
-                      Avg. Document Length (Tokens)
+                      Average Document Length (Tokens)
                     </label>
                     <span className="font-mono text-xs font-bold text-accent tabular-nums">
                       {avgDocTokens.toLocaleString()} tok
@@ -489,100 +493,139 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
                   <input
                     id="roi-tokens-slider"
                     type="range"
-                    min="1000"
-                    max="30000"
-                    step="1000"
+                    min="500"
+                    max="20000"
+                    step="500"
                     value={avgDocTokens}
                     onChange={(e) => setAvgDocTokens(Number(e.target.value))}
                     className="w-full accent-accent cursor-pointer"
                   />
                   <div className="flex justify-between text-2xs font-mono text-text-tertiary mt-1">
-                    <span>1k tok</span>
-                    <span>15k tok</span>
-                    <span>30k tok</span>
+                    <span>500 tok</span>
+                    <span>10,000 tok</span>
+                    <span>20,000 tok</span>
                   </div>
                 </div>
 
-                {/* Slider 3: Blind Chunk Overlap */}
+                {/* Input 3: Chunk Overlap Ratio */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label htmlFor="roi-overlap-slider" className="text-xs font-semibold text-text">
-                      Unoptimized Blind Overlap
+                      Chunk Overlap Ratio
                     </label>
                     <span className="font-mono text-xs font-bold text-status-warn-text tabular-nums">
-                      {overlapPct}% overlap
+                      {overlapPct}%
                     </span>
                   </div>
                   <input
                     id="roi-overlap-slider"
                     type="range"
-                    min="10"
-                    max="35"
+                    min="0"
+                    max="40"
                     step="5"
                     value={overlapPct}
                     onChange={(e) => setOverlapPct(Number(e.target.value))}
                     className="w-full accent-accent cursor-pointer"
                   />
                   <div className="flex justify-between text-2xs font-mono text-text-tertiary mt-1">
-                    <span>10% (Tuned)</span>
+                    <span>0% (No overlap)</span>
                     <span>20% (Default)</span>
-                    <span>35% (Severe Waste)</span>
+                    <span>40% (High overlap)</span>
                   </div>
                 </div>
-              </div>
 
-              <div className="pt-4 border-t border-separator text-2xs text-text-tertiary font-mono">
-                Model: Standard dense vector embeddings (1536d) at blended multi-tier storage cost.
+                {/* Input 4: Embedding Price per 1M Tokens (No default) */}
+                <div>
+                  <label htmlFor="model-price-input" className="text-xs font-semibold text-text block mb-1">
+                    Your Model Price per 1,000,000 Tokens (USD)
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-2 text-xs font-mono text-text-tertiary">$</span>
+                    <input
+                      id="model-price-input"
+                      type="number"
+                      step="0.001"
+                      min="0.001"
+                      placeholder="e.g. 0.02 for text-embedding-3-small"
+                      value={pricePerMillionInput}
+                      onChange={(e) => setPricePerMillionInput(e.target.value)}
+                      className="w-full pl-7 pr-3 py-1.5 rounded-control bg-surface-2 border border-separator text-xs font-mono text-text focus-ring"
+                    />
+                  </div>
+                  <span className="text-2xs text-text-tertiary font-mono block mt-1">
+                    Enter the exact rate from your embedding model provider.
+                  </span>
+                </div>
               </div>
             </div>
 
-            {/* Live Calculation Output Card (5 cols) */}
-            <div className="lg:col-span-5 rounded-card border-2 border-accent/40 bg-surface-1 shadow-card p-6 flex flex-col justify-between">
+            {/* Step-by-Step Formula Output (5 cols) */}
+            <div className="lg:col-span-5 rounded-card border-2 border-separator bg-surface-1 shadow-card p-6 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between pb-3 border-b border-separator mb-4">
-                  <span className="text-xs font-mono text-text-secondary font-semibold">Annual Waste Breakdown</span>
+                  <span className="text-xs font-mono text-text-secondary font-semibold">Step-by-Step Calculation</span>
                   <span className="text-2xs font-mono px-2 py-0.5 rounded-full bg-surface-2 text-text border border-separator font-semibold">
-                    Live Model
+                    Transparent Math
                   </span>
                 </div>
 
-                <div className="space-y-4">
-                  <div>
-                    <span className="text-2xs font-mono text-text-tertiary">Annual Redundant Overlap Tokens:</span>
-                    <div className="text-xl font-bold font-mono text-status-warn-text tabular-nums mt-0.5">
-                      {(savingsData.annualWastedTokens / 1_000_000).toFixed(1)}M tokens/yr
-                    </div>
+                <div className="space-y-3 font-mono text-xs">
+                  <div className="p-2 rounded bg-surface-2/60 border border-separator/60">
+                    <span className="text-2xs text-text-tertiary block">Step 1: Base Document Tokens</span>
+                    <span className="text-text font-bold">
+                      {monthlyDocs.toLocaleString()} docs &times; {avgDocTokens.toLocaleString()} tok ={' '}
+                      {(costCalculation.baseTokens / 1_000_000).toFixed(2)}M tokens/mo
+                    </span>
                   </div>
 
-                  <div>
-                    <span className="text-2xs font-mono text-text-tertiary">Estimated Annual Wasted Spend:</span>
-                    <div className="text-2xl font-bold font-mono text-text tabular-nums mt-0.5">
-                      ${savingsData.annualWastedSpend.toFixed(0)} <span className="text-xs font-normal text-text-tertiary">/ year</span>
-                    </div>
+                  <div className="p-2 rounded bg-surface-2/60 border border-separator/60">
+                    <span className="text-2xs text-text-tertiary block">Step 2: Overlap Redundancy Volume</span>
+                    <span className="text-status-warn-text font-bold">
+                      {(costCalculation.baseTokens / 1_000_000).toFixed(2)}M &times; {overlapPct}% ={' '}
+                      {(costCalculation.overlapTokens / 1_000_000).toFixed(2)}M redundant tok/mo
+                    </span>
                   </div>
 
-                  <div className="p-3.5 rounded-control bg-status-success-subtle border border-status-success/25">
-                    <span className="text-2xs font-mono text-status-success-text font-semibold block mb-0.5">
-                      Potential Annual Savings with ChunkLens:
+                  <div className="p-2 rounded bg-surface-2/60 border border-separator/60">
+                    <span className="text-2xs text-text-tertiary block">Step 3: Total Ingested Tokens</span>
+                    <span className="text-text font-bold">
+                      {(costCalculation.totalIngestedTokens / 1_000_000).toFixed(2)}M tokens/mo
                     </span>
-                    <div className="text-2xl font-extrabold font-mono text-status-success-text tabular-nums">
-                      ${savingsData.potentialAnnualSavings.toFixed(0)} / yr
-                    </div>
-                    <span className="text-2xs text-text-secondary block mt-1">
-                      By calibrating step overlap from {overlapPct}% down to optimal boundary continuity.
+                  </div>
+
+                  <div className="p-3 rounded-control bg-accent-subtle/30 border border-accent/25">
+                    <span className="text-2xs text-accent font-semibold block mb-1">
+                      Step 4: Embedding Spend (Based on User Rate)
                     </span>
+                    {costCalculation.priceNum !== null ? (
+                      <div className="space-y-1">
+                        <div className="text-sm font-bold text-text">
+                          ${costCalculation.totalCostMonthly?.toFixed(2)} / month
+                        </div>
+                        <div className="text-2xs text-text-secondary">
+                          ${costCalculation.totalCostAnnual?.toFixed(2)} / year total embedding cost
+                        </div>
+                        <div className="text-2xs text-status-warn-text font-semibold pt-1 border-t border-separator/60">
+                          Includes ${costCalculation.overlapCostAnnual?.toFixed(2)}/yr spent purely on overlap redundancy.
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-2xs text-text-tertiary italic">
+                        Enter your price per 1M tokens above to calculate dollar amounts.
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
 
-              <div className="pt-4">
+              <div className="pt-4 mt-4 border-t border-separator">
                 <Button
                   variant="primary"
                   size="sm"
                   onClick={() => onLaunchApp()}
                   className="w-full text-xs font-semibold"
                 >
-                  <span>Optimize Your Documents Free</span>
+                  <span>Launch Visualizer</span>
                 </Button>
               </div>
             </div>
@@ -606,7 +649,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             <div className="p-6 rounded-card border border-separator bg-surface-1 shadow-subtle flex flex-col justify-between card-interactive">
               <div>
-                <div className="h-10 w-10 rounded-control bg-status-warn-subtle border border-status-warn/25 flex items-center justify-center text-status-warn mb-4">
+                <div className="h-10 w-10 rounded-control bg-status-warn-subtle border border-status-warn/25 flex items-center justify-center text-status-warn-text mb-4">
                   <SplitSquareVertical className="h-5 w-5" />
                 </div>
                 <h3 className="text-base font-semibold text-text mb-2">Context Boundary Fractures</h3>
@@ -658,10 +701,10 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
                   <Grid3X3 className="h-3.5 w-3.5" />
                   <span>Interactive Heatmap Preview</span>
                 </div>
-                <h3 className="text-base font-bold text-text">Cross-Chunk Semantic Overlap Matrix</h3>
+                <h3 className="text-base font-bold text-text">Cross-Chunk Lexical Overlap Matrix</h3>
               </div>
               <div className="text-2xs font-mono text-text-tertiary">
-                Hover any cell to inspect similarity between chunk pairs
+                Hover any cell to inspect lexical similarity between chunk pairs
               </div>
             </div>
 
@@ -722,7 +765,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
                       Chunk #{hoveredCell.r + 1} &harr; Chunk #{hoveredCell.c + 1}
                     </div>
                     <div className="text-accent text-base font-extrabold tabular-nums">
-                      {hoveredCell.score}% Semantic Overlap
+                      {hoveredCell.score}% Lexical Overlap
                     </div>
                     <p className="text-2xs text-text-secondary font-sans leading-relaxed">
                       {hoveredCell.score === 100
@@ -752,7 +795,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
                 <Cpu className="h-4 w-4 text-accent" />
                 <div>
                   <div className="font-semibold text-text group-hover:text-accent transition-colors">Splitter Engines</div>
-                  <div className="text-2xs text-text-tertiary">4 splitters &amp; continuity math</div>
+                  <div className="text-2xs text-text-tertiary">5 strategies &amp; continuity math</div>
                 </div>
               </div>
               <ArrowRight className="h-3.5 w-3.5 text-text-tertiary group-hover:text-accent group-hover:translate-x-0.5 transition-all" />
@@ -782,7 +825,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
                 <Shield className="h-4 w-4 text-status-success-text" />
                 <div>
                   <div className="font-semibold text-text group-hover:text-status-success-text transition-colors">Zero-Egress Security</div>
-                  <div className="text-2xs text-text-tertiary">Web Worker air-gap proof</div>
+                  <div className="text-2xs text-text-tertiary">Web Worker client-side proof</div>
                 </div>
               </div>
               <ArrowRight className="h-3.5 w-3.5 text-text-tertiary group-hover:text-status-success-text group-hover:translate-x-0.5 transition-all" />
@@ -806,184 +849,64 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
         </div>
       </section>
 
-      {/* 5. PRICING & ROADMAP SECTION (FROZEN / EARLY ACCESS) */}
+      {/* 5. ROADMAP & COMMUNITY IDEAS */}
       <section className="py-20 px-4 sm:px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center max-w-xl mx-auto mb-16">
-            <span className="text-xs font-mono text-accent font-semibold">Product Tiers &amp; Roadmap</span>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-text mt-1 mb-2">
-              Transparent, Developer-Friendly Tiers
-            </h2>
-            <p className="text-xs sm:text-sm text-text-secondary">
-              The full single-document visualizer is 100% free and open-source. Commercial multi-document batch features are available via priority early access.
-            </p>
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center space-x-1.5 text-2xs font-mono text-accent mb-2 font-semibold">
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>Open Source Roadmap</span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-text mb-3">
+            Roadmap &amp; Community Ideas
+          </h2>
+          <p className="text-xs sm:text-sm text-text-secondary max-w-xl mx-auto mb-8 leading-relaxed font-sans">
+            ChunkLens is 100% free, client-side, and open-source. Help shape our upcoming features—tell us what you need for your RAG pipelines.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 text-left">
+            <div className="p-4 rounded-card border border-separator bg-surface-1 shadow-subtle">
+              <span className="font-semibold text-text text-xs block mb-1">Batch Document Evaluation</span>
+              <p className="text-2xs text-text-secondary leading-relaxed">
+                Evaluating multi-document corpora and folder uploads in local memory.
+              </p>
+            </div>
+            <div className="p-4 rounded-card border border-separator bg-surface-1 shadow-subtle">
+              <span className="font-semibold text-text text-xs block mb-1">Retrieval Simulator</span>
+              <p className="text-2xs text-text-secondary leading-relaxed">
+                Testing top-k query matching directly against client-side chunk vectors.
+              </p>
+            </div>
+            <div className="p-4 rounded-card border border-separator bg-surface-1 shadow-subtle">
+              <span className="font-semibold text-text text-xs block mb-1">Custom Tokenizer Encodings</span>
+              <p className="text-2xs text-text-secondary leading-relaxed">
+                Configuring custom vocabulary tables and delimiter grammars for specialized models.
+              </p>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* TIER 1: Community (Active Now) */}
-            <div className="p-6 rounded-card border border-separator bg-surface-1 shadow-subtle flex flex-col justify-between card-interactive">
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-mono font-semibold text-text-secondary">Community</span>
-                  <span className="text-2xs font-mono px-2 py-0.5 rounded-full bg-status-success-subtle text-status-success-text border border-status-success/25 font-semibold">
-                    Available Now
-                  </span>
-                </div>
-                <div className="flex items-baseline space-x-1 mb-4">
-                  <span className="text-3xl font-bold text-text">$0</span>
-                  <span className="text-xs text-text-tertiary font-mono">/ forever</span>
-                </div>
-                <p className="text-xs text-text-secondary mb-6">
-                  For individual AI engineers inspecting and tuning chunk strategies for single documents.
-                </p>
-
-                <div className="space-y-2.5 text-xs text-text-secondary border-t border-separator pt-4 mb-6">
-                  <div className="flex items-center space-x-2">
-                    <Check className="h-3.5 w-3.5 text-status-success-text shrink-0" />
-                    <span>All 4 Text Splitting Algorithms</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="h-3.5 w-3.5 text-status-success-text shrink-0" />
-                    <span>Exact TikToken BPE Encoders (5 models)</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="h-3.5 w-3.5 text-status-success-text shrink-0" />
-                    <span>Interactive N x N Similarity Heatmap</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="h-3.5 w-3.5 text-status-success-text shrink-0" />
-                    <span>Sequential Boundary Continuity Scoring</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="h-3.5 w-3.5 text-status-success-text shrink-0" />
-                    <span>Client-side zero-egress PDF parsing</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="h-3.5 w-3.5 text-status-success-text shrink-0" />
-                    <span>Python &amp; TypeScript code exporters</span>
-                  </div>
-                </div>
-              </div>
-
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => onLaunchApp()}
-                className="w-full text-xs font-semibold"
-              >
-                <span>Launch Visualizer</span>
-              </Button>
-            </div>
-
-            {/* TIER 2: Pro Developer (Frozen / Early Access) */}
-            <div className="p-6 rounded-card border-2 border-accent bg-surface-1 shadow-card flex flex-col justify-between relative card-interactive">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-accent text-white font-mono text-2xs font-semibold shadow-subtle">
-                In Development · Early Access
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-1 mt-1">
-                  <span className="text-xs font-mono font-semibold text-text">Pro Developer</span>
-                  <span className="text-2xs font-mono px-2 py-0.5 rounded-full bg-surface-2 text-text border border-separator font-semibold">
-                    Target Q1 2027
-                  </span>
-                </div>
-                <div className="flex items-baseline space-x-1 mb-4">
-                  <span className="text-3xl font-bold text-text">$29</span>
-                  <span className="text-xs text-text-tertiary font-mono">/ month</span>
-                </div>
-                <p className="text-xs text-text-secondary mb-6">
-                  For engineers building production RAG systems with query testing and multi-doc corpora.
-                </p>
-
-                <div className="space-y-2.5 text-xs text-text-secondary border-t border-separator pt-4 mb-6">
-                  <div className="flex items-center space-x-2 text-text font-medium">
-                    <Check className="h-3.5 w-3.5 text-accent shrink-0" />
-                    <span>Everything in Community, plus:</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="h-3.5 w-3.5 text-accent shrink-0" />
-                    <span>Batch Multi-Document Ingestion (50 docs)</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="h-3.5 w-3.5 text-accent shrink-0" />
-                    <span>Query Retrieval Simulator (Top-k recall test)</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="h-3.5 w-3.5 text-accent shrink-0" />
-                    <span>Contextual Retrieval prefix generator</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="h-3.5 w-3.5 text-accent shrink-0" />
-                    <span>Local WebGPU embedding models (BGE-Small)</span>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => onOpenEarlyAccess('Pro Developer Tier')}
-                className="w-full py-2.5 px-4 rounded-control text-xs font-semibold bg-accent text-white hover:bg-accent-hover transition-colors active-press focus-ring flex items-center justify-center space-x-1.5 shadow-subtle"
-              >
-                <Sparkles className="h-3.5 w-3.5" />
-                <span>Join Early Access Priority</span>
-              </button>
-            </div>
-
-            {/* TIER 3: Team & Enterprise (Frozen / Waitlist) */}
-            <div className="p-6 rounded-card border border-separator bg-surface-1 shadow-subtle flex flex-col justify-between card-interactive">
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-mono font-semibold text-text-secondary">Team &amp; Enterprise</span>
-                  <span className="text-2xs font-mono px-2 py-0.5 rounded-full bg-surface-2 text-text-tertiary border border-separator font-semibold">
-                    Waitlist
-                  </span>
-                </div>
-                <div className="flex items-baseline space-x-1 mb-4">
-                  <span className="text-3xl font-bold text-text">$99</span>
-                  <span className="text-xs text-text-tertiary font-mono">/ month</span>
-                </div>
-                <p className="text-xs text-text-secondary mb-6">
-                  For teams automating knowledge base quality and syncing directly with vector databases.
-                </p>
-
-                <div className="space-y-2.5 text-xs text-text-secondary border-t border-separator pt-4 mb-6">
-                  <div className="flex items-center space-x-2 text-text font-medium">
-                    <Check className="h-3.5 w-3.5 text-status-success-text shrink-0" />
-                    <span>Everything in Pro, plus:</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="h-3.5 w-3.5 text-status-success-text shrink-0" />
-                    <span>Shared Team Presets &amp; Workspaces</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="h-3.5 w-3.5 text-status-success-text shrink-0" />
-                    <span>Direct Vector DB Push (Pinecone / Qdrant)</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="h-3.5 w-3.5 text-status-success-text shrink-0" />
-                    <span>GitHub Actions CI/CD Knowledge Gate</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="h-3.5 w-3.5 text-status-success-text shrink-0" />
-                    <span>Enterprise SSO &amp; Priority SLA support</span>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => onOpenEarlyAccess('Team & Enterprise Tier')}
-                className="w-full py-2.5 px-4 rounded-control text-xs font-semibold bg-surface-2 hover:bg-surface-3 border border-separator text-text-secondary hover:text-text transition-colors active-press focus-ring"
-              >
-                <span>Request Enterprise Pilot</span>
-              </button>
-            </div>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a
+              href="https://github.com/Dhanesh10war/chunklens/discussions"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-control text-xs font-semibold bg-surface-2 hover:bg-surface-3 border border-separator text-text transition-colors active-press focus-ring shadow-subtle"
+            >
+              <Github className="h-4 w-4" />
+              <span>Share feedback on GitHub Discussions</span>
+            </a>
+            <a
+              href="https://github.com/Dhanesh10war/chunklens/issues"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-control text-xs font-medium text-text-secondary hover:text-text hover:bg-surface-2 transition-colors px-4 py-2"
+            >
+              <span>Open an Issue</span>
+            </a>
           </div>
         </div>
       </section>
 
-      {/* 6. FAQ SECTION ACCORDION */}
+      {/* 6. FAQ SECTION */}
       <section className="py-16 px-4 sm:px-6 bg-surface-2/30 border-t border-separator">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-10">
@@ -1005,15 +928,15 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
               },
               {
                 q: 'Which tokenizers are supported for exact BPE calculation?',
-                a: 'ChunkLens bundles official TikToken encoders including cl100k_base (GPT-4, text-embedding-3), o200k_base (GPT-4o), p50k_base (text-davinci-003), and r50k_base. You can switch tokenizers with one click to observe variance.',
+                a: 'ChunkLens bundles official TikToken encoders for OpenAI models including cl100k_base (GPT-4, text-embedding-3) and o200k_base (GPT-4o). Non-OpenAI models (such as Claude, Gemini, and Llama) are estimated using reference vocabulary compression ratios.',
               },
               {
                 q: 'How does the boundary continuity metric work?',
-                a: 'Boundary continuity measures the semantic cosine similarity between chunk N and chunk N+1. High scores (>40%) indicate natural prose flow across sections, while low scores (<20%) alert you that a key concept was severed abruptly.',
+                a: 'Boundary continuity measures the lexical TF-IDF cosine similarity between chunk N and chunk N+1 to inspect vocabulary transitions across partition boundaries.',
               },
               {
                 q: 'Can I export the exact chunking code to my Python or Node.js codebase?',
-                a: 'Yes. ChunkLens features one-click copyable code generators for LangChain Python, LlamaIndex, Haystack, LangChain JS, and standalone Python scripts with matching delimiters and token parameters.',
+                a: 'Yes. ChunkLens features one-click copyable code generators for LangChain Python, LlamaIndex, LangChain JavaScript, and standalone Python scripts with matching delimiters and token parameters.',
               },
             ].map((faq, idx) => (
               <div

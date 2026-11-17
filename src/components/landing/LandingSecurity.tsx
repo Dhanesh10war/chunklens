@@ -10,6 +10,7 @@ import {
   EyeOff,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { STRICT_CSP_HEADER } from '../../config/csp';
 
 interface LandingSecurityProps {
   onLaunchApp: () => void;
@@ -18,9 +19,9 @@ interface LandingSecurityProps {
 export const LandingSecurity: React.FC<LandingSecurityProps> = ({ onLaunchApp }) => {
   const [copiedCurl, setCopiedCurl] = useState(false);
 
-  const curlTest = `curl -sI https://chunklens.app | grep -i content-security-policy
+  const curlTest = `curl -sI <your-site-url> | grep -i content-security-policy
 # Expected response header:
-# Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'none'; img-src 'self' data: blob:; worker-src 'self' blob:;`;
+# Content-Security-Policy: ${STRICT_CSP_HEADER}`;
 
   const handleCopyCurl = async () => {
     try {
@@ -44,7 +45,7 @@ export const LandingSecurity: React.FC<LandingSecurityProps> = ({ onLaunchApp })
           True Zero-Egress. Your Data Never Leaves Your Machine.
         </h1>
         <p className="text-sm sm:text-base text-text-secondary leading-relaxed font-sans">
-          Most RAG tools upload your proprietary documents to cloud APIs for processing. ChunkLens is built from first principles as an air-gapped client-side application.
+          Most RAG tools upload your proprietary documents to cloud APIs for processing. After the app loads, it cannot send data anywhere (enforced by Content-Security-Policy).
         </p>
       </div>
 
@@ -87,11 +88,11 @@ export const LandingSecurity: React.FC<LandingSecurityProps> = ({ onLaunchApp })
             </div>
             <h3 className="text-base font-semibold text-text mb-2">Zero Tracking or Analytics</h3>
             <p className="text-xs text-text-secondary leading-relaxed mb-4">
-              No tracking cookies, no Google Analytics, no third-party scripts, and no server telemetry. What you paste into ChunkLens exists only in local RAM.
+              No tracking cookies, no Google Analytics, no third-party scripts, and no server telemetry. Documents are processed in-browser.
             </p>
           </div>
           <div className="pt-3 border-t border-separator font-mono text-2xs text-text-secondary">
-            100% ephemeral local storage
+            Privacy by architecture
           </div>
         </div>
       </div>
@@ -144,43 +145,13 @@ export const LandingSecurity: React.FC<LandingSecurityProps> = ({ onLaunchApp })
         </div>
       </div>
 
-      {/* Enterprise Compliance Readiness */}
-      <div className="p-8 rounded-card border border-separator bg-surface-2/30">
-        <div className="text-center max-w-xl mx-auto mb-8">
-          <h3 className="text-lg font-bold text-text mb-1">Enterprise Compliance Ready</h3>
-          <p className="text-xs text-text-secondary">
-            Designed to pass stringent enterprise security reviews without requiring complex cloud DPAs.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-          <div className="p-4 rounded-control bg-surface-1 border border-separator card-interactive">
-            <div className="font-semibold text-text mb-1">SOC 2 Type II</div>
-            <div className="text-2xs text-text-secondary leading-relaxed">
-              Data processing boundary remains strictly on your client workstation.
-            </div>
-          </div>
-          <div className="p-4 rounded-control bg-surface-1 border border-separator card-interactive">
-            <div className="font-semibold text-text mb-1">HIPAA Compatible</div>
-            <div className="text-2xs text-text-secondary leading-relaxed">
-              Zero Protected Health Information (PHI) is ever transmitted over the wire.
-            </div>
-          </div>
-          <div className="p-4 rounded-control bg-surface-1 border border-separator card-interactive">
-            <div className="font-semibold text-text mb-1">GDPR / CCPA</div>
-            <div className="text-2xs text-text-secondary leading-relaxed">
-              No personal data collected, stored, or processed on remote infrastructure.
-            </div>
-          </div>
-          <div className="p-4 rounded-control bg-surface-1 border border-separator card-interactive">
-            <div className="font-semibold text-text mb-1">Air-Gapped Friendly</div>
-            <div className="text-2xs text-text-secondary leading-relaxed">
-              Fully functional behind enterprise corporate firewalls and VPNs with zero network access.
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-8 text-center">
+      {/* Factual Compliance Statement (AUDIT-01 Remediation) */}
+      <div className="p-8 rounded-card border border-separator bg-surface-2/30 text-center max-w-2xl mx-auto">
+        <h3 className="text-lg font-bold text-text mb-2">Privacy &amp; Compliance</h3>
+        <p className="text-xs sm:text-sm text-text-secondary leading-relaxed mb-6 font-sans">
+          Your documents are not uploaded. Whether this fits your compliance requirements is for your team to decide.
+        </p>
+        <div className="text-center">
           <Button
             variant="primary"
             size="md"
@@ -188,7 +159,7 @@ export const LandingSecurity: React.FC<LandingSecurityProps> = ({ onLaunchApp })
             icon={<ArrowRight className="h-4 w-4" />}
             className="text-xs font-semibold px-6 shadow-card"
           >
-            <span>Launch Zero-Egress Visualizer</span>
+            <span>Launch Visualizer</span>
           </Button>
         </div>
       </div>
