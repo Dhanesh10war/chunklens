@@ -71,14 +71,14 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
       if (e.key === 'Escape') {
         onSelectChunk(null);
       } else if (chunks.length > 0) {
-        if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'j') {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key.toLowerCase() === 'j') {
           e.preventDefault();
           if (!selectedChunk) {
             onSelectChunk(chunks[0].id);
           } else if (selectedChunk.index < chunks.length - 1) {
             onSelectChunk(chunks[selectedChunk.index + 1].id);
           }
-        } else if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'k') {
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key.toLowerCase() === 'k') {
           e.preventDefault();
           if (!selectedChunk) {
             onSelectChunk(chunks[chunks.length - 1].id);
@@ -92,6 +92,16 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [chunks, selectedChunk, onSelectChunk]);
+
+  // Auto-scroll focused chunk into view smoothly
+  useEffect(() => {
+    if (selectedChunkId) {
+      const el = document.getElementById(`chunk-card-${selectedChunkId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+  }, [selectedChunkId]);
 
   // Stepper handlers
   const handlePrevChunk = () => {
@@ -301,6 +311,7 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
 
                   {/* Chunk Reading Card */}
                   <div
+                    id={`chunk-card-${chunk.id}`}
                     onClick={() => onSelectChunk(isSelected ? null : chunk.id)}
                     className={cn(
                       'group flex flex-col p-3.5 sm:p-4 rounded-card transition-all cursor-pointer border shadow-subtle',
@@ -390,6 +401,7 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
               return (
                 <div
                   key={chunk.id}
+                  id={`chunk-card-${chunk.id}`}
                   onClick={() => onSelectChunk(isSelected ? null : chunk.id)}
                   className={cn(
                     'p-4 rounded-card border transition-all cursor-pointer flex flex-col justify-between shadow-subtle',

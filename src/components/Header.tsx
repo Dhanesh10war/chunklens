@@ -14,6 +14,7 @@ import {
   Command,
   Grid3X3,
   Edit3,
+  Share2,
 } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Tooltip } from './ui/Tooltip';
@@ -35,6 +36,7 @@ interface HeaderProps {
   onToggleSidebar: () => void;
   onOpenCommandPalette?: () => void;
   onOpenLandingPage?: () => void;
+  onShareClick?: () => void;
   onPrefetchExport?: () => void;
   onPrefetchCommandPalette?: () => void;
   onPrefetchTokenizer?: () => void;
@@ -54,6 +56,7 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleSidebar,
   onOpenCommandPalette,
   onOpenLandingPage,
+  onShareClick,
   onPrefetchExport,
   onPrefetchCommandPalette,
   onPrefetchTokenizer,
@@ -286,6 +289,20 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </Tooltip>
 
+          {/* Share Setup: Copies zero-backend state URL */}
+          {onShareClick && (
+            <Tooltip content="Share configuration: copy link" position="bottom" wrapperClassName="hidden sm:inline-flex">
+              <button
+                onClick={onShareClick}
+                className="h-8 px-2.5 rounded-control bg-transparent hover:bg-surface-2 text-text-secondary hover:text-text border border-transparent flex items-center space-x-1.5 text-xs font-medium transition-colors active-press focus-ring"
+                aria-label="Share configuration: copy link"
+              >
+                <Share2 className="h-3.5 w-3.5" />
+                <span className="hidden min-[1400px]:inline">Share</span>
+              </button>
+            </Tooltip>
+          )}
+
           {/* Single Solid Accent Primary Action: Export - Always Visible */}
           <Tooltip content="Export code implementation and chunk datasets" shortcut="⌘E" position="bottom">
             <Button
@@ -418,6 +435,21 @@ export const Header: React.FC<HeaderProps> = ({
                   {isDark ? <Sun className="h-3.5 w-3.5 text-amber-400" /> : <Moon className="h-3.5 w-3.5 text-indigo-400" />}
                   <span>{isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}</span>
                 </button>
+
+                {/* Share setup link */}
+                {onShareClick && (
+                  <button
+                    role="menuitem"
+                    onClick={() => {
+                      onShareClick();
+                      closeMenuAndReturnFocus();
+                    }}
+                    className="w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center space-x-2 transition-colors focus:bg-surface-2 focus:outline-none"
+                  >
+                    <Share2 className="h-3.5 w-3.5 text-accent" />
+                    <span>Share Setup Link</span>
+                  </button>
+                )}
 
                 {/* Reset document (at <640px when hidden from left) */}
                 <button

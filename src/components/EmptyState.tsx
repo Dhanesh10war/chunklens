@@ -4,8 +4,13 @@ import {
   ClipboardPaste,
   ShieldCheck,
   ArrowRight,
+  Sparkles,
+  Sliders,
+  Check,
 } from 'lucide-react';
 import { SAMPLE_DOCUMENTS } from '../data/samples';
+import { RAG_ARCHETYPES } from '../data/archetypes';
+import { ChunkingConfig } from '../engine/types';
 import { UploadErrorInfo } from '../hooks/useDocumentUpload';
 import { UploadErrorBanner } from './UploadErrorBanner';
 import { Button } from './ui/Button';
@@ -18,6 +23,8 @@ interface EmptyStateProps {
   uploadError: UploadErrorInfo | null;
   onDismissError: () => void;
   isExtractingPdf?: boolean;
+  onSelectArchetype?: (config: ChunkingConfig, sampleId?: string) => void;
+  activeConfig?: ChunkingConfig;
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
@@ -27,10 +34,13 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   uploadError,
   onDismissError,
   isExtractingPdf = false,
+  onSelectArchetype,
+  activeConfig,
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [isPasting, setIsPasting] = useState(false);
   const [pastedText, setPastedText] = useState('');
+  const [calibratedName, setCalibratedName] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDrop = (e: React.DragEvent) => {
@@ -48,6 +58,13 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
     onPasteText(pastedText.trim(), 'Pasted Document');
     setPastedText('');
     setIsPasting(false);
+  };
+
+  const handleCalibrateForUpload = (name: string, config: ChunkingConfig) => {
+    setCalibratedName(name);
+    if (onSelectArchetype) {
+      onSelectArchetype(config);
+    }
   };
 
   return (
@@ -119,6 +136,12 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             </div>
 
             <div className="space-y-1">
+              {calibratedName && (
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-2 text-text border border-separator text-xs font-mono mb-1">
+                  <Check className="h-3 w-3 text-status-success-text" />
+                  <span>Calibrated for: {calibratedName}</span>
+                </div>
+              )}
               <p className="text-sm font-semibold text-text-primary">
                 {isExtractingPdf ? (
                   'Extracting text from PDF in browser...'
@@ -151,6 +174,112 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
               <span>Limit: 10 MB</span>
               <span>Automatic format recognition</span>
             </div>
+          </div>
+        </div>
+
+        {/* PRODUCTION RAG ARCHETYPE PRESETS */}
+        <div className="space-y-3 pt-1">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <h3 className="text-xs font-semibold text-text-primary flex items-center gap-1.5">
+                <Sparkles className="h-3.5 w-3.5 text-accent" />
+                <span>Production RAG Archetype Presets</span>
+              </h3>
+              <p className="text-2xs text-text-secondary">
+                Calibrated token budgets and splitters for standard vector database workloads.
+              </p>
+            </div>
+            <span className="text-2xs text-text-tertiary font-mono hidden sm:inline">
+              Pre-tuned splitters
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {RAG_ARCHETYPES.map((archetype) => {
+              const isCalibrated =
+                calibratedName === archetype.name ||
+                (activeConfig &&
+                  activeConfig.strategy === archetype.config.strategy &&
+                  activeConfig.chunkSize === archetype.config.chunkSize);
+
+              return (
+                <div
+                  key={archetype.id}
+                  className={cn(
+                    'p-4 rounded-card border bg-surface-1/60 hover:bg-surface-1 transition-all flex flex-col justify-between shadow-subtle',
+                    isCalibrated
+                      ? 'border-accent/60 ring-1 ring-accent/30'
+                      : 'border-separator hover:border-separator/80'
+                  )}
+                >
+                  <div className="space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h4 className="text-xs font-semibold text-text-primary flex items-center gap-1.5">
+                          <span>{archetype.name}</span>
+                        </h4>
+                        <span className="text-2xs text-text-tertiary font-mono">
+                          {archetype.targetWorkload}
+                        </span>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-full text-2xs font-mono font-semibold bg-surface-2 border border-separator text-text shrink-0">
+                        {archetype.badge}
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-text-secondary leading-relaxed">
+                      {archetype.description}
+                    </p>
+
+                    {/* Calibrated Params Strip */}
+                    <div className="flex items-center flex-wrap gap-1.5 pt-1 text-2xs font-mono text-text-secondary">
+                      <span className="px-1.5 py-0.5 rounded bg-surface-2 border border-separator/60">
+                        {archetype.config.chunkSize} tok
+                      </span>
+                      <span className="text-text-tertiary">•</span>
+                      <span className="px-1.5 py-0.5 rounded bg-surface-2 border border-separator/60">
+                        {archetype.config.chunkOverlap} ovl
+                      </span>
+                      <span className="text-text-tertiary">•</span>
+                      <span className="px-1.5 py-0.5 rounded bg-surface-2 border border-separator/60 capitalize">
+                        {archetype.config.strategy}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2 pt-3 mt-3 border-t border-separator/40 text-xs">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (onSelectArchetype) {
+                          onSelectArchetype(archetype.config, archetype.sampleId);
+                        } else {
+                          onSelectSample(archetype.sampleId);
+                        }
+                      }}
+                      className="flex-1 py-1.5 px-2.5 rounded-control bg-accent text-white hover:bg-accent-hover text-2xs font-semibold transition-colors active-press focus-ring flex items-center justify-center gap-1 shadow-subtle"
+                    >
+                      <span>Load Benchmark Corpus</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleCalibrateForUpload(archetype.name, archetype.config)}
+                      className={cn(
+                        'py-1.5 px-2.5 rounded-control border text-2xs transition-colors active-press focus-ring flex items-center justify-center gap-1 shrink-0 font-medium',
+                        isCalibrated
+                          ? 'bg-surface-3 text-text border-accent font-semibold'
+                          : 'bg-surface-2 hover:bg-surface-3 text-text border-separator'
+                      )}
+                    >
+                      <Sliders className="h-3 w-3 text-accent" />
+                      <span>{isCalibrated ? 'Calibrated' : 'Calibrate Upload'}</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -195,7 +324,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
                 className="w-full text-xs font-mono p-3 rounded bg-bg-base border border-border-default text-text-primary placeholder:text-text-tertiary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent resize-y"
               />
               <div className="flex items-center justify-between text-xs">
-                <span className="text-text-tertiary font-mono text-xs">
+                <span className="text-text-tertiary font-mono text-xs tabular-nums">
                   {pastedText.length.toLocaleString()} characters
                 </span>
                 <Button
@@ -249,7 +378,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
                       <span className="text-xs font-medium text-text-primary group-hover:text-accent transition-colors line-clamp-1">
                         {sample.title}
                       </span>
-                      <span className="text-xs font-mono px-1.5 py-0.2 rounded bg-surface border border-border-default text-text-tertiary shrink-0">
+                      <span className="text-xs font-mono px-1.5 py-0.2 rounded bg-surface border border-border-default text-text-tertiary shrink-0 tabular-nums">
                         {formattedSize}
                       </span>
                     </div>

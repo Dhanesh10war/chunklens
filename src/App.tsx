@@ -16,6 +16,8 @@ import { DetectedFormatInfo, detectFileFormat } from './utils/fileFormatDetector
 import { useDocumentUpload } from './hooks/useDocumentUpload';
 import { ChunkLoadErrorBoundary } from './components/ui/ChunkLoadErrorBoundary';
 import { ModalLoadingFallback } from './components/ui/ModalLoadingFallback';
+import { generateShareableUrl, parseSharedConfigFromUrl } from './utils/shareUrl';
+import { copyToClipboard } from './utils/clipboard';
 
 // Lazy-load heavy modals and auxiliary views to keep main bundle well below budget
 const prefetchCommandPalette = () =>
@@ -152,26 +154,41 @@ export const AppContent: React.FC = () => {
     });
   }, [selectedSampleId, documentTitle, rawText, config, detectedFormat]);
 
-  // Global keyboard shortcuts: '[' toggles sidebar, ']' toggles inspector, Cmd+K opens palette
+  // Check URL on initial load for shareable configuration state
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-        return;
+    const shared = parseSharedConfigFromUrl();
+    if (shared) {
+      if (Object.keys(shared.config).length > 0) {
+        setConfig((prev) => ({
+          ...prev,
+          ...shared.config,
+        }));
       }
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        setIsCommandPaletteOpen((prev) => !prev);
-      } else if (e.key === '[') {
-        e.preventDefault();
-        setIsSidebarOpen((prev) => !prev);
-      } else if (e.key === ']') {
-        e.preventDefault();
-        setIsInspectorOpen((prev) => !prev);
+      if (shared.sampleId) {
+        handleSelectSample(shared.sampleId);
       }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+      success(
+        'Shared Setup Restored',
+        `Configured ${shared.config.strategy || 'custom'} (${shared.config.chunkSize || 400} tok)`
+      );
+    }
   }, []);
+
+  const handleShareSetup = async () => {
+    const url = generateShareableUrl(config, selectedSampleId, documentTitle);
+    const ok = await copyToClipboard(url);
+    if (ok) {
+      success('Shareable Link Copied', 'Link with your exact chunking setup copied to clipboard.');
+    }
+  };
+
+  const handleSelectArchetype = (newConfig: ChunkingConfig, sampleId?: string) => {
+    setConfig(newConfig);
+    if (sampleId) {
+      handleSelectSample(sampleId);
+    }
+    success('RAG Archetype Applied', `Configured ${newConfig.chunkSize} tokens with ${newConfig.chunkOverlap} overlap.`);
+  };
 
   // Decouple high-frequency slider dragging from CPU tokenization for smooth 60fps UI
   const deferredText = useDeferredValue(rawText);
@@ -179,6 +196,59 @@ export const AppContent: React.FC = () => {
 
   // Background Web Worker offloads tokenization and chunk slicing from main UI thread
   const { result: chunkingResult, isProcessing } = useChunkingWorker(deferredText, deferredConfig);
+
+  // Global keyboard shortcuts:
+  // '[' toggles sidebar, ']' toggles inspector, Cmd+K opens palette, Cmd+E opens export
+  // 'j' / 'ArrowDown' steps down chunk, 'k' / 'ArrowUp' steps up chunk, 'Escape' clears chunk selection
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        (e.target as HTMLElement)?.isContentEditable
+      ) {
+        return;
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen((prev) => !prev);
+      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'e') {
+        e.preventDefault();
+        setIsExportModalOpen(true);
+      } else if (e.key === '[') {
+        e.preventDefault();
+        setIsSidebarOpen((prev) => !prev);
+      } else if (e.key === ']') {
+        e.preventDefault();
+        setIsInspectorOpen((prev) => !prev);
+      } else if (e.key === 'Escape') {
+        if (selectedChunkId) {
+          e.preventDefault();
+          setSelectedChunkId(null);
+        }
+      } else if (currentView === 'app' && activeTab === 'visualizer' && chunkingResult.chunks.length > 0) {
+        if (e.key === 'j' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          setSelectedChunkId((prevId) => {
+            if (!prevId) return chunkingResult.chunks[0].id;
+            const currentIdx = chunkingResult.chunks.findIndex((c) => c.id === prevId);
+            const nextIdx = Math.min(chunkingResult.chunks.length - 1, currentIdx + 1);
+            return chunkingResult.chunks[nextIdx].id;
+          });
+        } else if (e.key === 'k' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          setSelectedChunkId((prevId) => {
+            if (!prevId) return chunkingResult.chunks[chunkingResult.chunks.length - 1].id;
+            const currentIdx = chunkingResult.chunks.findIndex((c) => c.id === prevId);
+            const prevIndex = Math.max(0, currentIdx - 1);
+            return chunkingResult.chunks[prevIndex].id;
+          });
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentView, activeTab, chunkingResult.chunks, selectedChunkId]);
 
   const handleSelectSample = (sampleId: string) => {
     const sample = SAMPLE_DOCUMENTS.find((s) => s.id === sampleId);
@@ -284,6 +354,7 @@ export const AppContent: React.FC = () => {
         onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         onOpenLandingPage={handleOpenLandingPage}
+        onShareClick={handleShareSetup}
         onPrefetchExport={prefetchExportModal}
         onPrefetchCommandPalette={prefetchCommandPalette}
         onPrefetchTokenizer={prefetchTokenizerModal}
@@ -323,6 +394,8 @@ export const AppContent: React.FC = () => {
               uploadError={uploadError}
               onDismissError={clearError}
               isExtractingPdf={isExtractingPdf}
+              onSelectArchetype={handleSelectArchetype}
+              activeConfig={config}
             />
           ) : (
             <>

@@ -73,4 +73,11 @@ describe('Header Component (Responsive Priority & Overflow Menu - Item 3.6)', ()
     const html = renderToString(<Header {...defaultProps} />);
     expect(html).toContain(`v${__APP_VERSION__}`);
   });
+
+  it('renders share configuration button when onShareClick handler is provided', () => {
+    const onShare = vi.fn();
+    const html = renderToString(<Header {...defaultProps} onShareClick={onShare} />);
+    expect(html).toContain('aria-label="Share configuration: copy link"');
+    expect(html).toContain('Share');
+  });
 });
