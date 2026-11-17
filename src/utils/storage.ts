@@ -3,13 +3,16 @@ import { SAMPLE_DOCUMENTS } from '../data/samples';
 import { DetectedFormatInfo } from './fileFormatDetector';
 
 export const STORAGE_KEY = 'chunklens_session_v1';
+export const MAX_PERSISTED_TEXT_BYTES = 1_048_576; // 1 MB cap
 
 export interface StoredSession {
   selectedSampleId: string | null;
   documentTitle: string;
-  rawText: string;
+  rawText?: string;
   config: ChunkingConfig;
   detectedFormat?: DetectedFormatInfo | null;
+  rememberDocument?: boolean;
+  sidebarCollapsed?: boolean;
 }
 
 export const DEFAULT_CONFIG: ChunkingConfig = {
@@ -25,6 +28,8 @@ export const DEFAULT_SESSION: StoredSession = {
   documentTitle: SAMPLE_DOCUMENTS[0].title,
   rawText: SAMPLE_DOCUMENTS[0].content,
   config: DEFAULT_CONFIG,
+  rememberDocument: false,
+  sidebarCollapsed: false,
   detectedFormat: {
     formatId: 'markdown',
     label: 'Markdown Document',
@@ -51,7 +56,9 @@ function getStorage(): Storage | null {
 }
 
 /**
- * Safely loads session from browser localStorage with fallback to default sample.
+ * Safely loads session from browser localStorage.
+ * AUDIT-01 & AUDIT-09 Remediation:
+ * Migrates existing sessions: deletes rawText from localStorage unless rememberDocument is explicitly true.
  */
 export function loadStoredSession(): StoredSession {
   const storage = getStorage();
@@ -63,12 +70,40 @@ export function loadStoredSession(): StoredSession {
     const raw = storage.getItem(STORAGE_KEY);
     if (!raw) return DEFAULT_SESSION;
     const parsed = JSON.parse(raw);
-    if (parsed && typeof parsed === 'object' && parsed.rawText && parsed.config) {
+    if (parsed && typeof parsed === 'object') {
+      const rememberDocument = Boolean(parsed.rememberDocument);
+
+      // Startup Migration: delete rawText from localStorage if opt-in is false
+      if (parsed.rawText && !rememberDocument) {
+        try {
+          delete parsed.rawText;
+          storage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+        } catch {
+          // ignore migration write failure in restricted storage
+        }
+      }
+
+      // Determine in-memory rawText and documentTitle
+      let inMemoryRawText = '';
+      let inMemoryTitle = parsed.documentTitle || 'Untitled Document';
+
+      if (parsed.selectedSampleId) {
+        const sample = SAMPLE_DOCUMENTS.find((s) => s.id === parsed.selectedSampleId);
+        if (sample) {
+          inMemoryRawText = sample.content;
+          inMemoryTitle = sample.title;
+        }
+      } else if (rememberDocument && typeof parsed.rawText === 'string') {
+        inMemoryRawText = parsed.rawText;
+      }
+
       return {
         selectedSampleId: parsed.selectedSampleId ?? null,
-        documentTitle: parsed.documentTitle || 'Untitled Document',
-        rawText: parsed.rawText,
+        documentTitle: inMemoryTitle,
+        rawText: inMemoryRawText,
         detectedFormat: parsed.detectedFormat ?? null,
+        rememberDocument,
+        sidebarCollapsed: Boolean(parsed.sidebarCollapsed),
         config: {
           ...DEFAULT_CONFIG,
           ...parsed.config,
@@ -83,13 +118,31 @@ export function loadStoredSession(): StoredSession {
 }
 
 /**
- * Saves current session state to browser localStorage.
+ * Saves session state to browser localStorage.
+ * Privacy Rule: rawText is NEVER saved unless rememberDocument === true AND size <= 1 MB.
+ * Every write is safely wrapped in try/catch.
  */
 export function saveStoredSession(session: StoredSession): void {
   const storage = getStorage();
   if (!storage) return;
+
   try {
-    storage.setItem(STORAGE_KEY, JSON.stringify(session));
+    const payload: StoredSession = {
+      selectedSampleId: session.selectedSampleId,
+      documentTitle: session.documentTitle,
+      config: session.config,
+      detectedFormat: session.detectedFormat,
+      rememberDocument: !!session.rememberDocument,
+      sidebarCollapsed: session.sidebarCollapsed,
+    };
+
+    if (session.rememberDocument && session.rawText) {
+      if (session.rawText.length <= MAX_PERSISTED_TEXT_BYTES) {
+        payload.rawText = session.rawText;
+      }
+    }
+
+    storage.setItem(STORAGE_KEY, JSON.stringify(payload));
   } catch (err) {
     console.warn('Failed to save ChunkLens session to localStorage:', err);
   }

@@ -16,6 +16,7 @@ import {
   Edit3,
   Check,
   FilePlus,
+  Trash2,
 } from 'lucide-react';
 import { ChunkingStrategy } from '../engine/types';
 import { SAMPLE_DOCUMENTS } from '../data/samples';
@@ -36,6 +37,7 @@ export interface CommandPaletteProps {
   onOpenTokenizer: () => void;
   onSelectTab: (tab: 'visualizer' | 'heatmap' | 'editor') => void;
   onToggleCompare: () => void;
+  onClearSavedData?: () => void;
 }
 
 interface CommandItem {
@@ -63,6 +65,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   onOpenTokenizer,
   onSelectTab,
   onToggleCompare,
+  onClearSavedData,
 }) => {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -300,6 +303,17 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       icon: <Cpu className="h-4 w-4" />,
       action: () => {
         onOpenTokenizer();
+        onClose();
+      },
+    },
+    {
+      id: 'action-clear-saved-data',
+      category: 'Panels & Settings',
+      title: 'Clear Saved Data',
+      subtitle: 'Purge document and session settings from localStorage',
+      icon: <Trash2 className="h-4 w-4 text-status-error" />,
+      action: () => {
+        onClearSavedData?.();
         onClose();
       },
     },

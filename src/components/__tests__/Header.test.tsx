@@ -80,4 +80,10 @@ describe('Header Component (Responsive Priority & Overflow Menu - Item 3.6)', ()
     expect(html).toContain('aria-label="Share configuration: copy link"');
     expect(html).toContain('Share');
   });
+
+  it('renders clear saved data action in overflow menu when onClearSavedData is provided', () => {
+    const onClear = vi.fn();
+    const html = renderToString(<Header {...defaultProps} onClearSavedData={onClear} />);
+    expect(html).toContain('aria-label="More actions"');
+  });
 });

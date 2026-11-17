@@ -44,9 +44,12 @@ export const AppContent: React.FC = () => {
   // Load restored session or default sample
   const initialSession = useMemo(() => loadStoredSession(), []);
 
+  const [rememberDocument, setRememberDocument] = useState<boolean>(
+    Boolean(initialSession.rememberDocument)
+  );
   const [selectedSampleId, setSelectedSampleId] = useState<string | null>(initialSession.selectedSampleId);
   const [documentTitle, setDocumentTitle] = useState<string>(initialSession.documentTitle);
-  const [rawText, setRawText] = useState<string>(initialSession.rawText);
+  const [rawText, setRawText] = useState<string>(initialSession.rawText || '');
   const [detectedFormat, setDetectedFormat] = useState<DetectedFormatInfo | null>(
     initialSession.detectedFormat || (initialSession.rawText ? detectFileFormat(initialSession.documentTitle, initialSession.rawText) : null)
   );
@@ -55,7 +58,7 @@ export const AppContent: React.FC = () => {
   const [config, setConfig] = useState<ChunkingConfig>(initialSession.config);
 
   // UI state
-  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(!initialSession.sidebarCollapsed);
   const [isInspectorOpen, setIsInspectorOpen] = useState<boolean>(true);
   const [selectedChunkId, setSelectedChunkId] = useState<string | null>(null);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
@@ -151,8 +154,10 @@ export const AppContent: React.FC = () => {
       rawText,
       config,
       detectedFormat,
+      rememberDocument,
+      sidebarCollapsed: !isSidebarOpen,
     });
-  }, [selectedSampleId, documentTitle, rawText, config, detectedFormat]);
+  }, [selectedSampleId, documentTitle, rawText, config, detectedFormat, rememberDocument, isSidebarOpen]);
 
   // Check URL on initial load for shareable configuration state
   useEffect(() => {
@@ -304,11 +309,24 @@ export const AppContent: React.FC = () => {
     clearStoredSession();
     setSelectedSampleId(DEFAULT_SESSION.selectedSampleId);
     setDocumentTitle(DEFAULT_SESSION.documentTitle);
-    setRawText(DEFAULT_SESSION.rawText);
+    setRawText(DEFAULT_SESSION.rawText || '');
     setConfig(DEFAULT_SESSION.config);
     setDetectedFormat(DEFAULT_SESSION.detectedFormat || null);
     setSelectedChunkId(null);
     clearError();
+  };
+
+  const handleClearSavedData = () => {
+    clearStoredSession();
+    setRememberDocument(false);
+    setSelectedSampleId(DEFAULT_SESSION.selectedSampleId);
+    setDocumentTitle(DEFAULT_SESSION.documentTitle);
+    setRawText(DEFAULT_SESSION.rawText || '');
+    setConfig(DEFAULT_SESSION.config);
+    setDetectedFormat(DEFAULT_SESSION.detectedFormat || null);
+    setSelectedChunkId(null);
+    clearError();
+    success('Saved data cleared from this browser');
   };
 
   const handleNewDocument = () => {
@@ -360,6 +378,7 @@ export const AppContent: React.FC = () => {
         onPrefetchTokenizer={prefetchTokenizerModal}
         activeTab={activeTab}
         onChangeTab={setActiveTab}
+        onClearSavedData={handleClearSavedData}
       />
 
       {/* App Shell Layout: Collapsible Sidebar + Hero Main Canvas + Pro Inspector */}
@@ -377,6 +396,8 @@ export const AppContent: React.FC = () => {
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
           isExtractingPdf={isExtractingPdf}
+          rememberDocument={rememberDocument}
+          onToggleRememberDocument={setRememberDocument}
           onOpenTokenizerModal={() => setIsTokenizerModalOpen(true)}
           onPrefetchTokenizerModal={prefetchTokenizerModal}
         />
@@ -527,6 +548,7 @@ export const AppContent: React.FC = () => {
               onOpenTokenizer={() => setIsTokenizerModalOpen(true)}
               onSelectTab={setActiveTab}
               onToggleCompare={() => setIsCompareMode(!isCompareMode)}
+              onClearSavedData={handleClearSavedData}
             />
           )}
         </Suspense>

@@ -15,6 +15,7 @@ import {
   Grid3X3,
   Edit3,
   Share2,
+  Trash2,
 } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Tooltip } from './ui/Tooltip';
@@ -42,6 +43,7 @@ interface HeaderProps {
   onPrefetchTokenizer?: () => void;
   activeTab?: 'visualizer' | 'heatmap' | 'editor';
   onChangeTab?: (tab: 'visualizer' | 'heatmap' | 'editor') => void;
+  onClearSavedData?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -62,6 +64,7 @@ export const Header: React.FC<HeaderProps> = ({
   onPrefetchTokenizer,
   activeTab,
   onChangeTab,
+  onClearSavedData,
 }) => {
   const { isDark, toggleTheme } = useTheme();
   const [isOverflowOpen, setIsOverflowOpen] = useState(false);
@@ -343,8 +346,8 @@ export const Header: React.FC<HeaderProps> = ({
             </a>
           </Tooltip>
 
-          {/* Overflow Menu Trigger: Visible when viewport is < 1400px */}
-          <div className="relative min-[1400px]:hidden">
+          {/* Overflow Menu Trigger */}
+          <div className="relative">
             <Tooltip content="More actions" position="bottom">
               <button
                 ref={overflowTriggerRef}
@@ -463,6 +466,21 @@ export const Header: React.FC<HeaderProps> = ({
                   <RotateCcw className="h-3.5 w-3.5 text-status-warn" />
                   <span>Reset to defaults</span>
                 </button>
+
+                {/* Clear Saved Data (AUDIT-01, AUDIT-09) */}
+                {onClearSavedData && (
+                  <button
+                    role="menuitem"
+                    onClick={() => {
+                      onClearSavedData();
+                      closeMenuAndReturnFocus();
+                    }}
+                    className="w-full px-3 py-1.5 text-left text-xs text-status-error-text hover:bg-status-error-subtle flex items-center space-x-2 transition-colors focus:bg-status-error-subtle focus:outline-none"
+                  >
+                    <Trash2 className="h-3.5 w-3.5 text-status-error" />
+                    <span>Clear Saved Data</span>
+                  </button>
+                )}
 
                 <div className="my-1 border-t border-separator" />
 

@@ -25,6 +25,8 @@ interface SidebarProps {
   isOpen: boolean;
   onClose?: () => void;
   isExtractingPdf?: boolean;
+  rememberDocument?: boolean;
+  onToggleRememberDocument?: (enabled: boolean) => void;
   className?: string;
 }
 
@@ -41,6 +43,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isOpen,
   onClose,
   isExtractingPdf = false,
+  rememberDocument = false,
+  onToggleRememberDocument,
   className,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -230,6 +234,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </span>
               </div>
             )}
+
+            {/* Document Persistence Opt-In (AUDIT-01, AUDIT-09) */}
+            <div className="pt-2 border-t border-separator/60">
+              <label className="flex items-start space-x-2.5 cursor-pointer select-none group">
+                <input
+                  type="checkbox"
+                  checked={rememberDocument}
+                  onChange={(e) => onToggleRememberDocument?.(e.target.checked)}
+                  className="mt-0.5 rounded border-separator text-accent focus:ring-accent"
+                />
+                <div className="space-y-0.5">
+                  <span className="text-xs font-medium text-text group-hover:text-accent transition-colors">
+                    Remember my document on this device
+                  </span>
+                  <p className="text-2xs text-text-tertiary leading-tight">
+                    Default OFF · Saved locally in browser storage (capped at 1 MB). When off, documents are strictly ephemeral in RAM and discarded when the tab closes.
+                  </p>
+                </div>
+              </label>
+            </div>
           </div>
 
           <div className="h-px bg-separator" />
