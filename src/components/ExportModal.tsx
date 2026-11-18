@@ -77,7 +77,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         aria-hidden="true"
         onClick={onClose}
       />
-      <div className="relative bg-surface-1 surface-translucent border border-separator rounded-t-2xl sm:rounded-panel w-full max-w-3xl max-h-[90vh] max-h-[90dvh] overflow-hidden shadow-modal flex flex-col">
+      <div className="relative bg-surface-1 surface-translucent border border-separator rounded-t-2xl sm:rounded-panel w-full max-w-3xl max-h-modal overflow-hidden shadow-modal flex flex-col">
         {/* Modal Header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-separator bg-surface-1/50 surface-translucent shrink-0">
           <div className="flex items-center space-x-2.5">

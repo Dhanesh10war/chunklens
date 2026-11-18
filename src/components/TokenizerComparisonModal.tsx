@@ -64,7 +64,7 @@ export const TokenizerComparisonModal: React.FC<TokenizerComparisonModalProps> =
         onClick={onClose}
       />
       <div
-        className="relative bg-surface-1 surface-translucent border border-separator rounded-t-2xl sm:rounded-panel max-w-4xl w-full max-h-[90vh] max-h-[90dvh] flex flex-col shadow-modal overflow-hidden"
+        className="relative bg-surface-1 surface-translucent border border-separator rounded-t-2xl sm:rounded-panel max-w-4xl w-full max-h-modal flex flex-col shadow-modal overflow-hidden"
         role="dialog"
         aria-modal="true"
         aria-labelledby="tokenizer-modal-title"

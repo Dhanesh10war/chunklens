@@ -156,8 +156,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
                   'Extracting text from PDF in browser...'
                 ) : (
                   <>
-                    <span className="hidden [@media(pointer:coarse)]:inline">Tap to choose a file</span>
-                    <span className="inline [@media(pointer:coarse)]:hidden">Drop your document here, or click to browse</span>
+                    <span className="inline sm:hidden">Tap to choose a file</span>
+                    <span className="hidden sm:inline">Drop your document here, or click to browse</span>
                   </>
                 )}
               </p>
