@@ -31,3 +31,8 @@ docs/briefing-shots/
 test-results/
 playwright-report/
 playwright-report-compat/
+
+# Local audits and bundles
+audit/
+docs/audit/
+*.bundle
