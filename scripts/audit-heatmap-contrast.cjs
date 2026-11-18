@@ -111,6 +111,10 @@ function loadTokensFromCss() {
       accent: parseOklchToken(rootBlock, '--accent'),
       textLight: parseOklchToken(rootBlock, '--heat-text-on-light'),
       textDark: parseOklchToken(rootBlock, '--heat-text-on-dark'),
+      bg: parseOklchToken(rootBlock, '--bg'),
+      surface1: parseOklchToken(rootBlock, '--surface-1'),
+      surface2: parseOklchToken(rootBlock, '--surface-2'),
+      surface3: parseOklchToken(rootBlock, '--surface-3'),
     },
     Dark: {
       low: parseOklchToken(darkBlock, '--heat-low'),
@@ -119,6 +123,10 @@ function loadTokensFromCss() {
       accent: parseOklchToken(darkBlock, '--accent'),
       textLight: parseOklchToken(darkBlock, '--heat-text-on-light'),
       textDark: parseOklchToken(darkBlock, '--heat-text-on-dark'),
+      bg: parseOklchToken(darkBlock, '--bg'),
+      surface1: parseOklchToken(darkBlock, '--surface-1'),
+      surface2: parseOklchToken(darkBlock, '--surface-2'),
+      surface3: parseOklchToken(darkBlock, '--surface-3'),
     },
   };
 }
@@ -227,6 +235,25 @@ function auditTheme(name, tokens) {
   console.log(`   Contrast Ratio: ${accentContrast.toFixed(2)}:1`);
   console.log(`   Hex: ${oklchToHex(...tokens.accent)}`);
   console.log(`   Status: ${accentContrast >= 4.5 ? '[PASS] Meets >= 4.5:1' : '[FAIL] Below 4.5:1'}`);
+
+  // 4. Real Accent Text on Surfaces (Audit for text-accent in UI)
+  console.log(`\n4. Accent as Foreground Text on UI Surfaces:`);
+  const surfaces = [
+    { name: '--bg', oklch: tokens.bg },
+    { name: '--surface-1', oklch: tokens.surface1 },
+    { name: '--surface-2', oklch: tokens.surface2 },
+    { name: '--surface-3', oklch: tokens.surface3 },
+  ];
+
+  let accentTextFailures = 0;
+  for (const s of surfaces) {
+    if (!s.oklch) continue;
+    const ySurface = relLuminance(oklchToRgbRaw(...s.oklch));
+    const ratio = contrastRatio(ySurface, yAccent);
+    const meetsAA = ratio >= 4.5;
+    if (!meetsAA) accentTextFailures++;
+    console.log(`   ${s.name.padEnd(14)} (${oklchToHex(...s.oklch)}): ${ratio.toFixed(2)}:1 -> ${meetsAA ? '[PASS]' : '[FAIL - below 4.5:1, scheduled for Batch 2]'}`);
+  }
 
   const pass = gamutClippingFailures.length === 0 && accentInGamut && contrastFailures.length === 0 && accentContrast >= 4.5;
   return pass;

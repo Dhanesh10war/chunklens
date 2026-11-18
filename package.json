@@ -11,6 +11,8 @@
     "test:verbose": "vitest run --reporter=verbose",
     "test:egress": "node --experimental-websocket scripts/test-egress.cjs",
     "test:e2e": "playwright test",
+    "test:compat": "playwright test -c playwright.compat.config.ts",
+    "test:compat:quick": "playwright test -c playwright.compat.config.ts --project=chromium-desktop-1366 --project=chromium-mobile-390",
     "typecheck": "tsc -b",
     "lint": "tsc -b",
     "sync:csp": "node scripts/sync-csp.cjs",

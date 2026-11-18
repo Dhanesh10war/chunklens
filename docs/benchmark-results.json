@@ -1,0 +1,30 @@
+{
+  "landing": {
+    "lcp": 16392,
+    "cls": 0,
+    "longestTaskMs": 3110,
+    "avgTabLatencyMs": 0
+  },
+  "workbench": {
+    "cls": 0,
+    "longestTaskMs": 93,
+    "heatmapTabLatencyMs": 479,
+    "sliderLatencyMs": 586
+  },
+  "largeDoc": {
+    "charCount": 100690,
+    "chunkCount": 350,
+    "ingestDurationMs": 1392,
+    "longestTaskMs": 470
+  },
+  "heatmap67": {
+    "renderDurationMs": 2988,
+    "gridDimensions": "152x3",
+    "longestTaskMs": 678
+  },
+  "heatmap150": {
+    "renderDurationMs": 7752,
+    "gridDimensions": "518x3",
+    "longestTaskMs": 4392
+  }
+}
