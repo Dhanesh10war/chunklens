@@ -32,7 +32,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ref={ref}
             id={generatedId}
             className={cn(
-              'h-8 w-full appearance-none rounded-control bg-surface-2 text-text border border-border-default hover:border-border-hover pl-2.5 pr-8 text-xs font-sans transition-colors cursor-pointer focus-ring',
+              'h-8 w-full appearance-none rounded-control bg-surface-2 text-text border border-border-default hover:border-border-hover pl-2.5 pr-8 text-base sm:text-xs font-sans transition-colors cursor-pointer focus-ring',
               className
             )}
             {...props}

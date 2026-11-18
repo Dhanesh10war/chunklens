@@ -66,8 +66,9 @@ export const SliderWithInput: React.FC<SliderWithInputProps> = ({
         </div>
       </div>
 
-      {/* Range Slider */}
-      <div className="relative flex items-center py-1">
+      {/* Range Slider with 28px Hit Target and Centered Visual Track */}
+      <div className="relative flex items-center min-h-[28px]">
+        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-1.5 bg-surface-2 rounded-full pointer-events-none" />
         <input
           id={sliderId}
           type="range"
@@ -77,7 +78,7 @@ export const SliderWithInput: React.FC<SliderWithInputProps> = ({
           value={value}
           onChange={handleSliderChange}
           aria-label={label}
-          className="w-full h-1.5 bg-surface-2 rounded-full appearance-none cursor-pointer accent-accent focus-ring"
+          className="relative w-full h-7 bg-transparent appearance-none cursor-pointer accent-accent focus-ring"
         />
       </div>
 

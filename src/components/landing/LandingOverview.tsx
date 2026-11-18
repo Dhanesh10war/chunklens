@@ -393,7 +393,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
                           ~{chunk.approxTokens} tok
                         </span>
                       </div>
-                      <p className="text-xs text-text-secondary font-mono leading-relaxed line-clamp-3">
+                      <p dir="auto" className="text-xs text-text-secondary font-mono leading-relaxed line-clamp-3">
                         {chunk.text}
                       </p>
                     </div>

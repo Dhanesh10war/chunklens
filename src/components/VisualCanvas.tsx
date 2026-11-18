@@ -422,7 +422,7 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
                     </div>
 
                     {/* Chunk Text Content (Prose in sans, code in mono) */}
-                    <div className="min-w-0 w-full">
+                    <div className="min-w-0 w-full" dir="auto">
                       {renderFormattedChunkText(chunk.text)}
                     </div>
                   </div>
@@ -509,7 +509,7 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
                   </div>
 
                   {/* Chunk Text Content */}
-                  <div className="my-1">
+                  <div className="my-1" dir="auto">
                     {renderFormattedChunkText(chunk.text)}
                   </div>
 

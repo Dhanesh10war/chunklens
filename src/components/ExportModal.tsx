@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChunkMetadata, ChunkingConfig, CodeExportFramework } from '../engine/types';
 import { generateExportCode } from '../exporters/codeExporters';
 import { exportChunksToJson, exportChunksToCsv, downloadFile } from '../exporters/dataExporters';
@@ -24,6 +24,15 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<CodeExportFramework>('langchain-python');
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -57,16 +66,26 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-150">
-      <div className="bg-surface-1 surface-translucent border border-separator rounded-panel w-full max-w-3xl overflow-hidden shadow-modal">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="export-modal-title"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-150"
+    >
+      <div
+        className="fixed inset-0"
+        aria-hidden="true"
+        onClick={onClose}
+      />
+      <div className="relative bg-surface-1 surface-translucent border border-separator rounded-t-2xl sm:rounded-panel w-full max-w-3xl max-h-[90vh] max-h-[90dvh] overflow-hidden shadow-modal flex flex-col">
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-separator bg-surface-1/50 surface-translucent">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-separator bg-surface-1/50 surface-translucent shrink-0">
           <div className="flex items-center space-x-2.5">
             <div className="p-1.5 rounded-control bg-surface-2 border border-separator text-accent">
               <Terminal className="h-4 w-4" />
             </div>
             <div>
-              <h3 className="font-semibold text-text text-sm tracking-tight">Export Pipeline Code &amp; Datasets</h3>
+              <h3 id="export-modal-title" className="font-semibold text-text text-sm tracking-tight">Export Pipeline Code &amp; Datasets</h3>
               <p className="text-xs text-text-secondary">
                 Production-ready code snippets or export <span className="font-mono text-text tabular-nums">{chunks.length}</span> structured chunks for vector stores.
               </p>
@@ -75,7 +94,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-control text-text-secondary hover:text-text hover:bg-surface-2 active-press focus-ring transition-colors"
+            className="p-1.5 min-h-[32px] min-w-[32px] flex items-center justify-center rounded-control text-text-secondary hover:text-text hover:bg-surface-2 active-press focus-ring transition-colors"
             aria-label="Close export modal"
           >
             <X className="h-4 w-4" />

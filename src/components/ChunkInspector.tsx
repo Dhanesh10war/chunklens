@@ -327,6 +327,7 @@ export const ChunkInspector: React.FC<ChunkInspectorProps> = ({
               tabIndex={0}
               role="region"
               aria-label="Chunk content preview"
+              dir="auto"
               className="p-3 rounded-card bg-bg border border-separator font-mono text-xs text-text whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto break-words select-text focus-ring"
             >
               {chunk.text}

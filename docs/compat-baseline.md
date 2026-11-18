@@ -46,16 +46,17 @@ Rather than coarse suite-level exclusions, every baseline failure is enforced vi
   - `1366px` (standard laptop): `scrollWidth = 1366px` (PASS - fixed via secondary action icons and overflow menu)
 - **Allowlist Status:** `KNOWN_HORIZONTAL_OVERFLOW_VIEWPORTS` is now empty (`[]`). All 21 projects in the matrix pass the horizontal overflow assertion.
 
-### 3.2 Coarse Pointer Touch Target Offender Allowlist (`KNOWN_COARSE_TOUCH_OFFENDERS`) — Scheduled for Batch 3
-- `button:close configuration drawer` was upgraded to 32x32px with 44px hit target in Batch 1 and is no longer an offender.
-Seven controls fail the minimum 24px requirement (goal: 44px) under coarse pointer emulation:
-1. `button:new document` (116x20px, height < 24px)
-2. `input:remember my document` (13x13px, checkbox < 24px)
-3. `button:chunking strategy` (365x20px, height < 24px)
-4. `button:unit & tokenizer` (365x20px, height < 24px)
-5. `button:size & overlap` (365x20px, height < 24px)
-6. `input:target chunk size` (357x6px, slider track < 24px)
-7. `input:overlap window` (357x6px, slider track < 24px)
+### 3.2 Coarse Pointer Touch Target Offender Allowlist (`KNOWN_COARSE_TOUCH_OFFENDERS`) — RESOLVED IN BATCH 3
+**Status: COMPLETELY RESOLVED (0 offenders remaining, 100% of interactive controls meet >= 24px minimum and up to 44px on coarse pointers).**
+In Batch 3, all 7 baseline sub-24px controls were upgraded with touch-accessible dimensions:
+1. `button:new document`: upgraded to `min-h-[32px]` (`px-2.5 py-1`).
+2. `input:remember my document`: checkbox upgraded to `w-6 h-6` (24x24px) with `min-h-[32px]` label container.
+3. `button:chunking strategy`: accordion header upgraded to `min-h-[36px]` (`py-1.5 px-2`).
+4. `button:unit & tokenizer`: accordion header upgraded to `min-h-[36px]` (`py-1.5 px-2`).
+5. `button:size & overlap`: accordion header upgraded to `min-h-[36px]` (`py-1.5 px-2`).
+6. `input:target chunk size`: range input element upgraded to `h-7` (28px height interactive area) with centered visual track.
+7. `input:overlap window`: range input element upgraded to `h-7` (28px height interactive area) with centered visual track.
+`KNOWN_COARSE_TOUCH_OFFENDERS` is now empty (`[]`). All controls pass the touch target test without any allowlist entries.
 
 ### 3.3 Dark Theme Text Contrast Offender Allowlist (`KNOWN_DARK_THEME_CONTRAST_TARGETS`) — RESOLVED IN BATCH 2
 **Status: COMPLETELY RESOLVED (0 offenders remaining, WCAG 2.2 AA passes cleanly in both light and dark themes).**

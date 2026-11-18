@@ -57,15 +57,20 @@ export const TokenizerComparisonModal: React.FC<TokenizerComparisonModalProps> =
   const baselineChunkTokens = baselineModel?.totalChunkTokens || 0;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-150">
       <div
-        className="bg-surface-1 surface-translucent border border-separator rounded-panel max-w-4xl w-full max-h-[90vh] flex flex-col shadow-modal overflow-hidden"
+        className="fixed inset-0"
+        aria-hidden="true"
+        onClick={onClose}
+      />
+      <div
+        className="relative bg-surface-1 surface-translucent border border-separator rounded-t-2xl sm:rounded-panel max-w-4xl w-full max-h-[90vh] max-h-[90dvh] flex flex-col shadow-modal overflow-hidden"
         role="dialog"
         aria-modal="true"
         aria-labelledby="tokenizer-modal-title"
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-separator bg-surface-1/50 surface-translucent">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-separator bg-surface-1/50 surface-translucent shrink-0">
           <div className="flex items-center space-x-3">
             <div className="p-2 rounded-control bg-surface-2 text-accent border border-separator">
               <Cpu className="h-5 w-5" />
@@ -81,7 +86,7 @@ export const TokenizerComparisonModal: React.FC<TokenizerComparisonModalProps> =
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-control text-text-secondary hover:text-text bg-surface-2 border border-separator hover:bg-surface-3 active-press focus-ring transition-colors"
+            className="p-1.5 min-h-[32px] min-w-[32px] flex items-center justify-center rounded-control text-text-secondary hover:text-text bg-surface-2 border border-separator hover:bg-surface-3 active-press focus-ring transition-colors"
             aria-label="Close dialog"
           >
             <X className="h-4 w-4" />

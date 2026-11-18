@@ -71,6 +71,36 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
     );
   }
 
+  // 2D Grid Arrow-Key Keyboard Navigation
+  const handleCellKeyDown = (e: React.KeyboardEvent, r: number, c: number) => {
+    let targetRow = r;
+    let targetCol = c;
+    const count = displayChunks.length;
+
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      targetCol = Math.min(count - 1, c + 1);
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      targetCol = Math.max(0, c - 1);
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      targetRow = Math.min(count - 1, r + 1);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      targetRow = Math.max(0, r - 1);
+    } else {
+      return;
+    }
+
+    const targetId = `heatmap-cell-${targetRow}-${targetCol}`;
+    const el = document.getElementById(targetId);
+    if (el) {
+      el.focus();
+      setSelectedCell({ row: targetRow, col: targetCol });
+    }
+  };
+
   // Selected pair details for side inspector
   const activePair = selectedCell
     ? {
@@ -360,12 +390,15 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
                       return (
                         <button
                           key={`cell-${rowIdx}-${colIdx}`}
+                          id={`heatmap-cell-${rowIdx}-${colIdx}`}
                           onClick={() => setSelectedCell({ row: rowIdx, col: colIdx })}
+                          onKeyDown={(e) => handleCellKeyDown(e, rowIdx, colIdx)}
                           style={{
                             backgroundColor: entry.backgroundColor,
                             color: entry.color,
                             boxShadow: entry.boxShadow,
                           }}
+                          aria-label={`Chunk ${rowIdx + 1} and Chunk ${colIdx + 1}, ${(score * 100).toFixed(0)}% similarity`}
                           title={`Chunk #${rowIdx + 1} ↔ Chunk #${colIdx + 1}: ${(score * 100).toFixed(0)}% similarity${
                             isAdjacent ? ' (Adjacent boundary)' : ''
                           }`}

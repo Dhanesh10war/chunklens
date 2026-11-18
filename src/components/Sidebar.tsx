@@ -225,7 +225,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <Tooltip content="Clear document and open empty dropzone" position="right">
                   <button
                     onClick={onNewDocument}
-                    className="inline-flex items-center gap-1 text-xs font-sans text-accent hover:text-accent-hover focus-ring rounded-control px-1.5 py-0.5 transition-colors"
+                    className="inline-flex items-center gap-1.5 text-xs font-sans text-accent hover:text-accent-hover focus-ring rounded-control px-2.5 py-1 min-h-[32px] transition-colors"
                     aria-label="New document: clear canvas"
                   >
                     <FilePlus className="h-3.5 w-3.5" />
@@ -319,12 +319,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             {/* Document Persistence Opt-In (AUDIT-01, AUDIT-09) */}
             <div className="pt-2 border-t border-separator/60">
-              <label className="flex items-start space-x-2.5 cursor-pointer select-none group">
+              <label className="flex items-center space-x-2.5 cursor-pointer select-none group min-h-[32px]">
                 <input
                   type="checkbox"
                   checked={rememberDocument}
                   onChange={(e) => onToggleRememberDocument?.(e.target.checked)}
-                  className="mt-0.5 rounded border-separator text-accent focus:ring-accent"
+                  aria-label="Remember my document on this device"
+                  className="w-6 h-6 rounded border-separator text-accent focus:ring-accent cursor-pointer shrink-0"
                 />
                 <div className="space-y-0.5">
                   <span className="text-xs font-medium text-text group-hover:text-accent transition-colors">
@@ -345,7 +346,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               type="button"
               onClick={() => setIsStrategySectionOpen(!isStrategySectionOpen)}
-              className="flex items-center justify-between text-left group focus-ring rounded-control -mx-1 px-1 py-0.5"
+              className="flex items-center justify-between text-left group focus-ring rounded-control -mx-1 px-2 min-h-[36px] py-1.5 transition-colors"
             >
               <span className="text-xs font-semibold text-text select-none">
                 Chunking strategy
@@ -421,7 +422,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               type="button"
               onClick={() => setIsTokenizerSectionOpen(!isTokenizerSectionOpen)}
-              className="flex items-center justify-between text-left group focus-ring rounded-control -mx-1 px-1 py-0.5"
+              className="flex items-center justify-between text-left group focus-ring rounded-control -mx-1 px-2 min-h-[36px] py-1.5 transition-colors"
             >
               <span className="text-xs font-semibold text-text select-none">
                 Unit &amp; tokenizer
@@ -488,7 +489,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               type="button"
               onClick={() => setIsSizeSectionOpen(!isSizeSectionOpen)}
-              className="flex items-center justify-between text-left group focus-ring rounded-control -mx-1 px-1 py-0.5"
+              className="flex items-center justify-between text-left group focus-ring rounded-control -mx-1 px-2 min-h-[36px] py-1.5 transition-colors"
             >
               <span className="text-xs font-semibold text-text select-none">
                 Size &amp; overlap

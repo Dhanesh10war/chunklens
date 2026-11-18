@@ -207,7 +207,7 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
                       Illustration
                     </span>
                   </div>
-                  <p className="text-xs text-text-secondary font-mono leading-relaxed line-clamp-2">
+                  <p dir="auto" className="text-xs text-text-secondary font-mono leading-relaxed line-clamp-2">
                     {chunk.text}
                   </p>
                 </div>

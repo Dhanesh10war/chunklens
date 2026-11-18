@@ -29,15 +29,8 @@ const KNOWN_HORIZONTAL_OVERFLOW_VIEWPORTS: number[] = [
   // All baseline overflow viewports (320, 340, 768, 1024, 1280, 1366) fixed in Batch 1
 ];
 
-const KNOWN_COARSE_TOUCH_OFFENDERS = [
-  'button:new document',
-  'input:remember my document',
-  'button:chunking strategy',
-  'button:unit & tokenizer',
-  'button:size & overlap',
-  'input:target chunk size',
-  'input:overlap window',
-];
+// Batch 3 Fix: All 7 coarse touch target offenders upgraded to >= 24px (goal 44px)
+const KNOWN_COARSE_TOUCH_OFFENDERS: string[] = [];
 
 // Batch 2 Fix: All 10 dark theme accent text contrast offenders now pass WCAG 2.2 AA (>= 5.31:1 to 7.93:1)
 const KNOWN_DARK_THEME_CONTRAST_TARGETS: string[] = [];
