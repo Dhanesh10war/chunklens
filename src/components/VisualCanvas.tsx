@@ -363,6 +363,8 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
                       backgroundColor: `var(--chunk-${paletteIdx}-bg)`,
                       borderLeftColor: `var(--chunk-${paletteIdx})`,
                       borderLeftWidth: '3px',
+                      contentVisibility: 'auto',
+                      containIntrinsicSize: '0 120px',
                     }}
                   >
                     {/* Header Row: #01 Pill, Token count + Budget Bar, Copy Button */}
@@ -452,6 +454,8 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
                   style={{
                     borderLeftColor: `var(--chunk-${paletteIdx})`,
                     borderLeftWidth: '3px',
+                    contentVisibility: 'auto',
+                    containIntrinsicSize: '0 140px',
                   }}
                 >
                   {/* Card Header Bar */}

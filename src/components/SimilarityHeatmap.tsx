@@ -359,7 +359,11 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
             {/* Heatmap Rows */}
             <div className="space-y-1">
               {matrix.map((rowScores, rowIdx) => (
-                <div key={`row-${rowIdx}`} className="flex items-center">
+                <div
+                  key={`row-${rowIdx}`}
+                  className="flex items-center"
+                  style={{ contentVisibility: 'auto', containIntrinsicSize: '0 36px' }}
+                >
                   {/* Row Index Label */}
                   <div
                     className="w-12 text-right pr-2 font-mono text-xs text-text-tertiary shrink-0 select-none tabular-nums sticky left-0 z-10 bg-bg"

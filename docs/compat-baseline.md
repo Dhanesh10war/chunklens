@@ -69,43 +69,46 @@ In Batch 2, `--text-accent` was separated from solid button `--accent` with `okl
 
 - **Full Suite Command:** `PW_CHROME_PATH=... npm run test:compat`
 - **Total Test Runs:** 147 test runs (21 projects x 7 tests)
-- **Suite Outcome:** **147 total evaluated (69 real passes, 78 expected-fails, 0 unhandled failures)**
+- **Suite Outcome:** **147 total evaluated (147 real passes, 0 expected-fails, 0 unhandled failures)**
 - **Overall Suite Status:** Exit Code 0 (Green)
-- **Execution Time:** ~6.9 minutes across 2 workers
+- **All Offender Allowlists Cleared:**
+  - `KNOWN_HORIZONTAL_OVERFLOW_VIEWPORTS`: `[]` (Resolved in Batch 1)
+  - `KNOWN_DARK_THEME_CONTRAST_TARGETS`: `[]` (Resolved in Batch 2)
+  - `KNOWN_COARSE_TOUCH_OFFENDERS`: `[]` (Resolved in Batch 3)
 
 ### Granular Results Table (Engine x Viewport x Test Case)
 
 | Project | Viewport | T1: Landing Overflow | T2: Workbench Overflow | T3: Workbench States | T4: Touch Targets | T5: Tooltip Bounds | T6: Light Axe | T7: Dark Axe |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| `chromium-mobile-390` | 390x844 | **PASS** | **PASS** | **PASS** | **EXP-FAIL** (B3) | **PASS** | **PASS** | **EXP-FAIL** (B2) |
-| `chromium-mobile-600` | 600x960 | **PASS** | **PASS** | **PASS** | **EXP-FAIL** (B3) | **PASS** | **PASS** | **EXP-FAIL** (B2) |
-| `chromium-landscape-390x340` | 390x340 | **PASS** | **EXP-FAIL** (B1) | **PASS** | **EXP-FAIL** (B3) | **PASS** | **PASS** | **EXP-FAIL** (B2) |
-| `chromium-zoom400-320` | 320x568 | **PASS** | **EXP-FAIL** (B1) | **PASS** | **EXP-FAIL** (B3) | **PASS** | **PASS** | **EXP-FAIL** (B2) |
-| `chromium-tablet-portrait-768` | 768x1024 | **PASS** | **EXP-FAIL** (B1) | **EXP-FAIL** (B1) | **EXP-FAIL** (B3) | **PASS** | **PASS** | **EXP-FAIL** (B2) |
-| `chromium-tablet-landscape-1024`| 1024x768 | **PASS** | **EXP-FAIL** (B1) | **EXP-FAIL** (B1) | **EXP-FAIL** (B3) | **PASS** | **PASS** | **EXP-FAIL** (B2) |
-| `chromium-laptop-1280` | 1280x800 | **PASS** | **EXP-FAIL** (B1) | **EXP-FAIL** (B1) | **EXP-FAIL** (B3) | **PASS** | **PASS** | **EXP-FAIL** (B2) |
-| `chromium-desktop-1366` | 1366x768 | **PASS** | **EXP-FAIL** (B1) | **EXP-FAIL** (B1) | **EXP-FAIL** (B3) | **PASS** | **PASS** | **EXP-FAIL** (B2) |
-| `chromium-desktop-1920` | 1920x1080 | **PASS** | **PASS** | **PASS** | **EXP-FAIL** (B3) | **PASS** | **PASS** | **EXP-FAIL** (B2) |
-| `chromium-desktop-2560` | 2560x1440 | **PASS** | **PASS** | **PASS** | **EXP-FAIL** (B3) | **PASS** | **PASS** | **EXP-FAIL** (B2) |
-| `chromium-ultrawide-3440` | 3440x1440 | **PASS** | **PASS** | **PASS** | **EXP-FAIL** (B3) | **PASS** | **PASS** | **EXP-FAIL** (B2) |
-| `firefox-narrow-390` | 390x844 | **PASS** | **PASS** | **PASS** | **EXP-FAIL** (B3) | **PASS** | **PASS** | **EXP-FAIL** (B2) |
-| `firefox-tablet-portrait-768` | 768x1024 | **PASS** | **EXP-FAIL** (B1) | **EXP-FAIL** (B1) | **EXP-FAIL** (B3) | **PASS** | **PASS** | **EXP-FAIL** (B2) |
-| `firefox-tablet-landscape-1024` | 1024x768 | **PASS** | **EXP-FAIL** (B1) | **EXP-FAIL** (B1) | **EXP-FAIL** (B3) | **PASS** | **PASS** | **EXP-FAIL** (B2) |
-| `firefox-laptop-1280` | 1280x800 | **PASS** | **EXP-FAIL** (B1) | **EXP-FAIL** (B1) | **EXP-FAIL** (B3) | **PASS** | **PASS** | **EXP-FAIL** (B2) |
-| `firefox-desktop-1366` | 1366x768 | **PASS** | **EXP-FAIL** (B1) | **EXP-FAIL** (B1) | **EXP-FAIL** (B3) | **PASS** | **PASS** | **EXP-FAIL** (B2) |
-| `webkit-mobile-390` | 390x844 | **PASS** | **PASS** | **PASS** | **EXP-FAIL** (B3) | **PASS** | **PASS** | **EXP-FAIL** (B2) |
-| `webkit-tablet-portrait-768` | 768x1024 | **PASS** | **PASS** | **PASS** | **EXP-FAIL** (B3) | **PASS** | **PASS** | **EXP-FAIL** (B2) |
-| `webkit-tablet-landscape-1024` | 1024x768 | **PASS** | **EXP-FAIL** (B1) | **EXP-FAIL** (B1) | **EXP-FAIL** (B3) | **PASS** | **PASS** | **EXP-FAIL** (B2) |
-| `webkit-laptop-1280` | 1280x800 | **PASS** | **EXP-FAIL** (B1) | **EXP-FAIL** (B1) | **EXP-FAIL** (B3) | **PASS** | **PASS** | **EXP-FAIL** (B2) |
-| `webkit-desktop-1366` | 1366x768 | **PASS** | **EXP-FAIL** (B1) | **EXP-FAIL** (B1) | **EXP-FAIL** (B3) | **PASS** | **PASS** | **EXP-FAIL** (B2) |
+| `chromium-mobile-390` | 390x844 | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** |
+| `chromium-mobile-600` | 600x960 | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** |
+| `chromium-landscape-390x340` | 390x340 | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** |
+| `chromium-zoom400-320` | 320x568 | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** |
+| `chromium-tablet-portrait-768` | 768x1024 | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** |
+| `chromium-tablet-landscape-1024`| 1024x768 | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** |
+| `chromium-laptop-1280` | 1280x800 | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** |
+| `chromium-desktop-1366` | 1366x768 | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** |
+| `chromium-desktop-1920` | 1920x1080 | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** |
+| `chromium-desktop-2560` | 2560x1440 | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** |
+| `chromium-ultrawide-3440` | 3440x1440 | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** |
+| `firefox-narrow-390` | 390x844 | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** |
+| `firefox-tablet-portrait-768` | 768x1024 | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** |
+| `firefox-tablet-landscape-1024` | 1024x768 | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** |
+| `firefox-laptop-1280` | 1280x800 | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** |
+| `firefox-desktop-1366` | 1366x768 | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** |
+| `webkit-mobile-390` | 390x844 | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** |
+| `webkit-tablet-portrait-768` | 768x1024 | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** |
+| `webkit-tablet-landscape-1024` | 1024x768 | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** |
+| `webkit-laptop-1280` | 1280x800 | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** |
+| `webkit-desktop-1366` | 1366x768 | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** | **PASS** |
 
-*Summary: 69 Real Passes, 78 Expected Failures (Allowlisted), 0 Failures.*
+*Summary: 147 Real Passes, 0 Expected Failures, 0 Failures.*
 
 ### Quick Mode for Daily Work
 - **Command:** `npm run test:compat:quick`
 - **Scope:** 2 projects (`chromium-desktop-1366` and `chromium-mobile-390`), 14 tests
-- **Runtime:** 42.7 seconds
-- **Results:** 6 real passes, 8 expected-fails, 0 unhandled failures.
+- **Runtime:** ~46.6 seconds
+- **Results:** 14 real passes, 0 expected-fails, 0 unhandled failures.
 
 ---
 
