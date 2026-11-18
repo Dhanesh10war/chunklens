@@ -58,7 +58,14 @@ export const AppContent: React.FC = () => {
   const [config, setConfig] = useState<ChunkingConfig>(initialSession.config);
 
   // UI state
-  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(!initialSession.sidebarCollapsed);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(() => {
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      if (window.matchMedia('(max-width: 1023px)').matches) {
+        return false;
+      }
+    }
+    return !initialSession.sidebarCollapsed;
+  });
   const [isInspectorOpen, setIsInspectorOpen] = useState<boolean>(true);
   const [selectedChunkId, setSelectedChunkId] = useState<string | null>(null);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
@@ -382,7 +389,7 @@ export const AppContent: React.FC = () => {
       />
 
       {/* App Shell Layout: Collapsible Sidebar + Hero Main Canvas + Pro Inspector */}
-      <div className="flex-1 flex overflow-hidden h-[calc(100vh-52px)]">
+      <div className="flex-1 flex overflow-hidden h-app-content">
         {/* Left Sidebar */}
         <Sidebar
           config={config}

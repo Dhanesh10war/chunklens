@@ -225,6 +225,8 @@
   html {
     background-color: var(--bg);
     color: var(--text);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
   body {
     background-color: var(--bg);
@@ -280,6 +282,38 @@ html.theme-transitioning *::after {
 
 /* Interaction and Craft Utilities */
 @layer utilities {
+  /* Safe Area Inset Padding */
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .pl-safe {
+    padding-left: env(safe-area-inset-left, 0px);
+  }
+  .pr-safe {
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+  .px-safe {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+
+  /* Viewport Height with dvh and vh fallback */
+  .min-h-screen {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+  .h-screen {
+    height: 100vh;
+    height: 100dvh;
+  }
+  .h-app-content {
+    height: calc(100vh - 52px);
+    height: calc(100dvh - 52px);
+  }
+
   .active-press {
     transition: transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
   }

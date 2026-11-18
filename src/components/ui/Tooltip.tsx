@@ -294,7 +294,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
               pointerEvents: 'none',
             }}
             className={cn(
-              'pointer-events-none select-none max-w-[calc(100vw-16px)] rounded-control px-2 py-1 text-xs font-medium',
+              'pointer-events-none select-none max-w-[280px] rounded-control px-2 py-1 text-xs font-medium',
               'bg-surface-1 border border-separator shadow-elevated text-text flex items-center space-x-1.5',
               'transition-opacity duration-100 ease-out whitespace-nowrap',
               className

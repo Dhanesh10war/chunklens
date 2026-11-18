@@ -48,7 +48,7 @@ test.describe('WCAG 2.2 AA Accessibility Audits', () => {
     assertNoAxeViolations(mobileResults.violations);
   });
 
-  test('evaluates loaded visualizer state accessibility at desktop (1440px, 1366px) and mobile (375px)', async ({ page }) => {
+  test('evaluates loaded visualizer state accessibility at desktop (1440px) and mobile (375px)', async ({ page }) => {
     // 1. Desktop 1440x900
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/?view=app');
@@ -57,9 +57,20 @@ test.describe('WCAG 2.2 AA Accessibility Audits', () => {
     const desktopResults = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
     assertNoAxeViolations(desktopResults.violations);
 
-    // 2. Desktop 1366x768 (standard laptop viewport)
+    // 2. Mobile 375x812
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.waitForTimeout(300);
+
+    const mobileResults = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+    assertNoAxeViolations(mobileResults.violations);
+  });
+
+  test('evaluates loaded visualizer state at 1366px laptop viewport (no horizontal overflow)', async ({ page }) => {
     await page.setViewportSize({ width: 1366, height: 768 });
+    await page.goto('/?view=app');
+    await page.waitForSelector('header');
     await page.waitForTimeout(200);
+
     const hasHorizontalOverflow = await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth
     );
@@ -67,13 +78,6 @@ test.describe('WCAG 2.2 AA Accessibility Audits', () => {
 
     const laptopResults = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
     assertNoAxeViolations(laptopResults.violations);
-
-    // 3. Mobile 375x812
-    await page.setViewportSize({ width: 375, height: 812 });
-    await page.waitForTimeout(300);
-
-    const mobileResults = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
-    assertNoAxeViolations(mobileResults.violations);
   });
 
   test('evaluates empty state accessibility after resetting document at 1440px and 375px', async ({ page }) => {

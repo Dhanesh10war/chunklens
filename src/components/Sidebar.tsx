@@ -1,7 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { ChunkingConfig, ChunkingStrategy, TokenizerEncoding, ChunkUnit } from '../engine/types';
 import { SAMPLE_DOCUMENTS } from '../data/samples';
-import { Upload, RotateCcw, FileText, FilePlus, Cpu, ChevronDown, ChevronRight } from 'lucide-react';
+import { Upload, RotateCcw, FileText, FilePlus, Cpu, ChevronDown, ChevronRight, X } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Select } from './ui/Select';
 import { Input } from './ui/Input';
@@ -59,6 +59,70 @@ export const Sidebar: React.FC<SidebarProps> = ({
     config.separators ? config.separators.map((s) => JSON.stringify(s)).join(', ') : ''
   );
 
+  const drawerRef = useRef<HTMLElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState(() => {
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      return window.matchMedia('(max-width: 1023px)').matches;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mql = window.matchMedia('(max-width: 1023px)');
+    const onChange = (e: MediaQueryListEvent) => {
+      setIsMobileOrTablet(e.matches);
+    };
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen || !isMobileOrTablet) return;
+
+    previouslyFocusedRef.current = document.activeElement as HTMLElement | null;
+    const drawerEl = drawerRef.current;
+    if (drawerEl) {
+      const focusable = drawerEl.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length > 0) {
+        focusable[0].focus();
+      }
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose?.();
+      } else if (e.key === 'Tab' && drawerEl) {
+        const focusable = Array.from(
+          drawerEl.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          )
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      previouslyFocusedRef.current?.focus();
+    };
+  }, [isOpen, isMobileOrTablet, onClose]);
+
   if (!isOpen) return null;
 
   const handleSeparatorsChange = (raw: string) => {
@@ -111,26 +175,44 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const overlapStep = isTokens ? 10 : 50;
 
   return (
-    <aside
-      className={cn(
-        'w-full sm:w-[320px] surface-translucent border-r border-separator flex flex-col h-full shrink-0 select-none overflow-y-auto z-20',
-        className
+    <>
+      {/* Mobile/Tablet Backdrop Scrim */}
+      {isMobileOrTablet && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 backdrop-blur-xs transition-opacity"
+          onClick={onClose}
+          aria-hidden="true"
+        />
       )}
-    >
-      <div className="flex flex-col flex-1 pb-8">
-        {/* Mobile Header / Close Bar */}
-        <div className="flex items-center justify-between p-3 border-b border-separator lg:hidden">
-          <span className="font-semibold text-xs text-text">
-            Configuration
-          </span>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-control hover:bg-surface-2 text-text-secondary hover:text-text text-xs focus-ring transition-colors"
-            aria-label="Close configuration drawer"
-          >
-            ✕
-          </button>
-        </div>
+      <aside
+        ref={drawerRef}
+        role={isMobileOrTablet ? 'dialog' : undefined}
+        aria-modal={isMobileOrTablet ? true : undefined}
+        aria-label={isMobileOrTablet ? 'Configuration drawer' : undefined}
+        className={cn(
+          isMobileOrTablet
+            ? 'fixed inset-y-0 left-0 z-50 w-[90dvw] max-w-[320px] bg-surface-1 shadow-modal pt-safe pb-safe pl-safe'
+            : 'static z-20 w-[320px] shadow-none surface-translucent border-r border-separator',
+          'flex flex-col h-full shrink-0 select-none overflow-y-auto',
+          className
+        )}
+      >
+        <div className="flex flex-col flex-1 pb-8">
+          {/* Mobile Header / Close Bar */}
+          {isMobileOrTablet && (
+            <div className="flex items-center justify-between p-3 border-b border-separator">
+              <span className="font-semibold text-xs text-text">
+                Configuration
+              </span>
+              <button
+                onClick={onClose}
+                className="h-8 w-8 rounded-control flex items-center justify-center hover:bg-surface-2 text-text-secondary hover:text-text focus-ring transition-colors active-press"
+                aria-label="Close configuration drawer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          )}
 
         <div className="p-4 flex flex-col gap-5 text-xs">
           {/* SECTION 1: SOURCE */}
@@ -447,5 +529,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
     </aside>
+  </>
   );
 };

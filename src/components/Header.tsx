@@ -132,10 +132,10 @@ export const Header: React.FC<HeaderProps> = ({
   }, [isOverflowOpen]);
 
   return (
-    <header className="h-[52px] border-b border-separator surface-translucent sticky top-0 z-30 select-none flex items-center px-3 sm:px-4">
-      <div className="w-full flex items-center justify-between gap-2 lg:gap-3 min-w-0">
+    <header className="h-[52px] border-b border-separator surface-translucent sticky top-0 z-30 select-none flex items-center px-3 sm:px-4 pl-safe pr-safe">
+      <div className="w-full flex items-center justify-between gap-1.5 sm:gap-2 lg:gap-3 min-w-0">
         {/* Left Cluster: Sidebar Toggle, Brand + Version, Document Title & Reset */}
-        <div className="flex items-center space-x-2 shrink-0 sm:min-w-0">
+        <div className="flex items-center space-x-1.5 sm:space-x-2 min-w-0 shrink">
           <Tooltip content={isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'} shortcut="[" position="bottom">
             <button
               onClick={onToggleSidebar}
@@ -159,7 +159,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <Layers className="h-3.5 w-3.5" />
                 </div>
                 <h1 className="font-semibold text-sm tracking-tight text-text m-0 p-0 inline">ChunkLens</h1>
-                <span className="text-xs font-mono text-text-secondary mr-2 sm:mr-0">{`v${__APP_VERSION__}`}</span>
+                <span className="text-xs font-mono text-text-secondary hidden xs:inline">{`v${__APP_VERSION__}`}</span>
               </button>
             </Tooltip>
           ) : (
@@ -168,16 +168,16 @@ export const Header: React.FC<HeaderProps> = ({
                 <Layers className="h-3.5 w-3.5" />
               </div>
               <h1 className="font-semibold text-sm tracking-tight text-text m-0 p-0 inline">ChunkLens</h1>
-              <span className="text-xs font-mono text-text-secondary mr-2 sm:mr-0">{`v${__APP_VERSION__}`}</span>
+              <span className="text-xs font-mono text-text-secondary hidden xs:inline">{`v${__APP_VERSION__}`}</span>
             </div>
           )}
 
-          <span className="text-separator hidden sm:inline" aria-hidden="true">/</span>
+          <span className="text-separator hidden md:inline" aria-hidden="true">/</span>
 
           {/* Document Name & Reset */}
-          <div className="hidden sm:flex items-center space-x-1.5 min-w-0 max-w-[140px] sm:max-w-[200px] md:max-w-[280px] lg:max-w-[340px] min-[1400px]:max-w-[420px]">
+          <div className="hidden md:flex items-center space-x-1.5 min-w-0 max-w-[120px] lg:max-w-[200px] xl:max-w-[300px] min-[1400px]:max-w-[400px]">
             <Tooltip content={documentTitle || 'No document loaded'} position="bottom">
-              <span className="text-xs text-text-secondary truncate font-mono">
+              <span className="text-xs text-text-secondary truncate font-mono min-w-0">
                 {documentTitle || <span className="text-text-tertiary italic">No document</span>}
               </span>
             </Tooltip>
@@ -195,25 +195,30 @@ export const Header: React.FC<HeaderProps> = ({
                 aria-label="Reset document"
               >
                 <RotateCcw className="h-3 w-3" />
-                <span>Reset</span>
+                <span className="hidden lg:inline">Reset</span>
               </button>
             </Tooltip>
           </div>
         </div>
 
-        {/* Center: Segmented Control Tabs */}
+        {/* Center: View Switcher Tabs */}
         {activeTab && onChangeTab && (
           <div className="hidden md:flex items-center justify-center shrink-0">
             <SegmentedControl
               variant="subtle"
               size="sm"
               options={[
-                { value: 'visualizer', label: 'Chunks', icon: <Layers className="h-3.5 w-3.5" /> },
+                {
+                  value: 'visualizer',
+                  label: <span className="hidden xs:inline">Chunks</span>,
+                  icon: <Layers className="h-3.5 w-3.5" />,
+                },
                 {
                   value: 'heatmap',
                   label: (
                     <span>
-                      <span className="hidden min-[1400px]:inline">Similarity </span>Heatmap
+                      <span className="hidden min-[1400px]:inline">Similarity </span>
+                      <span className="hidden xs:inline">Heatmap</span>
                     </span>
                   ),
                   icon: <Grid3X3 className="h-3.5 w-3.5" />,
@@ -222,7 +227,8 @@ export const Header: React.FC<HeaderProps> = ({
                   value: 'editor',
                   label: (
                     <span>
-                      <span className="hidden min-[1400px]:inline">Edit Raw </span>Text
+                      <span className="hidden min-[1400px]:inline">Edit Raw </span>
+                      <span className="hidden xs:inline">Text</span>
                     </span>
                   ),
                   icon: <Edit3 className="h-3.5 w-3.5" />,
@@ -236,23 +242,23 @@ export const Header: React.FC<HeaderProps> = ({
         )}
 
         {/* Right Actions Cluster */}
-        <div className="flex items-center gap-1.5 shrink-0 relative">
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 relative">
           {/* Privacy Popover Trigger: Quiet Success Pill */}
           <PrivacyPopover />
 
-          {/* Quick Actions (Command Palette Search-style Pill) */}
+          {/* Quick Actions (Command Palette) */}
           {onOpenCommandPalette && (
-            <Tooltip content="Open command palette" shortcut="⌘K" position="bottom" wrapperClassName="hidden xl:inline-flex">
+            <Tooltip content="Open command palette" shortcut="⌘K" position="bottom" wrapperClassName="hidden lg:inline-flex">
               <button
                 onClick={onOpenCommandPalette}
                 onMouseEnter={onPrefetchCommandPalette}
                 onFocus={onPrefetchCommandPalette}
-                className="flex items-center space-x-1.5 h-8 px-2.5 rounded-control bg-surface-2 border border-separator text-text-secondary hover:text-text hover:bg-surface-3 text-xs font-mono transition-colors active-press focus-ring"
+                className="flex items-center space-x-1.5 h-8 px-2 min-[1400px]:px-2.5 rounded-control bg-surface-2 border border-separator text-text-secondary hover:text-text hover:bg-surface-3 text-xs font-mono transition-colors active-press focus-ring"
                 aria-label="Open command palette"
               >
                 <Command className="h-3.5 w-3.5 shrink-0 text-text-tertiary" />
                 <span className="hidden min-[1400px]:inline">Quick Actions</span>
-                <kbd className="text-2xs px-1 py-0.5 rounded bg-surface-1 dark:bg-surface-3 border border-separator text-text-secondary">
+                <kbd className="hidden min-[1400px]:inline text-2xs px-1 py-0.5 rounded bg-surface-1 dark:bg-surface-3 border border-separator text-text-secondary">
                   ⌘K
                 </kbd>
               </button>
@@ -261,12 +267,12 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Tokenizers Comparison: Icon-only at <1400px, Full above */}
           {onTokenizerClick && (
-            <Tooltip content="Compare multi-model token variance and embedding costs" position="bottom" wrapperClassName="hidden md:inline-flex">
+            <Tooltip content="Compare multi-model token variance and embedding costs" position="bottom" wrapperClassName="hidden lg:inline-flex">
               <button
                 onClick={onTokenizerClick}
                 onMouseEnter={onPrefetchTokenizer}
                 onFocus={onPrefetchTokenizer}
-                className="h-8 px-2.5 rounded-control bg-transparent hover:bg-surface-2 text-text-secondary hover:text-text border border-transparent flex items-center space-x-1.5 text-xs font-medium transition-colors active-press focus-ring"
+                className="h-8 w-8 min-[1400px]:w-auto min-[1400px]:px-2.5 rounded-control bg-transparent hover:bg-surface-2 text-text-secondary hover:text-text border border-transparent flex items-center justify-center min-[1400px]:space-x-1.5 text-xs font-medium transition-colors active-press focus-ring"
                 aria-label="Compare tokenizers and embedding costs"
               >
                 <Cpu className="h-3.5 w-3.5" />
@@ -276,11 +282,11 @@ export const Header: React.FC<HeaderProps> = ({
           )}
 
           {/* Compare Benchmark Mode: Icon-only at <1400px */}
-          <Tooltip content="Side-by-side benchmark comparison" position="bottom" wrapperClassName="hidden md:inline-flex">
+          <Tooltip content="Side-by-side benchmark comparison" position="bottom" wrapperClassName="hidden lg:inline-flex">
             <button
               onClick={onToggleCompare}
               className={cn(
-                'h-8 px-2.5 rounded-control border flex items-center space-x-1.5 text-xs font-medium transition-colors active-press focus-ring',
+                'h-8 w-8 min-[1400px]:w-auto min-[1400px]:px-2.5 rounded-control border flex items-center justify-center min-[1400px]:space-x-1.5 text-xs font-medium transition-colors active-press focus-ring',
                 isCompareMode
                   ? 'bg-accent-subtle border-accent/30 text-accent'
                   : 'bg-transparent border-transparent hover:bg-surface-2 text-text-secondary hover:text-text'
@@ -294,10 +300,10 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Share Setup: Copies zero-backend state URL */}
           {onShareClick && (
-            <Tooltip content="Share configuration: copy link" position="bottom" wrapperClassName="hidden sm:inline-flex">
+            <Tooltip content="Share configuration: copy link" position="bottom" wrapperClassName="hidden lg:inline-flex">
               <button
                 onClick={onShareClick}
-                className="h-8 px-2.5 rounded-control bg-transparent hover:bg-surface-2 text-text-secondary hover:text-text border border-transparent flex items-center space-x-1.5 text-xs font-medium transition-colors active-press focus-ring"
+                className="h-8 w-8 min-[1400px]:w-auto min-[1400px]:px-2.5 rounded-control bg-transparent hover:bg-surface-2 text-text-secondary hover:text-text border border-transparent flex items-center justify-center min-[1400px]:space-x-1.5 text-xs font-medium transition-colors active-press focus-ring"
                 aria-label="Share configuration: copy link"
               >
                 <Share2 className="h-3.5 w-3.5" />
@@ -316,14 +322,14 @@ export const Header: React.FC<HeaderProps> = ({
               onMouseEnter={onPrefetchExport}
               onFocus={onPrefetchExport}
               aria-label="Export code and chunks"
-              className="h-8 px-3 rounded-control text-xs font-medium"
+              className="h-8 px-2.5 sm:px-3 rounded-control text-xs font-medium"
             >
               <span>Export</span>
             </Button>
           </Tooltip>
 
-          {/* Theme Toggle: Kept visible at >= 768px (Amendment E) */}
-          <Tooltip content={isDark ? 'Switch to light mode' : 'Switch to dark mode'} position="bottom" wrapperClassName="hidden md:flex">
+          {/* Theme Toggle: Kept visible at >= 1024px */}
+          <Tooltip content={isDark ? 'Switch to light mode' : 'Switch to dark mode'} position="bottom" wrapperClassName="hidden lg:flex">
             <button
               onClick={toggleTheme}
               className="h-8 w-8 rounded-control flex items-center justify-center text-text-secondary hover:text-text hover:bg-surface-2 transition-colors active-press focus-ring"
@@ -373,14 +379,74 @@ export const Header: React.FC<HeaderProps> = ({
                 onKeyDown={handleMenuKeyDown}
                 className="absolute right-0 top-full mt-1.5 w-56 rounded-card bg-surface-1 border border-separator shadow-modal py-1 z-50 focus:outline-none"
               >
-                {/* Compare Mode (at <768px) */}
+                {/* View Switcher Items (at <768px in overflow menu as backup) */}
+                {activeTab && onChangeTab && (
+                  <div className="md:hidden border-b border-separator pb-1 mb-1">
+                    <div className="px-3 py-1 text-xs font-semibold text-text-tertiary">
+                      Views
+                    </div>
+                    <button
+                      role="menuitem"
+                      onClick={() => {
+                        onChangeTab('visualizer');
+                        closeMenuAndReturnFocus();
+                      }}
+                      className={cn(
+                        'w-full px-3 py-1.5 text-left text-xs flex items-center justify-between transition-colors focus:bg-surface-2 focus:outline-none',
+                        activeTab === 'visualizer' ? 'bg-accent-subtle text-accent font-medium' : 'text-text-secondary hover:text-text hover:bg-surface-2'
+                      )}
+                    >
+                      <span className="flex items-center space-x-2">
+                        <Layers className="h-3.5 w-3.5" />
+                        <span>Chunks View</span>
+                      </span>
+                      {activeTab === 'visualizer' && <span className="text-2xs font-semibold">Active</span>}
+                    </button>
+                    <button
+                      role="menuitem"
+                      onClick={() => {
+                        onChangeTab('heatmap');
+                        closeMenuAndReturnFocus();
+                      }}
+                      className={cn(
+                        'w-full px-3 py-1.5 text-left text-xs flex items-center justify-between transition-colors focus:bg-surface-2 focus:outline-none',
+                        activeTab === 'heatmap' ? 'bg-accent-subtle text-accent font-medium' : 'text-text-secondary hover:text-text hover:bg-surface-2'
+                      )}
+                    >
+                      <span className="flex items-center space-x-2">
+                        <Grid3X3 className="h-3.5 w-3.5" />
+                        <span>Similarity Heatmap</span>
+                      </span>
+                      {activeTab === 'heatmap' && <span className="text-2xs font-semibold">Active</span>}
+                    </button>
+                    <button
+                      role="menuitem"
+                      onClick={() => {
+                        onChangeTab('editor');
+                        closeMenuAndReturnFocus();
+                      }}
+                      className={cn(
+                        'w-full px-3 py-1.5 text-left text-xs flex items-center justify-between transition-colors focus:bg-surface-2 focus:outline-none',
+                        activeTab === 'editor' ? 'bg-accent-subtle text-accent font-medium' : 'text-text-secondary hover:text-text hover:bg-surface-2'
+                      )}
+                    >
+                      <span className="flex items-center space-x-2">
+                        <Edit3 className="h-3.5 w-3.5" />
+                        <span>Raw Document Editor</span>
+                      </span>
+                      {activeTab === 'editor' && <span className="text-2xs font-semibold">Active</span>}
+                    </button>
+                  </div>
+                )}
+
+                {/* Compare Mode (at <1024px) */}
                 <button
                   role="menuitem"
                   onClick={() => {
                     onToggleCompare();
                     closeMenuAndReturnFocus();
                   }}
-                  className="md:hidden w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center justify-between transition-colors focus:bg-surface-2 focus:outline-none"
+                  className="lg:hidden w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center justify-between transition-colors focus:bg-surface-2 focus:outline-none"
                 >
                   <span className="flex items-center space-x-2">
                     <SplitSquareVertical className="h-3.5 w-3.5 text-accent" />
@@ -389,7 +455,7 @@ export const Header: React.FC<HeaderProps> = ({
                   {isCompareMode && <span className="text-2xs text-accent font-medium">Active</span>}
                 </button>
 
-                {/* Tokenizers Comparison (at <768px when hidden on toolbar) */}
+                {/* Tokenizers Comparison (at <1024px when hidden on toolbar) */}
                 {onTokenizerClick && (
                   <button
                     role="menuitem"
@@ -398,14 +464,14 @@ export const Header: React.FC<HeaderProps> = ({
                       closeMenuAndReturnFocus();
                     }}
                     onMouseEnter={onPrefetchTokenizer}
-                    className="md:hidden w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center space-x-2 transition-colors focus:bg-surface-2 focus:outline-none"
+                    className="lg:hidden w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center space-x-2 transition-colors focus:bg-surface-2 focus:outline-none"
                   >
                     <Cpu className="h-3.5 w-3.5 text-accent" />
                     <span>Compare Tokenizers</span>
                   </button>
                 )}
 
-                {/* Quick Actions / Command Palette (at <1280px when hidden on toolbar) */}
+                {/* Quick Actions / Command Palette (at <1024px when hidden on toolbar) */}
                 {onOpenCommandPalette && (
                   <button
                     role="menuitem"
@@ -414,7 +480,7 @@ export const Header: React.FC<HeaderProps> = ({
                       closeMenuAndReturnFocus();
                     }}
                     onMouseEnter={onPrefetchCommandPalette}
-                    className="xl:hidden w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center justify-between transition-colors focus:bg-surface-2 focus:outline-none"
+                    className="lg:hidden w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center justify-between transition-colors focus:bg-surface-2 focus:outline-none"
                   >
                     <span className="flex items-center space-x-2">
                       <Command className="h-3.5 w-3.5 text-text-tertiary" />
@@ -426,20 +492,20 @@ export const Header: React.FC<HeaderProps> = ({
                   </button>
                 )}
 
-                {/* Theme Toggle (at <768px) */}
+                {/* Theme Toggle (at <1024px) */}
                 <button
                   role="menuitem"
                   onClick={() => {
                     toggleTheme();
                     closeMenuAndReturnFocus();
                   }}
-                  className="md:hidden w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center space-x-2 transition-colors focus:bg-surface-2 focus:outline-none"
+                  className="lg:hidden w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center space-x-2 transition-colors focus:bg-surface-2 focus:outline-none"
                 >
                   {isDark ? <Sun className="h-3.5 w-3.5 text-amber-400" /> : <Moon className="h-3.5 w-3.5 text-indigo-400" />}
                   <span>{isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}</span>
                 </button>
 
-                {/* Share setup link (at <640px when hidden on toolbar) */}
+                {/* Share setup link (at <1024px when hidden on toolbar) */}
                 {onShareClick && (
                   <button
                     role="menuitem"
@@ -447,21 +513,21 @@ export const Header: React.FC<HeaderProps> = ({
                       onShareClick();
                       closeMenuAndReturnFocus();
                     }}
-                    className="sm:hidden w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center space-x-2 transition-colors focus:bg-surface-2 focus:outline-none"
+                    className="lg:hidden w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center space-x-2 transition-colors focus:bg-surface-2 focus:outline-none"
                   >
                     <Share2 className="h-3.5 w-3.5 text-accent" />
                     <span>Share Setup Link</span>
                   </button>
                 )}
 
-                {/* Reset document (at <640px when hidden from left) */}
+                {/* Reset document (at <768px when hidden from left) */}
                 <button
                   role="menuitem"
                   onClick={() => {
                     onResetDocument();
                     closeMenuAndReturnFocus();
                   }}
-                  className="sm:hidden w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center space-x-2 transition-colors focus:bg-surface-2 focus:outline-none"
+                  className="md:hidden w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center space-x-2 transition-colors focus:bg-surface-2 focus:outline-none"
                 >
                   <RotateCcw className="h-3.5 w-3.5 text-status-warn" />
                   <span>Reset to defaults</span>
