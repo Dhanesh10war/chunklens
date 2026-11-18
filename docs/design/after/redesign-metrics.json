@@ -51,9 +51,9 @@
     "-4px"
   ],
   "fontStacks": [
-    "\"Geist Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif",
-    "-apple-system, BlinkMacSystemFont, \"Geist Sans\", Inter, \"Segoe UI\", Roboto, sans-serif",
-    "\"Geist Mono\", \"JetBrains Mono\", \"SF Mono\", Menlo, Monaco, monospace"
+    "\"Geist Sans\", Inter, system-ui, \"Segoe UI\", Roboto, sans-serif",
+    "system-ui, \"Geist Sans\", Inter, \"Segoe UI\", Roboto, sans-serif",
+    "\"Geist Mono\", \"JetBrains Mono\", ui-monospace, Menlo, Monaco, monospace"
   ],
   "a11yViolationsCount": 0,
   "a11yViolations": [],

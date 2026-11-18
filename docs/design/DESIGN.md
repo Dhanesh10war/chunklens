@@ -73,8 +73,8 @@ Generated in OKLCH so no chunk visually dominates the reading canvas. Rendered a
 
 ## 3. Typography & Spacing Grid
 
-- **UI Sans Stack:** `Geist Sans`, `Inter`, `-apple-system`, `BlinkMacSystemFont`, `"Segoe UI"`, `Roboto`, `sans-serif`
-- **Engine Mono Stack:** `Geist Mono`, `"JetBrains Mono"`, `"SF Mono"`, `Menlo`, `Monaco`, `monospace`
+- **UI Sans Stack:** `Geist Sans`, `Inter`, `system-ui`, `"Segoe UI"`, `Roboto`, `sans-serif`
+- **Engine Mono Stack:** `Geist Mono`, `"JetBrains Mono"`, `ui-monospace`, `Menlo`, `Monaco`, `monospace`
 - **Tabular Numerals:** Every metric, token count, cost, and latency value uses `font-variant-numeric: tabular-nums`.
 - **Typographic Scale:**
   - `10px`: Micro indicators, tags, keyboard shortcut badges

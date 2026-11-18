@@ -157,7 +157,7 @@ export function exportChunksToHtml(
   <meta charset="UTF-8">
   <title>${safeTitle} - ChunkLens Export</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 2rem; }
+    body { font-family: system-ui, "Segoe UI", Roboto, sans-serif; margin: 2rem; }
     table { width: 100%; border-collapse: collapse; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: left; vertical-align: top; }
     th { background: #f4f4f4; }

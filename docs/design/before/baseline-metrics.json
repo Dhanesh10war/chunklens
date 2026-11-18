@@ -82,8 +82,8 @@
     "24px"
   ],
   "fontStacks": [
-    "Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif",
-    "\"JetBrains Mono\", \"SF Mono\", Menlo, Monaco, Consolas, monospace"
+    "Inter, system-ui, \"Segoe UI\", Roboto, sans-serif",
+    "\"JetBrains Mono\", ui-monospace, Menlo, Monaco, Consolas, monospace"
   ],
   "a11yViolationsCount": 7,
   "a11yViolations": [

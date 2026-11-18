@@ -98,7 +98,7 @@ You can independently verify the zero-egress guarantee at any time:
   - Chrome / Chromium 119+ (released October 2023)
   - Microsoft Edge 119+ (released October 2023)
   - Mozilla Firefox 121+ (released December 2023)
-  - Apple Safari 17.4+ (released March 2024)
+  - Safari 17.4+ (released March 2024)
   - Node.js 22+ for headless test environments (Node 20 is polyfilled in `src/utils/pdfParser.ts`).
 
 ---
