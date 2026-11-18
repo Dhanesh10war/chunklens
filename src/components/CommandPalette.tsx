@@ -101,7 +101,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       id: 'strat-recursive',
       category: 'Strategies',
       title: 'Recursive Character Splitter',
-      subtitle: 'Recursively uses linebreaks and spaces for natural semantic boundaries',
+      subtitle: 'Recursively uses linebreaks and spaces for natural paragraph boundaries',
       icon: <Layers className="h-4 w-4" />,
       action: () => {
         onSelectStrategy('recursive');
@@ -216,7 +216,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       id: 'view-heatmap',
       category: 'Views',
       title: 'Switch to Similarity Heatmap',
-      subtitle: 'N x N semantic similarity matrix and boundary continuity',
+      subtitle: 'N x N lexical similarity matrix (TF-IDF) and boundary continuity',
       shortcut: '2',
       icon: <Grid3X3 className="h-4 w-4" />,
       action: () => {

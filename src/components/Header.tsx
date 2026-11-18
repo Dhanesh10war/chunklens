@@ -175,7 +175,7 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="text-separator hidden sm:inline" aria-hidden="true">/</span>
 
           {/* Document Name & Reset */}
-          <div className="hidden sm:flex items-center space-x-1.5 min-w-0 max-w-[130px] md:max-w-[180px] min-[1400px]:max-w-[240px]">
+          <div className="hidden sm:flex items-center space-x-1.5 min-w-0 max-w-[140px] sm:max-w-[200px] md:max-w-[280px] lg:max-w-[340px] min-[1400px]:max-w-[420px]">
             <Tooltip content={documentTitle || 'No document loaded'} position="bottom">
               <span className="text-xs text-text-secondary truncate font-mono">
                 {documentTitle || <span className="text-text-tertiary italic">No document</span>}
@@ -371,7 +371,7 @@ export const Header: React.FC<HeaderProps> = ({
                 role="menu"
                 aria-label="More actions menu"
                 onKeyDown={handleMenuKeyDown}
-                className="absolute right-0 top-full mt-1.5 w-56 rounded-card surface-translucent border border-separator shadow-modal py-1 z-50 focus:outline-none"
+                className="absolute right-0 top-full mt-1.5 w-56 rounded-card bg-surface-1 border border-separator shadow-modal py-1 z-50 focus:outline-none"
               >
                 {/* Compare Mode (at <768px) */}
                 <button
@@ -389,7 +389,7 @@ export const Header: React.FC<HeaderProps> = ({
                   {isCompareMode && <span className="text-2xs text-accent font-medium">Active</span>}
                 </button>
 
-                {/* Tokenizers Comparison */}
+                {/* Tokenizers Comparison (at <768px when hidden on toolbar) */}
                 {onTokenizerClick && (
                   <button
                     role="menuitem"
@@ -398,14 +398,14 @@ export const Header: React.FC<HeaderProps> = ({
                       closeMenuAndReturnFocus();
                     }}
                     onMouseEnter={onPrefetchTokenizer}
-                    className="w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center space-x-2 transition-colors focus:bg-surface-2 focus:outline-none"
+                    className="md:hidden w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center space-x-2 transition-colors focus:bg-surface-2 focus:outline-none"
                   >
                     <Cpu className="h-3.5 w-3.5 text-accent" />
                     <span>Compare Tokenizers</span>
                   </button>
                 )}
 
-                {/* Quick Actions / Command Palette */}
+                {/* Quick Actions / Command Palette (at <1280px when hidden on toolbar) */}
                 {onOpenCommandPalette && (
                   <button
                     role="menuitem"
@@ -414,7 +414,7 @@ export const Header: React.FC<HeaderProps> = ({
                       closeMenuAndReturnFocus();
                     }}
                     onMouseEnter={onPrefetchCommandPalette}
-                    className="w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center justify-between transition-colors focus:bg-surface-2 focus:outline-none"
+                    className="xl:hidden w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center justify-between transition-colors focus:bg-surface-2 focus:outline-none"
                   >
                     <span className="flex items-center space-x-2">
                       <Command className="h-3.5 w-3.5 text-text-tertiary" />
@@ -439,7 +439,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <span>{isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}</span>
                 </button>
 
-                {/* Share setup link */}
+                {/* Share setup link (at <640px when hidden on toolbar) */}
                 {onShareClick && (
                   <button
                     role="menuitem"
@@ -447,7 +447,7 @@ export const Header: React.FC<HeaderProps> = ({
                       onShareClick();
                       closeMenuAndReturnFocus();
                     }}
-                    className="w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center space-x-2 transition-colors focus:bg-surface-2 focus:outline-none"
+                    className="sm:hidden w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center space-x-2 transition-colors focus:bg-surface-2 focus:outline-none"
                   >
                     <Share2 className="h-3.5 w-3.5 text-accent" />
                     <span>Share Setup Link</span>
@@ -484,7 +484,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                 <div className="my-1 border-t border-separator" />
 
-                {/* Product & Pricing Landing Page */}
+                {/* Overview & Features Landing Page */}
                 {onOpenLandingPage && (
                   <button
                     role="menuitem"
@@ -495,7 +495,7 @@ export const Header: React.FC<HeaderProps> = ({
                     className="w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center space-x-2 transition-colors focus:bg-surface-2 focus:outline-none"
                   >
                     <Layers className="h-3.5 w-3.5 text-accent" />
-                    <span>Product &amp; Pricing</span>
+                    <span>Overview &amp; Features</span>
                   </button>
                 )}
 

@@ -105,9 +105,9 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
             </span>
             <span className="text-xs text-text-tertiary">
               {averageContinuity >= 0.4
-                ? '(High semantic flow)'
+                ? '(High lexical continuity)'
                 : averageContinuity >= 0.2
-                ? '(Moderate flow)'
+                ? '(Moderate continuity)'
                 : '(Context fragmented)'}
             </span>
           </div>

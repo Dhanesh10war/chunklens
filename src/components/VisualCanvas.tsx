@@ -117,11 +117,51 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
   };
 
   // Renders document prose in sans, code blocks in mono
+  const renderTextSpanWithHeadings = (rawText: string) => {
+    const lines = rawText.split('\n');
+    return lines.map((line, idx) => {
+      const isLast = idx === lines.length - 1;
+      const h1Match = line.match(/^(#\s+)(.+)$/);
+      if (h1Match) {
+        return (
+          <div key={idx} className="font-semibold text-text text-base mt-2 mb-1">
+            <span className="text-text-tertiary font-mono font-normal mr-1">{h1Match[1]}</span>
+            <span>{h1Match[2]}</span>
+          </div>
+        );
+      }
+      const h2Match = line.match(/^(##\s+)(.+)$/);
+      if (h2Match) {
+        return (
+          <div key={idx} className="font-semibold text-text text-sm mt-1.5 mb-0.5">
+            <span className="text-text-tertiary font-mono font-normal mr-1">{h2Match[1]}</span>
+            <span>{h2Match[2]}</span>
+          </div>
+        );
+      }
+      const h3Match = line.match(/^(###\s+)(.+)$/);
+      if (h3Match) {
+        return (
+          <div key={idx} className="font-medium text-text text-sm mt-1 mb-0.5">
+            <span className="text-text-tertiary font-mono font-normal mr-1">{h3Match[1]}</span>
+            <span>{h3Match[2]}</span>
+          </div>
+        );
+      }
+      return (
+        <React.Fragment key={idx}>
+          {line}
+          {!isLast && '\n'}
+        </React.Fragment>
+      );
+    });
+  };
+
   const renderFormattedChunkText = (text: string) => {
     if (!text.includes('```')) {
       return (
         <div className="font-sans text-sm leading-relaxed text-text whitespace-pre-wrap break-words select-text">
-          {text}
+          {renderTextSpanWithHeadings(text)}
         </div>
       );
     }
@@ -147,7 +187,7 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
           }
           return (
             <span key={pIdx} className="font-sans whitespace-pre-wrap">
-              {part}
+              {renderTextSpanWithHeadings(part)}
             </span>
           );
         })}
@@ -304,7 +344,7 @@ export const VisualCanvas: React.FC<VisualCanvasProps> = ({
                         ▨▨ ~{chunk.overlapPrevChars} ch overlap with Chunk #{chunk.index}
                       </span>
                       <span className="text-text-tertiary hidden sm:inline">
-                        Preserves semantic continuity across split boundary
+                        Preserves context continuity across split boundary
                       </span>
                     </div>
                   )}

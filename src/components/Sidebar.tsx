@@ -249,7 +249,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     Remember my document on this device
                   </span>
                   <p className="text-2xs text-text-tertiary leading-tight">
-                    Default OFF · Saved locally in browser storage (capped at 1 MB). When off, documents are strictly ephemeral in RAM and discarded when the tab closes.
+                    Default OFF (1 MB cap). When off, documents remain strictly ephemeral in RAM.
                   </p>
                 </div>
               </label>
@@ -297,7 +297,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {/* Strategy Context Banner */}
                 <div className="text-xs text-text-secondary leading-relaxed px-0.5">
                   {config.strategy === 'recursive' &&
-                    'Recursively tries separators (\\n\\n, \\n, " ") to maintain semantic boundary structure.'}
+                    'Recursively tries separators (\\n\\n, \\n, " ") to maintain document structure and paragraph boundaries.'}
                   {config.strategy === 'fixed' &&
                     'Strict character or token windowing with sliding overlap. Fast and simple.'}
                   {config.strategy === 'markdown' &&

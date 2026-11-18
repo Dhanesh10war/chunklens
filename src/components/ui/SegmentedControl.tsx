@@ -88,7 +88,7 @@ export function SegmentedControl<T extends string>({
               'flex items-center justify-center space-x-1.5 px-3 py-1 rounded-[6px] font-medium whitespace-nowrap transition-all duration-150 active-press focus-ring',
               isSelected
                 ? 'bg-surface-1 dark:bg-surface-3 text-text shadow-subtle'
-                : 'text-text-secondary hover:text-text'
+                : 'text-text-secondary hover:text-text hover:bg-surface-3/40'
             )}
           >
             {opt.icon && <span className="shrink-0">{opt.icon}</span>}
