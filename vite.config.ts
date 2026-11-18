@@ -49,6 +49,7 @@ export default defineConfig(({ command }) => {
       exclude: ['**/node_modules/**', '**/dist/**', '**/*.spec.ts'],
     },
     build: {
+      target: 'es2020',
       chunkSizeWarningLimit: 6000,
       rollupOptions: {
         output: {

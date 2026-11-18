@@ -109,9 +109,11 @@ function buildHeatmapLookup(isDark: boolean): readonly HeatmapColorEntry[] {
 
     const isHigh = pct >= 70;
 
-    // Inset ring: uses chosen text color at ~55% alpha so high cells are visually distinct
+    // Inset ring: uses chosen text color at ~45% alpha so high cells are visually distinct
     const ringStyle = isHigh
-      ? `inset 0 0 0 1px color-mix(in srgb, ${chosenText} 55%, transparent)`
+      ? chosenText === 'var(--heat-text-on-light)'
+        ? 'inset 0 0 0 1px rgba(0, 0, 0, 0.45)'
+        : 'inset 0 0 0 1px rgba(255, 255, 255, 0.45)'
       : undefined;
 
     entries.push({

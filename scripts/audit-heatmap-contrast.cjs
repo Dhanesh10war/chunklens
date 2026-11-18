@@ -109,6 +109,7 @@ function loadTokensFromCss() {
       mid: parseOklchToken(rootBlock, '--heat-mid'),
       high: parseOklchToken(rootBlock, '--heat-high'),
       accent: parseOklchToken(rootBlock, '--accent'),
+      textAccent: parseOklchToken(rootBlock, '--text-accent'),
       textLight: parseOklchToken(rootBlock, '--heat-text-on-light'),
       textDark: parseOklchToken(rootBlock, '--heat-text-on-dark'),
       bg: parseOklchToken(rootBlock, '--bg'),
@@ -121,6 +122,7 @@ function loadTokensFromCss() {
       mid: parseOklchToken(darkBlock, '--heat-mid'),
       high: parseOklchToken(darkBlock, '--heat-high'),
       accent: parseOklchToken(darkBlock, '--accent'),
+      textAccent: parseOklchToken(darkBlock, '--text-accent'),
       textLight: parseOklchToken(darkBlock, '--heat-text-on-light'),
       textDark: parseOklchToken(darkBlock, '--heat-text-on-dark'),
       bg: parseOklchToken(darkBlock, '--bg'),
@@ -245,14 +247,18 @@ function auditTheme(name, tokens) {
     { name: '--surface-3', oklch: tokens.surface3 },
   ];
 
+  const yForeground = tokens.textAccent
+    ? relLuminance(oklchToRgbRaw(...tokens.textAccent))
+    : yAccent;
+
   let accentTextFailures = 0;
   for (const s of surfaces) {
     if (!s.oklch) continue;
     const ySurface = relLuminance(oklchToRgbRaw(...s.oklch));
-    const ratio = contrastRatio(ySurface, yAccent);
+    const ratio = contrastRatio(ySurface, yForeground);
     const meetsAA = ratio >= 4.5;
     if (!meetsAA) accentTextFailures++;
-    console.log(`   ${s.name.padEnd(14)} (${oklchToHex(...s.oklch)}): ${ratio.toFixed(2)}:1 -> ${meetsAA ? '[PASS]' : '[FAIL - below 4.5:1, scheduled for Batch 2]'}`);
+    console.log(`   ${s.name.padEnd(14)} (${oklchToHex(...s.oklch)}): ${ratio.toFixed(2)}:1 -> ${meetsAA ? '[PASS]' : '[FAIL - below 4.5:1]'}`);
   }
 
   const pass = gamutClippingFailures.length === 0 && accentInGamut && contrastFailures.length === 0 && accentContrast >= 4.5;

@@ -57,18 +57,10 @@ Seven controls fail the minimum 24px requirement (goal: 44px) under coarse point
 6. `input:target chunk size` (357x6px, slider track < 24px)
 7. `input:overlap window` (357x6px, slider track < 24px)
 
-### 3.3 Dark Theme Text Contrast Offender Allowlist (`KNOWN_DARK_THEME_CONTRAST_TARGETS`) — Scheduled for Batch 2
-Ten UI elements use `text-accent` (`oklch(0.55 0.15 255)` / `#2971c6`) as foreground text on dark surfaces, yielding 2.69:1 to 4.02:1 (below the 4.5:1 WCAG AA threshold):
-1. `.lg\:flex-row > div:nth-child(1) > .mb-1.text-accent.inline-flex > span`
-2. `.min-w-\[55px\]`
-3. `.max-w-xl.mb-10.text-center > .mb-1.text-accent.inline-flex > span`
-4. `div:nth-child(1) > .mb-2.justify-between.flex > .tabular-nums.font-bold.text-accent`
-5. `div:nth-child(2) > .mb-2.justify-between.flex > .tabular-nums.font-bold.text-accent`
-6. `.mb-1.block.text-accent`
-7. `.text-accent.font-semibold.text-xs`
-8. `.md\:flex-row > div:nth-child(1) > .mb-1.text-accent.inline-flex > span`
-9. `.mb-2.text-accent.inline-flex > span`
-10. `.hover\:underline`
+### 3.3 Dark Theme Text Contrast Offender Allowlist (`KNOWN_DARK_THEME_CONTRAST_TARGETS`) — RESOLVED IN BATCH 2
+**Status: COMPLETELY RESOLVED (0 offenders remaining, WCAG 2.2 AA passes cleanly in both light and dark themes).**
+Previously, 10 UI elements used `var(--accent)` (`oklch(0.55 0.15 255)` / `#2971c6`) as foreground text on dark surfaces, yielding ~4.0:1.
+In Batch 2, `--text-accent` was separated from solid button `--accent` with `oklch(0.72 0.12 255)` in dark theme (`#71a4e6`) and `oklch(0.48 0.16 255)` in light theme, achieving 5.31:1 to 7.93:1 across all dark UI surfaces and 5.40:1 to 6.64:1 across light surfaces. All 10 offenders now pass WCAG 2.2 AA without any axe violations. `KNOWN_DARK_THEME_CONTRAST_TARGETS` is now empty `[]`.
 
 ---
 

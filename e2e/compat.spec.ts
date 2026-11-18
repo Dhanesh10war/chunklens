@@ -39,18 +39,8 @@ const KNOWN_COARSE_TOUCH_OFFENDERS = [
   'input:overlap window',
 ];
 
-const KNOWN_DARK_THEME_CONTRAST_TARGETS = [
-  '.lg\\:flex-row > div:nth-child(1) > .mb-1.text-accent.inline-flex > span',
-  '.min-w-\\[55px\\]',
-  '.max-w-xl.mb-10.text-center > .mb-1.text-accent.inline-flex > span',
-  'div:nth-child(1) > .mb-2.justify-between.flex > .tabular-nums.font-bold.text-accent',
-  'div:nth-child(2) > .mb-2.justify-between.flex > .tabular-nums.font-bold.text-accent',
-  '.mb-1.block.text-accent',
-  '.text-accent.font-semibold.text-xs',
-  '.md\\:flex-row > div:nth-child(1) > .mb-1.text-accent.inline-flex > span',
-  '.mb-2.text-accent.inline-flex > span',
-  '.hover\\:underline',
-];
+// Batch 2 Fix: All 10 dark theme accent text contrast offenders now pass WCAG 2.2 AA (>= 5.31:1 to 7.93:1)
+const KNOWN_DARK_THEME_CONTRAST_TARGETS: string[] = [];
 
 test.describe('Platform & Viewport Compatibility Suite', () => {
 
@@ -304,6 +294,9 @@ test.describe('Platform & Viewport Compatibility Suite', () => {
   // 6a. Axe Accessibility: Light Theme
   // -------------------------------------------------------------------------
   test('Landing page light theme accessibility meets WCAG 2.2 AA', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('chunklens_theme', 'light');
+    });
     await page.goto('/');
     await page.waitForSelector('header');
     await page.evaluate(() => {
@@ -321,6 +314,9 @@ test.describe('Platform & Viewport Compatibility Suite', () => {
   // 6b. Axe Accessibility: Dark Theme & Granular Contrast Allowlist
   // -------------------------------------------------------------------------
   test('Landing page dark theme accessibility meets WCAG 2.2 AA', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('chunklens_theme', 'dark');
+    });
     await page.goto('/');
     await page.waitForSelector('header');
     await page.evaluate(() => {

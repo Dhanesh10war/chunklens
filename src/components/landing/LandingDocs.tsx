@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { cn } from '../../utils/cn';
+import { copyToClipboard } from '../../utils/clipboard';
 
 interface LandingDocsProps {
   onLaunchApp: () => void;
@@ -66,12 +67,10 @@ console.log(\`Generated \${docs.length} partitions.\`);`,
   };
 
   const handleCopyCode = async () => {
-    try {
-      await navigator.clipboard.writeText(codeSnippets[activeTab]);
+    const success = await copyToClipboard(codeSnippets[activeTab]);
+    if (success) {
       setCopiedCode(true);
       setTimeout(() => setCopiedCode(false), 2000);
-    } catch {
-      // Fallback
     }
   };
 

@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { STRICT_CSP_HEADER } from '../../config/csp';
+import { copyToClipboard } from '../../utils/clipboard';
 
 interface LandingSecurityProps {
   onLaunchApp: () => void;
@@ -24,12 +25,10 @@ export const LandingSecurity: React.FC<LandingSecurityProps> = ({ onLaunchApp })
 # Content-Security-Policy: ${STRICT_CSP_HEADER}`;
 
   const handleCopyCurl = async () => {
-    try {
-      await navigator.clipboard.writeText(curlTest);
+    const success = await copyToClipboard(curlTest);
+    if (success) {
       setCopiedCurl(true);
       setTimeout(() => setCopiedCurl(false), 2000);
-    } catch {
-      // Fallback
     }
   };
 

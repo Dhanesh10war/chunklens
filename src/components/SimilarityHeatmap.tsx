@@ -182,8 +182,8 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
                   style={{
                     backgroundColor: 'var(--heat-high)',
                     boxShadow: isDark
-                      ? 'inset 0 0 0 1px color-mix(in srgb, var(--heat-text-on-dark) 55%, transparent)'
-                      : 'inset 0 0 0 1px color-mix(in srgb, var(--heat-text-on-light) 55%, transparent)',
+                      ? 'inset 0 0 0 1px rgba(255, 255, 255, 0.45)'
+                      : 'inset 0 0 0 1px rgba(0, 0, 0, 0.45)',
                   }}
                 />
                 <span>High (≥70%)</span>

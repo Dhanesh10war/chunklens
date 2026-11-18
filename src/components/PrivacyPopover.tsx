@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ShieldCheck, X, Check, Copy } from 'lucide-react';
 import { Tooltip } from './ui/Tooltip';
 import { cn } from '../utils/cn';
+import { copyToClipboard } from '../utils/clipboard';
 
 interface PrivacyPopoverProps {
   className?: string;
@@ -41,12 +42,10 @@ export const PrivacyPopover: React.FC<PrivacyPopoverProps> = ({ className }) => 
 3. Upload documents, adjust chunk sizes, export code
 4. Notice 0 external requests (all requests are strictly local 127.0.0.1 or origin)
 5. Inspect <meta http-equiv="Content-Security-Policy">: connect-src 'none'`;
-    try {
-      await navigator.clipboard.writeText(text);
+    const success = await copyToClipboard(text);
+    if (success) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Fallback
     }
   };
 
