@@ -17,6 +17,7 @@
     "lint": "tsc -b",
     "sync:csp": "node scripts/sync-csp.cjs",
     "check:bundle": "node scripts/check-bundle.cjs",
+    "bench:chunkers": "vite-node scripts/bench-chunkers.ts",
     "audit:contrast": "node scripts/audit-heatmap-contrast.cjs"
   },
   "dependencies": {
