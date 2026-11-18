@@ -1,11 +1,19 @@
 import { ChunkUnit, TokenizerEncoding } from '../types';
-import { countTokens, getTokenizer } from '../tokenizers/tokenizer';
+import { ChunkerOptions, resolveCountTokens, resolveTokenizer } from './context';
 
 /**
  * Creates a length function measuring either tokens or character count
  */
-export function createLengthFn(unit: ChunkUnit, encoding: TokenizerEncoding): (text: string) => number {
-  return (text: string) => (unit === 'tokens' ? countTokens(text, encoding) : text.length);
+export function createLengthFn(
+  unit: ChunkUnit,
+  encoding: TokenizerEncoding,
+  options?: ChunkerOptions
+): (text: string) => number {
+  if (unit === 'characters') {
+    return (text: string) => text.length;
+  }
+  const countFn = resolveCountTokens(encoding, options);
+  return (text: string) => countFn(text);
 }
 
 /**
@@ -50,7 +58,8 @@ export function splitOversizedText(
   chunkSize: number,
   chunkOverlap: number,
   unit: ChunkUnit,
-  encoding: TokenizerEncoding
+  encoding: TokenizerEncoding,
+  options?: ChunkerOptions
 ): string[] {
   if (!text) return [];
 
@@ -70,7 +79,12 @@ export function splitOversizedText(
   }
 
   // Token-based oversized splitting
-  const enc = getTokenizer(encoding);
+  const enc = resolveTokenizer(encoding, options);
+  if (!enc) {
+    // Fall back gracefully to character approximation if no tokenizer is injected
+    return splitOversizedText(text, chunkSize * 4, chunkOverlap * 4, 'characters', encoding, options);
+  }
+
   const tokens = enc.encode(text);
   if (tokens.length <= chunkSize) {
     return [text];
@@ -100,7 +114,8 @@ export function splitOversizedSpan(
   chunkSize: number,
   chunkOverlap: number,
   unit: ChunkUnit,
-  encoding: TokenizerEncoding
+  encoding: TokenizerEncoding,
+  options?: ChunkerOptions
 ): Array<{ start: number; end: number; text: string }> {
   const spanText = fullText.slice(start, end);
   if (!spanText) return [];
@@ -127,7 +142,11 @@ export function splitOversizedSpan(
   }
 
   // Token-based
-  const enc = getTokenizer(encoding);
+  const enc = resolveTokenizer(encoding, options);
+  if (!enc) {
+    return splitOversizedSpan(fullText, start, end, chunkSize * 4, chunkOverlap * 4, 'characters', encoding, options);
+  }
+
   const tokens = enc.encode(spanText);
   if (tokens.length <= chunkSize) {
     return [{ start, end, text: spanText }];

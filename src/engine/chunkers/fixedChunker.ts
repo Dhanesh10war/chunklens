@@ -1,8 +1,12 @@
 import { ChunkMetadata, ChunkingConfig } from '../types';
-import { countTokens, getTokenizer } from '../tokenizers/tokenizer';
+import { ChunkerOptions, resolveCountTokens, resolveTokenizer } from './context';
 import { detectOrphan } from './utils';
 
-export function chunkFixed(text: string, config: ChunkingConfig): ChunkMetadata[] {
+export function chunkFixed(
+  text: string,
+  config: ChunkingConfig,
+  options?: ChunkerOptions
+): ChunkMetadata[] {
   if (!text || text.trim().length === 0) return [];
 
   const { chunkSize, chunkOverlap, unit, encoding } = config;
@@ -10,6 +14,7 @@ export function chunkFixed(text: string, config: ChunkingConfig): ChunkMetadata[
   const step = Math.max(1, chunkSize - safeOverlap);
 
   const chunks: ChunkMetadata[] = [];
+  const countFn = resolveCountTokens(encoding, options);
 
   if (unit === 'characters') {
     let start = 0;
@@ -30,7 +35,7 @@ export function chunkFixed(text: string, config: ChunkingConfig): ChunkMetadata[
         startCharIndex: start,
         endCharIndex: end,
         charCount: chunkText.length,
-        tokenCount: countTokens(chunkText, encoding),
+        tokenCount: countFn(chunkText),
         overlapPrevChars: overlapPrev,
         overlapNextChars: overlapNext,
         isOrphan,
@@ -43,7 +48,12 @@ export function chunkFixed(text: string, config: ChunkingConfig): ChunkMetadata[
     }
   } else {
     // Token-based fixed window
-    const enc = getTokenizer(encoding);
+    const enc = resolveTokenizer(encoding, options);
+    if (!enc) {
+      // Fall back to character splitting if tokenizer not provided
+      return chunkFixed(text, { ...config, unit: 'characters' }, options);
+    }
+
     const tokens = enc.encode(text);
     let tokenStart = 0;
     let index = 0;

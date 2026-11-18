@@ -1,5 +1,5 @@
 import { ChunkMetadata, ChunkingConfig } from '../types';
-import { countTokens } from '../tokenizers/tokenizer';
+import { ChunkerOptions, resolveCountTokens } from './context';
 import { createLengthFn } from './utils';
 
 /**
@@ -9,10 +9,15 @@ import { createLengthFn } from './utils';
  * schema header row (column definitions), preventing LLM hallucinations and
  * context loss during RAG retrieval.
  */
-export function chunkTabular(text: string, config: ChunkingConfig): ChunkMetadata[] {
+export function chunkTabular(
+  text: string,
+  config: ChunkingConfig,
+  options?: ChunkerOptions
+): ChunkMetadata[] {
   if (!text || !text.trim()) return [];
 
-  const lengthFn = createLengthFn(config.unit, config.encoding);
+  const lengthFn = createLengthFn(config.unit, config.encoding, options);
+  const countFn = resolveCountTokens(config.encoding, options);
   const trimmed = text.trim();
 
   // If JSON array of records, process as structured JSON chunks with schema retention
@@ -25,14 +30,14 @@ export function chunkTabular(text: string, config: ChunkingConfig): ChunkMetadat
         typeof parsed[0] === 'object' &&
         parsed[0] !== null
       ) {
-        return chunkJsonRecords(text, parsed, config, lengthFn);
+        return chunkJsonRecords(text, parsed, config, lengthFn, options);
       }
     } catch {
       // If JSON parse fails, fall through to delimited row parser
     }
   }
 
-  return chunkDelimitedRows(text, config, lengthFn);
+  return chunkDelimitedRows(text, config, lengthFn, countFn);
 }
 
 /**
@@ -42,7 +47,8 @@ export function chunkTabular(text: string, config: ChunkingConfig): ChunkMetadat
 function chunkDelimitedRows(
   fullText: string,
   config: ChunkingConfig,
-  lengthFn: (t: string) => number
+  lengthFn: (t: string) => number,
+  countFn: (t: string) => number
 ): ChunkMetadata[] {
   interface TabularLine {
     text: string;
@@ -79,7 +85,7 @@ function chunkDelimitedRows(
         startCharIndex: headerLine.start,
         endCharIndex: headerLine.end,
         charCount: chunkText.length,
-        tokenCount: countTokens(chunkText, config.encoding),
+        tokenCount: countFn(chunkText),
         overlapPrevChars: 0,
         overlapNextChars: 0,
         isOrphan: false,
@@ -186,7 +192,7 @@ function chunkDelimitedRows(
       startCharIndex: Math.max(0, startCharIndex),
       endCharIndex: Math.max(startCharIndex, endCharIndex),
       charCount: chunk.text.length,
-      tokenCount: countTokens(chunk.text, config.encoding),
+      tokenCount: countFn(chunk.text),
       overlapPrevChars,
       overlapNextChars,
       isOrphan: false,
@@ -202,9 +208,12 @@ function chunkJsonRecords(
   fullText: string,
   records: Array<Record<string, unknown>>,
   config: ChunkingConfig,
-  lengthFn: (t: string) => number
+  lengthFn: (t: string) => number,
+  options?: ChunkerOptions
 ): ChunkMetadata[] {
   if (records.length === 0) return [];
+
+  const countFn = resolveCountTokens(config.encoding, options);
 
   const keys = Object.keys(records[0] || {});
   const schemaHeader = `// Schema: [${keys.join(', ')}]\n`;
@@ -260,7 +269,7 @@ function chunkJsonRecords(
       startCharIndex: 0,
       endCharIndex: fullText.length,
       charCount: chunk.text.length,
-      tokenCount: countTokens(chunk.text, config.encoding),
+      tokenCount: countFn(chunk.text),
       overlapPrevChars: 0,
       overlapNextChars: 0,
       isOrphan: false,

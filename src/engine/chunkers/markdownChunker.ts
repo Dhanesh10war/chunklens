@@ -1,5 +1,5 @@
 import { ChunkMetadata, ChunkingConfig } from '../types';
-import { countTokens } from '../tokenizers/tokenizer';
+import { ChunkerOptions, resolveCountTokens } from './context';
 import { createLengthFn, detectOrphan, splitOversizedSpan } from './utils';
 
 interface BlockSpan {
@@ -14,12 +14,17 @@ interface MarkdownSection {
   blocks: BlockSpan[];
 }
 
-export function chunkMarkdown(text: string, config: ChunkingConfig): ChunkMetadata[] {
+export function chunkMarkdown(
+  text: string,
+  config: ChunkingConfig,
+  options?: ChunkerOptions
+): ChunkMetadata[] {
   if (!text || text.trim().length === 0) return [];
 
   const { chunkSize, chunkOverlap, unit, encoding } = config;
   const safeOverlap = Math.min(chunkOverlap, Math.max(0, chunkSize - 1));
-  const lengthFn = createLengthFn(unit, encoding);
+  const lengthFn = createLengthFn(unit, encoding, options);
+  const countFn = resolveCountTokens(encoding, options);
 
   // Parse lines with exact start/end character offsets in text
   const lineRegex = /(.*)(?:\r?\n|$)/g;
@@ -171,7 +176,7 @@ export function chunkMarkdown(text: string, config: ChunkingConfig): ChunkMetada
 
         if (blockLen > chunkSize) {
           // Subdivide oversized block directly from source without synthesizing fences
-          const subSpans = splitOversizedSpan(text, block.start, block.end, chunkSize, safeOverlap, unit, encoding);
+          const subSpans = splitOversizedSpan(text, block.start, block.end, chunkSize, safeOverlap, unit, encoding, options);
           for (const sub of subSpans) {
             rawSpans.push({
               start: sub.start,
@@ -210,7 +215,7 @@ export function chunkMarkdown(text: string, config: ChunkingConfig): ChunkMetada
       startCharIndex: item.start,
       endCharIndex: item.end,
       charCount: chunkText.length,
-      tokenCount: countTokens(chunkText, encoding),
+      tokenCount: countFn(chunkText),
       overlapPrevChars,
       overlapNextChars,
       isOrphan: detectOrphan(text, item.start),

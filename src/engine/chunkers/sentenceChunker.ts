@@ -1,5 +1,5 @@
 import { ChunkMetadata, ChunkingConfig } from '../types';
-import { countTokens } from '../tokenizers/tokenizer';
+import { ChunkerOptions, resolveCountTokens } from './context';
 import { createLengthFn, detectOrphan, splitOversizedSpan } from './utils';
 
 const ABBREVIATIONS = new Set([
@@ -76,12 +76,17 @@ function findSentenceSpans(text: string): SentenceSpan[] {
   return spans;
 }
 
-export function chunkSentence(text: string, config: ChunkingConfig): ChunkMetadata[] {
+export function chunkSentence(
+  text: string,
+  config: ChunkingConfig,
+  options?: ChunkerOptions
+): ChunkMetadata[] {
   if (!text || text.trim().length === 0) return [];
 
   const { chunkSize, chunkOverlap, unit, encoding } = config;
   const safeOverlap = Math.min(chunkOverlap, Math.max(0, chunkSize - 1));
-  const lengthFn = createLengthFn(unit, encoding);
+  const lengthFn = createLengthFn(unit, encoding, options);
+  const countFn = resolveCountTokens(encoding, options);
 
   // 1. Segment text into contiguous sentence spans that partition the source
   const rawSentenceSpans = findSentenceSpans(text);
@@ -92,7 +97,7 @@ export function chunkSentence(text: string, config: ChunkingConfig): ChunkMetada
   for (const s of rawSentenceSpans) {
     const sLen = lengthFn(text.slice(s.start, s.end));
     if (sLen > chunkSize) {
-      const sub = splitOversizedSpan(text, s.start, s.end, chunkSize, safeOverlap, unit, encoding);
+      const sub = splitOversizedSpan(text, s.start, s.end, chunkSize, safeOverlap, unit, encoding, options);
       for (const item of sub) {
         atomicSpans.push({ start: item.start, end: item.end });
       }
@@ -164,7 +169,7 @@ export function chunkSentence(text: string, config: ChunkingConfig): ChunkMetada
       startCharIndex: span.start,
       endCharIndex: span.end,
       charCount: chunkText.length,
-      tokenCount: countTokens(chunkText, encoding),
+      tokenCount: countFn(chunkText),
       overlapPrevChars,
       overlapNextChars,
       isOrphan: detectOrphan(text, span.start),

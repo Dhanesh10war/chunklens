@@ -1,5 +1,5 @@
 import { ChunkMetadata, ChunkingConfig } from '../types';
-import { countTokens } from '../tokenizers/tokenizer';
+import { ChunkerOptions, resolveCountTokens } from './context';
 import { createLengthFn, detectOrphan, splitOversizedSpan } from './utils';
 
 const DEFAULT_SEPARATORS = ['\n\n', '\n', '. ', ' ', ''];
@@ -9,13 +9,18 @@ interface Span {
   end: number;
 }
 
-export function chunkRecursive(text: string, config: ChunkingConfig): ChunkMetadata[] {
+export function chunkRecursive(
+  text: string,
+  config: ChunkingConfig,
+  options?: ChunkerOptions
+): ChunkMetadata[] {
   if (!text || text.trim().length === 0) return [];
 
   const { chunkSize, chunkOverlap, unit, encoding } = config;
   const safeOverlap = Math.min(chunkOverlap, Math.max(0, chunkSize - 1));
   const separators = config.separators && config.separators.length > 0 ? config.separators : DEFAULT_SEPARATORS;
-  const lengthFn = createLengthFn(unit, encoding);
+  const lengthFn = createLengthFn(unit, encoding, options);
+  const countFn = resolveCountTokens(encoding, options);
 
   /**
    * Recursively splits a [start, end] span into sub-spans using separator hierarchy,
@@ -46,7 +51,7 @@ export function chunkRecursive(text: string, config: ChunkingConfig): ChunkMetad
 
     if (separator === '') {
       // Split character-by-character or token-by-token
-      const oversized = splitOversizedSpan(text, start, end, chunkSize, safeOverlap, unit, encoding);
+      const oversized = splitOversizedSpan(text, start, end, chunkSize, safeOverlap, unit, encoding, options);
       return oversized.map((o) => ({ start: o.start, end: o.end }));
     }
 
@@ -83,7 +88,7 @@ export function chunkRecursive(text: string, config: ChunkingConfig): ChunkMetad
         if (nextSeparators.length > 0) {
           result.push(...splitSpan(piece.start, piece.end, nextSeparators));
         } else {
-          const oversized = splitOversizedSpan(text, piece.start, piece.end, chunkSize, safeOverlap, unit, encoding);
+          const oversized = splitOversizedSpan(text, piece.start, piece.end, chunkSize, safeOverlap, unit, encoding, options);
           result.push(...oversized.map((o) => ({ start: o.start, end: o.end })));
         }
       } else {
@@ -163,7 +168,7 @@ export function chunkRecursive(text: string, config: ChunkingConfig): ChunkMetad
       startCharIndex: span.start,
       endCharIndex: span.end,
       charCount: chunkText.length,
-      tokenCount: countTokens(chunkText, encoding),
+      tokenCount: countFn(chunkText),
       overlapPrevChars,
       overlapNextChars,
       isOrphan: detectOrphan(text, span.start),
