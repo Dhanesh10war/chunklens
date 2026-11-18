@@ -30,6 +30,8 @@ const prefetchSimilarityHeatmap = () =>
   import('./components/SimilarityHeatmap').then((m) => ({ default: m.SimilarityHeatmap }));
 const prefetchTokenizerModal = () =>
   import('./components/TokenizerComparisonModal').then((m) => ({ default: m.TokenizerComparisonModal }));
+const prefetchLearningModal = () =>
+  import('./components/learning/LearningModal').then((m) => ({ default: m.LearningModal }));
 const prefetchLandingPage = () =>
   import('./components/landing/LandingPage').then((m) => ({ default: m.LandingPage }));
 
@@ -38,6 +40,7 @@ const ComparisonView = React.lazy(prefetchComparisonView);
 const ExportModal = React.lazy(prefetchExportModal);
 const SimilarityHeatmap = React.lazy(prefetchSimilarityHeatmap);
 const TokenizerComparisonModal = React.lazy(prefetchTokenizerModal);
+const LearningModal = React.lazy(prefetchLearningModal);
 const LandingPage = React.lazy(prefetchLandingPage);
 
 export const AppContent: React.FC = () => {
@@ -72,6 +75,7 @@ export const AppContent: React.FC = () => {
   const [isCompareMode, setIsCompareMode] = useState<boolean>(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState<boolean>(false);
   const [isTokenizerModalOpen, setIsTokenizerModalOpen] = useState<boolean>(false);
+  const [isLearningModalOpen, setIsLearningModalOpen] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'visualizer' | 'heatmap' | 'editor'>('visualizer');
   const [currentView, setCurrentView] = useState<'app' | 'landing'>(() => {
     if (typeof window !== 'undefined') {
@@ -98,10 +102,14 @@ export const AppContent: React.FC = () => {
     }
   };
 
-  const handleLaunchAppFromLanding = (sampleId?: string) => {
+  const handleLaunchAppFromLanding = (sampleId?: string, newConfig?: ChunkingConfig) => {
+    if (newConfig) {
+      setConfig(newConfig);
+      success('Applied calibrated preset to workbench');
+    }
     if (sampleId) {
       handleSelectSample(sampleId);
-    } else {
+    } else if (!newConfig) {
       // Clear document so Document Chunking & RAG Cost Workbench (EmptyState) appears first
       handleNewDocument();
     }
@@ -233,6 +241,9 @@ export const AppContent: React.FC = () => {
       } else if (e.key === ']') {
         e.preventDefault();
         setIsInspectorOpen((prev) => !prev);
+      } else if (e.key === '?' || (e.shiftKey && e.key === '/')) {
+        e.preventDefault();
+        setIsLearningModalOpen((prev) => !prev);
       } else if (e.key === 'Escape') {
         if (selectedChunkId) {
           e.preventDefault();
@@ -380,9 +391,11 @@ export const AppContent: React.FC = () => {
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         onOpenLandingPage={handleOpenLandingPage}
         onShareClick={handleShareSetup}
+        onOpenLearningModal={() => setIsLearningModalOpen(true)}
         onPrefetchExport={prefetchExportModal}
         onPrefetchCommandPalette={prefetchCommandPalette}
         onPrefetchTokenizer={prefetchTokenizerModal}
+        onPrefetchLearningModal={prefetchLearningModal}
         activeTab={activeTab}
         onChangeTab={setActiveTab}
         onClearSavedData={handleClearSavedData}
@@ -565,6 +578,7 @@ export const AppContent: React.FC = () => {
               }}
               onOpenExport={() => setIsExportModalOpen(true)}
               onOpenTokenizer={() => setIsTokenizerModalOpen(true)}
+              onOpenLearningModal={() => setIsLearningModalOpen(true)}
               onSelectTab={setActiveTab}
               onToggleCompare={() => setIsCompareMode(!isCompareMode)}
               onClearSavedData={handleClearSavedData}
@@ -598,6 +612,23 @@ export const AppContent: React.FC = () => {
               rawText={rawText}
               chunks={chunkingResult.chunks}
               baselineEncoding={config.encoding}
+            />
+          )}
+        </Suspense>
+      </ChunkLoadErrorBoundary>
+
+      {/* User Manual & RAG Academy Modal */}
+      <ChunkLoadErrorBoundary fallbackTitle="Failed to load User Manual & RAG Academy">
+        <Suspense fallback={isLearningModalOpen ? <ModalLoadingFallback label="Loading academy & manual..." /> : null}>
+          {isLearningModalOpen && (
+            <LearningModal
+              isOpen={isLearningModalOpen}
+              onClose={() => setIsLearningModalOpen(false)}
+              onApplyConfig={(newConfig) => {
+                setConfig(newConfig);
+                setIsLearningModalOpen(false);
+                success('Applied chunking strategy to workbench');
+              }}
             />
           )}
         </Suspense>

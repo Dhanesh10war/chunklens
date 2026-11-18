@@ -9,9 +9,10 @@ import { LandingFeatures } from './LandingFeatures';
 import { LandingUseCases } from './LandingUseCases';
 import { LandingSecurity } from './LandingSecurity';
 import { LandingDocs } from './LandingDocs';
+import { ChunkingConfig } from '../../engine/types';
 
 interface LandingPageProps {
-  onLaunchApp: (sampleId?: string) => void;
+  onLaunchApp: (sampleId?: string, config?: ChunkingConfig) => void;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
@@ -76,7 +77,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
           <LandingSecurity onLaunchApp={() => onLaunchApp()} />
         )}
         {activeTab === 'docs' && (
-          <LandingDocs onLaunchApp={() => onLaunchApp()} />
+          <LandingDocs
+            onLaunchApp={() => onLaunchApp()}
+            onApplyConfig={(config) => onLaunchApp(undefined, config)}
+          />
         )}
       </main>
 

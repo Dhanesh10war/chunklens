@@ -17,6 +17,7 @@ import {
   Check,
   FilePlus,
   Trash2,
+  BookOpen,
 } from 'lucide-react';
 import { ChunkingStrategy } from '../engine/types';
 import { SAMPLE_DOCUMENTS } from '../data/samples';
@@ -35,6 +36,7 @@ export interface CommandPaletteProps {
   onToggleInspector: () => void;
   onOpenExport: () => void;
   onOpenTokenizer: () => void;
+  onOpenLearningModal?: () => void;
   onSelectTab: (tab: 'visualizer' | 'heatmap' | 'editor') => void;
   onToggleCompare: () => void;
   onClearSavedData?: () => void;
@@ -63,6 +65,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   onToggleInspector,
   onOpenExport,
   onOpenTokenizer,
+  onOpenLearningModal,
   onSelectTab,
   onToggleCompare,
   onClearSavedData,
@@ -303,6 +306,17 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       icon: <Cpu className="h-4 w-4" />,
       action: () => {
         onOpenTokenizer();
+        onClose();
+      },
+    },
+    {
+      id: 'action-learning-modal',
+      category: 'Panels & Settings',
+      title: 'Open User Manual & RAG Academy',
+      subtitle: 'Feature guides, retrieval science, presets, and glossary',
+      icon: <BookOpen className="h-4 w-4" />,
+      action: () => {
+        onOpenLearningModal?.();
         onClose();
       },
     },

@@ -355,10 +355,6 @@ html.theme-transitioning * {
   .pr-safe {
     padding-right: env(safe-area-inset-right, 0px);
   }
-  .px-safe {
-    padding-left: env(safe-area-inset-left, 0px);
-    padding-right: env(safe-area-inset-right, 0px);
-  }
 
   /* Viewport Height with dvh and vh fallback */
   .min-h-screen {

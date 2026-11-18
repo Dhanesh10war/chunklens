@@ -16,6 +16,7 @@ import {
   Edit3,
   Share2,
   Trash2,
+  BookOpen,
 } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Tooltip } from './ui/Tooltip';
@@ -38,9 +39,11 @@ interface HeaderProps {
   onOpenCommandPalette?: () => void;
   onOpenLandingPage?: () => void;
   onShareClick?: () => void;
+  onOpenLearningModal?: () => void;
   onPrefetchExport?: () => void;
   onPrefetchCommandPalette?: () => void;
   onPrefetchTokenizer?: () => void;
+  onPrefetchLearningModal?: () => void;
   activeTab?: 'visualizer' | 'heatmap' | 'editor';
   onChangeTab?: (tab: 'visualizer' | 'heatmap' | 'editor') => void;
   onClearSavedData?: () => void;
@@ -59,9 +62,11 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenCommandPalette,
   onOpenLandingPage,
   onShareClick,
+  onOpenLearningModal,
   onPrefetchExport,
   onPrefetchCommandPalette,
   onPrefetchTokenizer,
+  onPrefetchLearningModal,
   activeTab,
   onChangeTab,
   onClearSavedData,
@@ -297,6 +302,22 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="hidden min-[1400px]:inline">Compare</span>
             </button>
           </Tooltip>
+
+          {/* User Manual & RAG Academy: Icon-only at <1400px, Full above */}
+          {onOpenLearningModal && (
+            <Tooltip content="User manual & RAG academy" shortcut="?" position="bottom" wrapperClassName="hidden lg:inline-flex">
+              <button
+                onClick={onOpenLearningModal}
+                onMouseEnter={onPrefetchLearningModal}
+                onFocus={onPrefetchLearningModal}
+                className="h-8 w-8 min-[1400px]:w-auto min-[1400px]:px-2.5 rounded-control bg-transparent hover:bg-surface-2 text-text-secondary hover:text-text border border-transparent flex items-center justify-center min-[1400px]:space-x-1.5 text-xs font-medium transition-colors active-press focus-ring"
+                aria-label="Open User Manual and RAG Academy"
+              >
+                <BookOpen className="h-3.5 w-3.5 text-accent" />
+                <span className="hidden min-[1400px]:inline">Academy</span>
+              </button>
+            </Tooltip>
+          )}
 
           {/* Share Setup: Copies zero-backend state URL */}
           {onShareClick && (
@@ -549,6 +570,27 @@ export const Header: React.FC<HeaderProps> = ({
                 )}
 
                 <div className="my-1 border-t border-separator" />
+
+                {/* User Manual & RAG Academy */}
+                {onOpenLearningModal && (
+                  <button
+                    role="menuitem"
+                    onClick={() => {
+                      onOpenLearningModal();
+                      closeMenuAndReturnFocus();
+                    }}
+                    onMouseEnter={onPrefetchLearningModal}
+                    className="w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center justify-between transition-colors focus:bg-surface-2 focus:outline-none"
+                  >
+                    <span className="flex items-center space-x-2">
+                      <BookOpen className="h-3.5 w-3.5 text-accent" />
+                      <span>User Manual &amp; Academy</span>
+                    </span>
+                    <kbd className="text-2xs px-1 py-0.5 rounded bg-surface-1 dark:bg-surface-3 border border-separator font-mono text-text-secondary">
+                      ?
+                    </kbd>
+                  </button>
+                )}
 
                 {/* Overview & Features Landing Page */}
                 {onOpenLandingPage && (

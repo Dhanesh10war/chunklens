@@ -4,18 +4,22 @@ import {
   Copy,
   Check,
   ArrowRight,
+  Code2,
   Sliders,
   Keyboard,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { cn } from '../../utils/cn';
 import { copyToClipboard } from '../../utils/clipboard';
+import { LearningCenterView } from '../learning/LearningCenterView';
+import { ChunkingConfig } from '../../engine/types';
 
 interface LandingDocsProps {
   onLaunchApp: () => void;
+  onApplyConfig?: (config: ChunkingConfig) => void;
 }
 
-export const LandingDocs: React.FC<LandingDocsProps> = ({ onLaunchApp }) => {
+export const LandingDocs: React.FC<LandingDocsProps> = ({ onLaunchApp, onApplyConfig }) => {
   const [activeTab, setActiveTab] = useState<'langchain-python' | 'llamaindex' | 'langchain-js'>('langchain-python');
   const [copiedCode, setCopiedCode] = useState(false);
 
@@ -74,24 +78,50 @@ console.log(\`Generated \${docs.length} partitions.\`);`,
     }
   };
 
+  const handleApplyPreset = (config: ChunkingConfig) => {
+    if (onApplyConfig) {
+      onApplyConfig(config);
+    }
+    onLaunchApp();
+  };
+
   return (
     <div className="py-12 px-4 sm:px-6 max-w-6xl mx-auto font-sans">
       {/* Header */}
-      <div className="text-center max-w-3xl mx-auto mb-14">
-        <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-control bg-accent-subtle text-accent text-2xs font-mono font-semibold mb-3 border border-accent/25">
+      <div className="text-center max-w-3xl mx-auto mb-12">
+        <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-control bg-accent-subtle text-accent text-2xs font-mono font-semibold mb-3 border border-accent/30">
           <BookOpen className="h-3 w-3" />
-          <span>Implementation &amp; API Guide</span>
+          <span>User Manual &amp; RAG Academy</span>
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-text mb-4">
-          Export Production Code with One Click
+          Master Document Chunking &amp; RAG Architecture
         </h1>
         <p className="text-sm sm:text-base text-text-secondary leading-relaxed font-sans">
-          ChunkLens bridges the gap between visual document inspection and production code. Tune your parameters visually, then export drop-in snippets for Python and TypeScript.
+          Comprehensive feature tutorials, empirical retrieval science, domain presets, and production code generators. Everything you need to eliminate chunk boundary fragmentation and optimize vector search.
         </p>
       </div>
 
-      {/* Code Export Showcase */}
+      {/* Main Interactive Learning Hub */}
+      <div className="mb-16">
+        <LearningCenterView
+          onApplyConfig={handleApplyPreset}
+          defaultTab="manual"
+          className="bg-transparent"
+        />
+      </div>
+
+      {/* Quick Code Export Showcase */}
       <div className="rounded-card border border-separator bg-surface-1 shadow-card p-6 sm:p-8 mb-16">
+        <div className="flex items-center space-x-2 mb-4">
+          <div className="h-6 w-6 rounded-control bg-surface-2 border border-separator flex items-center justify-center text-accent">
+            <Code2 className="h-3.5 w-3.5" />
+          </div>
+          <h2 className="text-lg font-bold text-text">Export Production Code with One Click</h2>
+        </div>
+        <p className="text-xs text-text-secondary mb-6 leading-relaxed">
+          Export drop-in text splitters pre-calibrated to your target token budget, overlap ratio, and delimiter hierarchy.
+        </p>
+
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
           {/* Framework Tabs */}
           <div className="flex items-center space-x-1.5 bg-surface-2 p-1 rounded-control border border-separator text-xs">
@@ -147,10 +177,10 @@ console.log(\`Generated \${docs.length} partitions.\`);`,
         </pre>
       </div>
 
-      {/* Parameter Optimization Guide */}
+      {/* Parameter Optimization Guide & Visualizer Shortcuts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
         <div className="p-6 rounded-card border border-separator bg-surface-1 shadow-subtle card-interactive">
-          <div className="h-10 w-10 rounded-control bg-accent-subtle border border-accent/25 flex items-center justify-center text-accent mb-4">
+          <div className="h-10 w-10 rounded-control bg-accent-subtle border border-accent/30 flex items-center justify-center text-accent mb-4">
             <Sliders className="h-5 w-5" />
           </div>
           <h3 className="text-lg font-bold text-text mb-2">Chunk Size &amp; Overlap Rules of Thumb</h3>
@@ -193,8 +223,8 @@ console.log(\`Generated \${docs.length} partitions.\`);`,
               <kbd className="px-1.5 py-0.5 rounded bg-surface-2 border border-separator font-mono text-2xs text-text">Cmd+E / Ctrl+E</kbd>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-text-secondary">Similarity Heatmap</span>
-              <kbd className="px-1.5 py-0.5 rounded bg-surface-2 border border-separator font-mono text-2xs text-text">H</kbd>
+              <span className="text-text-secondary">User Manual &amp; RAG Academy</span>
+              <kbd className="px-1.5 py-0.5 rounded bg-surface-2 border border-separator font-mono text-2xs text-text">?</kbd>
             </div>
           </div>
         </div>
@@ -202,9 +232,9 @@ console.log(\`Generated \${docs.length} partitions.\`);`,
 
       {/* CTA Box */}
       <div className="p-8 rounded-card border border-separator bg-surface-2/40 text-center">
-        <h3 className="text-xl font-bold text-text mb-2">Ready to calibrate your pipeline?</h3>
+        <h3 className="text-xl font-bold text-text mb-2">Ready to calibrate your document pipeline?</h3>
         <p className="text-xs text-text-secondary max-w-md mx-auto mb-6">
-          Test your document chunks, verify boundary continuity, and export production-ready code in seconds.
+          Inspect chunks in real time, examine token cost variances, test semantic continuity, and tune parameters visually.
         </p>
         <Button
           variant="primary"

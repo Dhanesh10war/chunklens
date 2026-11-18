@@ -37,7 +37,7 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({
     { id: 'features', label: 'Features & Engine', icon: <Cpu className="h-3.5 w-3.5" /> },
     { id: 'use-cases', label: 'Use Cases', icon: <Briefcase className="h-3.5 w-3.5" /> },
     { id: 'security', label: 'Zero-Egress Security', icon: <ShieldCheck className="h-3.5 w-3.5" /> },
-    { id: 'docs', label: 'Docs & API', icon: <BookOpen className="h-3.5 w-3.5" /> },
+    { id: 'docs', label: 'Docs & Academy', icon: <BookOpen className="h-3.5 w-3.5" /> },
   ];
 
   const handleTabClick = (tab: LandingPageTab) => {
