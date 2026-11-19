@@ -344,4 +344,39 @@ test.describe('Platform & Viewport Compatibility Suite', () => {
 
     assertNoAxeViolations(darkResults.violations);
   });
+
+  // -------------------------------------------------------------------------
+  // 7. Learn Track: Multi-Engine Compatibility (Chromium, Firefox, WebKit)
+  // -------------------------------------------------------------------------
+  test('Learn Track curriculum map and lesson views maintain layout integrity without horizontal overflow', async ({ page }) => {
+    // 1. Curriculum map
+    await page.goto('/?view=learn');
+    await page.waitForSelector('header');
+    await page.waitForTimeout(200);
+
+    let overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+    );
+    expect(overflow, 'no horizontal overflow on curriculum map').toBe(false);
+
+    // 2. Lesson 1.1
+    await page.goto('/?view=learn&lesson=1-1-what-is-rag');
+    await page.waitForSelector('header');
+    await page.waitForTimeout(200);
+
+    overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+    );
+    expect(overflow, 'no horizontal overflow on lesson 1.1').toBe(false);
+
+    // 3. Lesson 3.2
+    await page.goto('/?view=learn&lesson=3-2-the-size-trade-off');
+    await page.waitForSelector('header');
+    await page.waitForTimeout(200);
+
+    overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+    );
+    expect(overflow, 'no horizontal overflow on lesson 3.2').toBe(false);
+  });
 });

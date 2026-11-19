@@ -141,10 +141,10 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
       case 'code':
         return (
           <div key={index} className="my-4 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-900">
-            <div className="px-4 py-1.5 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between text-xs text-slate-400 font-mono">
+            <div className="px-4 py-1.5 learn-code-header flex items-center justify-between text-xs font-mono">
               <span>{block.language || 'code'}</span>
             </div>
-            <pre className="p-4 text-xs sm:text-sm font-mono text-slate-200 overflow-x-auto">
+            <pre tabIndex={0} role="region" aria-label="Code block" className="p-4 text-xs sm:text-sm font-mono text-slate-200 overflow-x-auto focus:outline-none focus:ring-1 focus:ring-slate-500">
               <code>{block.code}</code>
             </pre>
           </div>
@@ -160,7 +160,7 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
         );
       case 'table':
         return (
-          <div key={index} className="my-5 overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-800">
+          <div key={index} tabIndex={0} role="region" aria-label="Content table" className="my-5 overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-500">
             <table className="w-full text-left text-sm text-slate-700 dark:text-slate-300 border-collapse">
               <thead className="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 font-semibold">
                 <tr>
@@ -303,7 +303,7 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
                   onLaunchWorkbench(shareUrl);
                 }
               }}
-              className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium transition-colors inline-flex items-center gap-1.5 min-h-[38px] shadow-sm whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              className="px-4 py-2 rounded-lg learn-primary-btn text-xs sm:text-sm font-medium transition-colors inline-flex items-center gap-1.5 min-h-[38px] shadow-sm whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
               <span>Open in Workbench</span>
               <span>→</span>

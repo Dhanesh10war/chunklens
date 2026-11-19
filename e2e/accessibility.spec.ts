@@ -223,4 +223,157 @@ test.describe('WCAG 2.2 AA Accessibility Audits', () => {
       await page.waitForTimeout(200);
     }
   });
+
+  // -------------------------------------------------------------------------
+  // 7. Learn Track: Curriculum Map Accessibility (1440px & 375px, Light & Dark)
+  // -------------------------------------------------------------------------
+  test('evaluates Learn curriculum map accessibility at 1440px and 375px in light and dark themes', async ({ page }) => {
+    for (const theme of ['light', 'dark']) {
+      await page.addInitScript((th) => {
+        localStorage.setItem('chunklens_theme', th);
+      }, theme);
+
+      // 1. Desktop 1440x900
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.goto('/?view=learn');
+      await page.waitForSelector('header');
+      await page.waitForTimeout(300);
+
+      const desktopAxe = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+      assertNoAxeViolations(desktopAxe.violations);
+
+      // Verify no horizontal overflow
+      const hasHorizontalOverflow = await page.evaluate(
+        () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+      );
+      expect(hasHorizontalOverflow, `no horizontal overflow at 1440px in ${theme}`).toBe(false);
+
+      // 2. Mobile 375x812
+      await page.setViewportSize({ width: 375, height: 812 });
+      await page.waitForTimeout(300);
+
+      const mobileAxe = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+      assertNoAxeViolations(mobileAxe.violations);
+
+      const mobileOverflow = await page.evaluate(
+        () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+      );
+      expect(mobileOverflow, `no horizontal overflow at 375px in ${theme}`).toBe(false);
+    }
+  });
+
+  // -------------------------------------------------------------------------
+  // 8. Learn Track: Lesson 1.1 + V1 Explorer Accessibility (1440px & 375px)
+  // -------------------------------------------------------------------------
+  test('evaluates Lesson 1.1 and V1 Pipeline widget accessibility at 1440px and 375px in light and dark themes', async ({ page }) => {
+    for (const theme of ['light', 'dark']) {
+      await page.addInitScript((th) => {
+        localStorage.setItem('chunklens_theme', th);
+      }, theme);
+
+      // Desktop 1440x900
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.goto('/?view=learn&lesson=1-1-what-is-rag');
+      await page.waitForSelector('header');
+      await page.waitForTimeout(400);
+
+      // Verify V1 Widget honesty badge and diagram are present
+      await expect(page.getByText('RAG Pipeline Flow Simulator')).toBeVisible();
+      await expect(page.getByText('Illustration')).toBeVisible();
+
+      // Test accessible data table toggle
+      const tableToggleBtn = page.getByRole('button', { name: /Accessible Table/i });
+      if (await tableToggleBtn.isVisible()) {
+        await tableToggleBtn.click();
+        await page.waitForTimeout(200);
+        await expect(page.getByRole('table')).toBeVisible();
+      }
+
+      const desktopAxe = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+      assertNoAxeViolations(desktopAxe.violations);
+
+      // Mobile 375x812
+      await page.setViewportSize({ width: 375, height: 812 });
+      await page.waitForTimeout(300);
+
+      const mobileAxe = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+      assertNoAxeViolations(mobileAxe.violations);
+    }
+  });
+
+  // -------------------------------------------------------------------------
+  // 9. Learn Track: Lesson 3.2 + V2 Sandbox Accessibility (1440px & 375px)
+  // -------------------------------------------------------------------------
+  test('evaluates Lesson 3.2 and V2 Chunk Sandbox accessibility at 1440px and 375px in light and dark themes', async ({ page }) => {
+    for (const theme of ['light', 'dark']) {
+      await page.addInitScript((th) => {
+        localStorage.setItem('chunklens_theme', th);
+      }, theme);
+
+      // Desktop 1440x900
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.goto('/?view=learn&lesson=3-2-the-size-trade-off');
+      await page.waitForSelector('header');
+      await page.waitForTimeout(400);
+
+      // Verify V2 Sandbox honesty badge
+      await expect(page.getByText('Live Document Chunking Sandbox')).toBeVisible();
+      await expect(page.getByText('Real engine')).toBeVisible();
+
+      // Test accessible table toggle
+      const tableToggleBtn = page.getByRole('button', { name: /Accessible Table/i });
+      if (await tableToggleBtn.isVisible()) {
+        await tableToggleBtn.click();
+        await page.waitForTimeout(200);
+        await expect(page.getByRole('table').first()).toBeVisible();
+      }
+
+      const desktopAxe = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+      assertNoAxeViolations(desktopAxe.violations);
+
+      // Mobile 375x812
+      await page.setViewportSize({ width: 375, height: 812 });
+      await page.waitForTimeout(300);
+
+      const mobileAxe = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+      assertNoAxeViolations(mobileAxe.violations);
+    }
+  });
+
+  // -------------------------------------------------------------------------
+  // 10. Learn Track: 200% Zoom and Interactive Target Sizing (>= 24px)
+  // -------------------------------------------------------------------------
+  test('evaluates Learn Track under 200% zoom and touch target sizes (>= 24px)', async ({ page }) => {
+    // 200% zoom on a standard 1366px screen yields an effective viewport of 683px
+    await page.setViewportSize({ width: 683, height: 768 });
+    await page.goto('/?view=learn&lesson=3-2-the-size-trade-off');
+    await page.waitForSelector('header');
+    await page.waitForTimeout(400);
+
+    const hasHorizontalOverflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+    );
+    expect(hasHorizontalOverflow, 'no horizontal scrollbar at 200% zoom equivalent (683px)').toBe(false);
+
+    // Verify touch targets >= 24px
+    const subMinTargets = await page.evaluate(() => {
+      const interactives = Array.from(document.querySelectorAll('button, a, input, select, textarea, [role="button"], [role="tab"]'));
+      const bad: { tag: string; label: string; width: number; height: number }[] = [];
+      for (const el of interactives) {
+        const rect = el.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) continue;
+        if (rect.width < 24 || rect.height < 24) {
+          bad.push({
+            tag: el.tagName.toLowerCase(),
+            label: (el.getAttribute('aria-label') || el.textContent || '').trim().slice(0, 30),
+            width: Math.round(rect.width),
+            height: Math.round(rect.height),
+          });
+        }
+      }
+      return bad;
+    });
+
+    expect(subMinTargets, 'all Learn controls meet minimum 24px touch target requirement').toEqual([]);
+  });
 });

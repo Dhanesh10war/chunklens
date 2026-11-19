@@ -84,7 +84,14 @@ export const WidgetContainer: React.FC<WidgetContainerProps> = ({
       {/* Main content body */}
       <div className="p-4 sm:p-5">
         {showTableAlt && tableAlternative ? (
-          <div className="overflow-x-auto">{tableAlternative}</div>
+          <div
+            tabIndex={0}
+            role="region"
+            aria-label="Tabular data alternative"
+            className="overflow-x-auto focus:outline-none focus:ring-1 focus:ring-slate-500"
+          >
+            {tableAlternative}
+          </div>
         ) : (
           children
         )}

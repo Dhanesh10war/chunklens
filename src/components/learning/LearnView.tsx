@@ -174,7 +174,7 @@ export const LearnView: React.FC<LearnViewProps> = ({
       </header>
 
       {/* Main Container */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full min-w-0">
         {/* VIEW 1: Individual Lesson Reading Mode */}
         {activeLesson ? (
           <div className="space-y-6">
@@ -315,7 +315,7 @@ export const LearnView: React.FC<LearnViewProps> = ({
                 <button
                   type="button"
                   onClick={() => onNavigateLesson(nextLesson.slug)}
-                  className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors min-h-[40px] flex items-center gap-2 shadow-sm"
+                  className="px-4 py-2 rounded-lg learn-primary-btn text-xs font-medium transition-colors min-h-[40px] flex items-center gap-2 shadow-sm"
                 >
                   <span>Next: {nextLesson.title}</span>
                   <span aria-hidden="true">→</span>
@@ -324,7 +324,7 @@ export const LearnView: React.FC<LearnViewProps> = ({
                 <button
                   type="button"
                   onClick={() => onNavigateLesson(null)}
-                  className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors min-h-[40px]"
+                  className="px-4 py-2 rounded-lg learn-primary-btn text-xs font-medium transition-colors min-h-[40px]"
                 >
                   Back to Curriculum
                 </button>
@@ -379,7 +379,7 @@ export const LearnView: React.FC<LearnViewProps> = ({
                   <button
                     type="button"
                     onClick={() => onNavigateLesson(progressState.lastViewedLesson)}
-                    className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition-colors min-h-[32px]"
+                    className="px-3 py-1.5 rounded-lg learn-primary-btn font-medium transition-colors min-h-[32px]"
                   >
                     Resume Lesson
                   </button>
@@ -396,8 +396,8 @@ export const LearnView: React.FC<LearnViewProps> = ({
                   onClick={() => handleSelectPath(null)}
                   className={`px-3 py-1.5 rounded-lg font-medium transition-colors whitespace-nowrap min-h-[32px] ${
                     selectedPath === null
-                      ? 'bg-indigo-600 text-white shadow-sm'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                      ? 'learn-path-btn-active shadow-sm font-semibold'
+                      : 'learn-path-btn-inactive'
                   }`}
                 >
                   All Modules
@@ -409,8 +409,8 @@ export const LearnView: React.FC<LearnViewProps> = ({
                     onClick={() => handleSelectPath(pathId)}
                     className={`px-3 py-1.5 rounded-lg font-medium transition-colors whitespace-nowrap min-h-[32px] ${
                       selectedPath === pathId
-                        ? 'bg-indigo-600 text-white shadow-sm'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                        ? 'learn-path-btn-active shadow-sm font-semibold'
+                        : 'learn-path-btn-inactive'
                     }`}
                   >
                     {PATH_DESCRIPTIONS[pathId].title}
@@ -546,16 +546,16 @@ export const LearnView: React.FC<LearnViewProps> = ({
                                 <span className="text-xs font-semibold px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
                                   Planned
                                 </span>
-                                <span className="text-xs text-slate-400">{lesson.readTime}</span>
+                                <span className="text-xs learn-subtle-text">{lesson.readTime}</span>
                               </div>
                               <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">
                                 {lesson.title}
                               </h3>
-                              <p className="text-xs text-slate-500 dark:text-slate-500 mt-1 line-clamp-2">
+                              <p className="text-xs learn-subtle-text mt-1 line-clamp-2">
                                 {lesson.summary}
                               </p>
                             </div>
-                            <div className="mt-3 pt-2 text-xs text-slate-400 italic">
+                            <div className="mt-3 pt-2 text-xs learn-subtle-text italic">
                               In development
                             </div>
                           </div>

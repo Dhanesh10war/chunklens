@@ -13,6 +13,8 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 /* Reduced motion adjustments */
@@ -263,4 +265,66 @@
 .learn-view-root input[type='checkbox'] {
   min-height: 24px;
   min-width: 24px;
+}
+
+/* Learning Path Picker Buttons */
+.learn-path-btn-active {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+}
+
+.dark .learn-path-btn-active {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.learn-path-btn-inactive {
+  color: #475569 !important;
+}
+
+.learn-path-btn-inactive:hover {
+  color: #0f172a !important;
+}
+
+.dark .learn-path-btn-inactive {
+  color: #94a3b8 !important;
+}
+
+.dark .learn-path-btn-inactive:hover {
+  color: #f1f5f9 !important;
+}
+
+/* Primary Action Buttons */
+.learn-primary-btn {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+}
+
+.learn-primary-btn:hover {
+  background-color: #1e293b !important;
+}
+
+.dark .learn-primary-btn {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.dark .learn-primary-btn:hover {
+  background-color: #e2e8f0 !important;
+}
+
+/* Code header */
+.learn-code-header {
+  background-color: #0f172a !important;
+  color: #f1f5f9 !important;
+  border-bottom: 1px solid #1e293b !important;
+}
+
+/* Subtle Text with guaranteed WCAG 2.2 AA >= 4.5:1 contrast */
+.learn-subtle-text {
+  color: #475569;
+}
+
+.dark .learn-subtle-text {
+  color: #94a3b8;
 }

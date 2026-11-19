@@ -153,7 +153,12 @@ export const V1PipelineFlowExplorer: React.FC = () => {
       </div>
 
       {/* Interactive Flow Diagram (Inline SVG) */}
-      <div className="mb-6 p-4 rounded-xl bg-slate-950 text-white border border-slate-800 overflow-x-auto">
+      <div
+        tabIndex={0}
+        role="region"
+        aria-label="Interactive pipeline flow diagram"
+        className="mb-6 p-4 rounded-xl bg-slate-950 text-white border border-slate-800 overflow-x-auto focus:outline-none focus:ring-1 focus:ring-slate-500"
+      >
         <svg
           viewBox="0 0 700 110"
           className="w-full min-w-[560px] h-auto"

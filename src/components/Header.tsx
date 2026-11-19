@@ -140,7 +140,7 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="h-[52px] border-b border-separator surface-translucent sticky top-0 z-30 select-none flex items-center px-3 sm:px-4 pl-safe pr-safe">
       <div className="w-full flex items-center justify-between gap-1.5 sm:gap-2 lg:gap-3 min-w-0">
         {/* Left Cluster: Sidebar Toggle, Brand + Version, Document Title & Reset */}
-        <div className="flex items-center space-x-1.5 sm:space-x-2 min-w-0 shrink">
+        <div className="flex items-center gap-3 min-w-0 shrink">
           <Tooltip content={isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'} shortcut="[" position="bottom">
             <button
               onClick={onToggleSidebar}
@@ -152,30 +152,13 @@ export const Header: React.FC<HeaderProps> = ({
           </Tooltip>
 
           {/* App Brand + Version */}
-          {onOpenLandingPage ? (
-            <Tooltip content="Return to landing page" position="bottom">
-              <button
-                type="button"
-                onClick={onOpenLandingPage}
-                className="flex items-center space-x-1.5 shrink-0 hover:opacity-85 transition-opacity focus-ring rounded-control text-left p-0.5"
-                aria-label="Return to ChunkLens product landing page"
-              >
-                <div className="h-6 w-6 rounded-control bg-surface-2 border border-separator flex items-center justify-center text-accent shrink-0">
-                  <Layers className="h-3.5 w-3.5" />
-                </div>
-                <h1 className="font-semibold text-sm tracking-tight text-text m-0 p-0 inline">ChunkLens</h1>
-                <span className="text-xs font-mono text-text-secondary hidden xs:inline">{`v${__APP_VERSION__}`}</span>
-              </button>
-            </Tooltip>
-          ) : (
-            <div className="flex items-center space-x-1.5 shrink-0">
-              <div className="h-6 w-6 rounded-control bg-surface-2 border border-separator flex items-center justify-center text-accent shrink-0">
-                <Layers className="h-3.5 w-3.5" />
-              </div>
-              <h1 className="font-semibold text-sm tracking-tight text-text m-0 p-0 inline">ChunkLens</h1>
-              <span className="text-xs font-mono text-text-secondary hidden xs:inline">{`v${__APP_VERSION__}`}</span>
+          <div className="flex items-center space-x-1.5 shrink-0">
+            <div className="h-6 w-6 rounded-control bg-surface-2 border border-separator flex items-center justify-center text-accent shrink-0">
+              <Layers className="h-3.5 w-3.5" />
             </div>
-          )}
+            <h1 className="font-semibold text-sm tracking-tight text-text m-0 p-0 inline">ChunkLens</h1>
+            <span className="text-xs font-mono text-text-secondary hidden xs:inline">{`v${__APP_VERSION__}`}</span>
+          </div>
 
           <span className="text-separator hidden md:inline" aria-hidden="true">/</span>
 

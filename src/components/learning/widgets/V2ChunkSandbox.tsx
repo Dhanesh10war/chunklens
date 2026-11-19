@@ -206,13 +206,16 @@ export const V2ChunkSandbox: React.FC<V2ChunkSandboxProps> = ({
             </span>
           </div>
           <input
+            id="v2-sandbox-chunk-size"
+            aria-label="Chunk size in units"
             type="range"
             min="100"
             max="2000"
             step="50"
             value={chunkSize}
             onChange={(e) => setChunkSize(Number(e.target.value))}
-            className="w-full accent-indigo-600 cursor-pointer min-h-[24px]"
+            style={{ height: '28px', minHeight: '28px' }}
+            className="w-full h-7 accent-indigo-600 cursor-pointer"
           />
         </div>
 
@@ -225,13 +228,16 @@ export const V2ChunkSandbox: React.FC<V2ChunkSandboxProps> = ({
             </span>
           </div>
           <input
+            id="v2-sandbox-chunk-overlap"
+            aria-label="Chunk overlap in units"
             type="range"
             min="0"
             max={Math.max(0, chunkSize - 50)}
             step="10"
             value={chunkOverlap}
             onChange={(e) => setChunkOverlap(Number(e.target.value))}
-            className="w-full accent-indigo-600 cursor-pointer min-h-[24px]"
+            style={{ height: '28px', minHeight: '28px' }}
+            className="w-full h-7 accent-indigo-600 cursor-pointer"
           />
         </div>
 
@@ -343,7 +349,12 @@ export const V2ChunkSandbox: React.FC<V2ChunkSandboxProps> = ({
             <span className="text-slate-500">Click a chunk to inspect</span>
           </div>
 
-          <div className="max-h-[240px] overflow-y-auto space-y-1.5 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60">
+          <div
+            tabIndex={0}
+            role="region"
+            aria-label="Resulting chunks list"
+            className="max-h-[240px] overflow-y-auto space-y-1.5 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 focus:outline-none focus:ring-1 focus:ring-slate-500"
+          >
             {chunks.map((c, idx) => {
               const isSelected = idx === selectedChunkIndex;
               return (
@@ -393,7 +404,12 @@ export const V2ChunkSandbox: React.FC<V2ChunkSandboxProps> = ({
               )}
             </div>
           </div>
-          <div className="p-3 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 font-mono text-xs text-slate-800 dark:text-slate-200 whitespace-pre-wrap max-h-40 overflow-y-auto">
+          <div
+            tabIndex={0}
+            role="region"
+            aria-label="Selected chunk text preview"
+            className="p-3 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 font-mono text-xs text-slate-800 dark:text-slate-200 whitespace-pre-wrap max-h-40 overflow-y-auto focus:outline-none focus:ring-1 focus:ring-slate-500"
+          >
             {selectedChunk.text}
           </div>
         </div>
