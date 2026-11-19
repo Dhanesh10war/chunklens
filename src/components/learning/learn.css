@@ -1,0 +1,266 @@
+/**
+ * ChunkLens Learn Track Stylesheet
+ * 
+ * Rules:
+ * - Scoped strictly to Learn components (imported solely by LearnView)
+ * - Zero additions to src/index.css
+ * - Supports dark mode via .dark parent
+ * - WCAG 2.2 AA compliant focus states and touch targets >= 24px
+ * - Reduced motion support (120ms - 200ms max, instant when preferred)
+ */
+
+.learn-view-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Reduced motion adjustments */
+@media (prefers-reduced-motion: reduce) {
+  .learn-view-root *,
+  .learn-view-root *::before,
+  .learn-view-root *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Base Prose Styles */
+.learn-prose {
+  color: #334155;
+  line-height: 1.75;
+  font-size: 1rem;
+}
+
+.dark .learn-prose {
+  color: #cbd5e1;
+}
+
+.learn-prose h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #0f172a;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.dark .learn-prose h1 {
+  color: #f8fafc;
+}
+
+.learn-prose h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #0f172a;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.dark .learn-prose h2 {
+  color: #f1f5f9;
+  border-bottom-color: #1e293b;
+}
+
+.learn-prose h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #1e293b;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.dark .learn-prose h3 {
+  color: #e2e8f0;
+}
+
+.learn-prose p {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.learn-prose ul {
+  list-style-type: disc;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding-left: 1.5rem;
+}
+
+.learn-prose ol {
+  list-style-type: decimal;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding-left: 1.5rem;
+}
+
+.learn-prose li {
+  margin-top: 0.375rem;
+  margin-bottom: 0.375rem;
+}
+
+.learn-prose blockquote {
+  border-left: 4px solid #6366f1;
+  padding-left: 1rem;
+  font-style: italic;
+  color: #475569;
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.dark .learn-prose blockquote {
+  border-left-color: #818cf8;
+  color: #94a3b8;
+}
+
+.learn-prose code:not(pre code) {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.875em;
+  padding: 0.15em 0.35em;
+  border-radius: 0.25rem;
+  background-color: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+}
+
+.dark .learn-prose code:not(pre code) {
+  background-color: #0f172a;
+  color: #f8fafc;
+  border-color: #1e293b;
+}
+
+.learn-prose pre {
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: #0f172a;
+  color: #f8fafc;
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.dark .learn-prose pre {
+  background-color: #020617;
+  border: 1px solid #1e293b;
+}
+
+/* Tables */
+.learn-prose table {
+  width: 100%;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.learn-prose th,
+.learn-prose td {
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.dark .learn-prose th,
+.dark .learn-prose td {
+  border-color: #1e293b;
+}
+
+.learn-prose th {
+  background-color: #f8fafc;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.dark .learn-prose th {
+  background-color: #0f172a;
+  color: #f8fafc;
+}
+
+/* Callouts */
+.learn-callout {
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+  padding: 1rem 1.25rem;
+  border-radius: 0.5rem;
+  border-left-width: 4px;
+}
+
+.learn-callout-note {
+  background-color: #f0f9ff;
+  border-left-color: #0284c7;
+  color: #0369a1;
+}
+
+.dark .learn-callout-note {
+  background-color: rgba(3, 105, 161, 0.15);
+  border-left-color: #38bdf8;
+  color: #bae6fd;
+}
+
+.learn-callout-tip {
+  background-color: #f0fdf4;
+  border-left-color: #16a34a;
+  color: #15803d;
+}
+
+.dark .learn-callout-tip {
+  background-color: rgba(22, 163, 74, 0.15);
+  border-left-color: #4ade80;
+  color: #bbf7d0;
+}
+
+.learn-callout-warning {
+  background-color: #fffbeb;
+  border-left-color: #d97706;
+  color: #b45309;
+}
+
+.dark .learn-callout-warning {
+  background-color: rgba(217, 119, 6, 0.15);
+  border-left-color: #fbbf24;
+  color: #fde68a;
+}
+
+/* Comparison Layout */
+.learn-compare-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .learn-compare-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.learn-compare-card {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+}
+
+.dark .learn-compare-card {
+  background-color: #0f172a;
+  border-color: #1e293b;
+}
+
+/* Minimum interactive target sizes for touch */
+.learn-view-root button,
+.learn-view-root a,
+.learn-view-root input[type='radio'],
+.learn-view-root input[type='checkbox'] {
+  min-height: 24px;
+  min-width: 24px;
+}

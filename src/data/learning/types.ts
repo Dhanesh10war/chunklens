@@ -53,8 +53,9 @@ export interface DomainPreset {
 }
 
 export interface GlossaryTerm {
+  id?: string;
   term: string;
-  category: 'Vector Search' | 'Chunking' | 'Evaluation' | 'LLM Architecture';
+  category: 'Vector Search' | 'Chunking' | 'Evaluation' | 'LLM Architecture' | 'Foundations';
   definition: string;
   formulaOrExample?: string;
   seeAlso?: string[];
