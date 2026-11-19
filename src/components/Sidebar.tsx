@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { ChunkingConfig, ChunkingStrategy, TokenizerEncoding, ChunkUnit } from '../engine/types';
 import { SAMPLE_DOCUMENTS } from '../data/samples';
-import { Upload, RotateCcw, FileText, FilePlus, Cpu, ChevronDown, ChevronRight, X } from 'lucide-react';
+import { Upload, RotateCcw, FileText, FilePlus, Cpu, ChevronDown, ChevronRight, ChevronUp, X } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Select } from './ui/Select';
 import { Input } from './ui/Input';
@@ -27,6 +27,7 @@ interface SidebarProps {
   isExtractingPdf?: boolean;
   rememberDocument?: boolean;
   onToggleRememberDocument?: (enabled: boolean) => void;
+  sidebarWidth?: number;
   className?: string;
 }
 
@@ -45,12 +46,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isExtractingPdf = false,
   rememberDocument = false,
   onToggleRememberDocument,
+  sidebarWidth,
   className,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDraggingFile, setIsDraggingFile] = useState(false);
 
   // Collapsible section toggles (default open)
+  const [isSourceSectionOpen, setIsSourceSectionOpen] = useState(true);
+  const [showAllSamples, setShowAllSamples] = useState(false);
   const [isStrategySectionOpen, setIsStrategySectionOpen] = useState(true);
   const [isTokenizerSectionOpen, setIsTokenizerSectionOpen] = useState(true);
   const [isSizeSectionOpen, setIsSizeSectionOpen] = useState(true);
@@ -189,11 +193,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         role={isMobileOrTablet ? 'dialog' : undefined}
         aria-modal={isMobileOrTablet ? true : undefined}
         aria-label={isMobileOrTablet ? 'Configuration drawer' : undefined}
+        style={!isMobileOrTablet ? { width: `${sidebarWidth || 300}px` } : undefined}
         className={cn(
           isMobileOrTablet
             ? 'fixed inset-y-0 left-0 z-50 w-[90dvw] max-w-[320px] bg-surface-1 shadow-modal pt-safe pb-safe pl-safe'
-            : 'static z-20 w-[320px] shadow-none surface-translucent border-r border-separator',
-          'flex flex-col h-full shrink-0 select-none overflow-y-auto',
+            : 'static z-20 shadow-none surface-translucent border-r border-separator shrink-0',
+          'flex flex-col h-full select-none overflow-y-auto',
           className
         )}
       >
@@ -218,9 +223,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* SECTION 1: SOURCE */}
           <div className="flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-text select-none">
-                Document source
-              </span>
+              <button
+                type="button"
+                onClick={() => setIsSourceSectionOpen(!isSourceSectionOpen)}
+                className="flex items-center gap-1.5 text-left group focus-ring rounded-control -mx-1 px-1 py-1 min-h-[32px] transition-colors"
+                aria-expanded={isSourceSectionOpen}
+              >
+                <span className="text-xs font-semibold text-text select-none">
+                  Document source
+                </span>
+                <span className="text-text-tertiary group-hover:text-text transition-colors">
+                  {isSourceSectionOpen ? (
+                    <ChevronDown className="h-3.5 w-3.5" />
+                  ) : (
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  )}
+                </span>
+              </button>
               {onNewDocument && (
                 <Tooltip content="Clear document and open empty dropzone" position="right">
                   <button
@@ -235,33 +254,99 @@ export const Sidebar: React.FC<SidebarProps> = ({
               )}
             </div>
 
-            {/* Sample Corpora Selection */}
-            <div className="flex flex-col gap-0.5 border border-separator rounded-card bg-surface-2/40 p-1">
-              {SAMPLE_DOCUMENTS.map((sample) => {
-                const isSelected = sample.id === selectedSampleId;
-                const approxTokens = Math.round(sample.content.length / 4);
-                return (
+            {isSourceSectionOpen && (
+              <>
+                {/* Sample Corpora Selection (Compact / Expandable) */}
+                {selectedSampleId && !showAllSamples ? (
+                  <div className="flex flex-col gap-1 border border-separator rounded-card bg-surface-2/40 p-1">
+                    {(() => {
+                      const activeSample = SAMPLE_DOCUMENTS.find((s) => s.id === selectedSampleId);
+                      if (!activeSample) return null;
+                      const approxTokens = Math.round(activeSample.content.length / 4);
+                      return (
+                        <button
+                          key={activeSample.id}
+                          onClick={() => setShowAllSamples(true)}
+                          className="flex items-center justify-between px-2.5 py-1.5 rounded-control text-left transition-colors active-press focus-ring text-xs border bg-accent-subtle text-text font-medium border-accent/25 shadow-subtle group min-h-[32px]"
+                          title="Click to switch sample document"
+                        >
+                          <div className="flex items-center space-x-2 truncate min-w-0 pr-2">
+                            <FileText className="h-3.5 w-3.5 shrink-0 text-accent" />
+                            <span className="truncate">{activeSample.title}</span>
+                          </div>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <span className="text-2xs font-mono text-text-tertiary tabular-nums">
+                              ~{approxTokens.toLocaleString()} tok
+                            </span>
+                            <ChevronDown className="h-3 w-3 text-text-tertiary group-hover:text-text transition-colors" />
+                          </div>
+                        </button>
+                      );
+                    })()}
+                    <button
+                      type="button"
+                      onClick={() => setShowAllSamples(true)}
+                      className="w-full text-center text-2xs text-text-secondary hover:text-accent min-h-[28px] py-1 px-1 rounded-control hover:bg-surface-2 transition-colors focus-ring flex items-center justify-center gap-1"
+                    >
+                      <span>Browse sample corpora ({SAMPLE_DOCUMENTS.length})</span>
+                      <ChevronDown className="h-3 w-3" />
+                    </button>
+                  </div>
+                ) : !selectedSampleId && !showAllSamples ? (
                   <button
-                    key={sample.id}
-                    onClick={() => onSelectSample(sample.id)}
-                    className={cn(
-                      'flex items-center justify-between px-2.5 py-1.5 rounded-control text-left transition-colors active-press focus-ring text-xs border',
-                      isSelected
-                        ? 'bg-accent-subtle text-text font-medium border-accent/25 shadow-subtle'
-                        : 'text-text-secondary hover:text-text hover:bg-surface-2/80 border-transparent'
-                    )}
+                    type="button"
+                    onClick={() => setShowAllSamples(true)}
+                    className="flex items-center justify-between px-2.5 py-2 rounded-card border border-separator bg-surface-2 hover:bg-surface-2 text-left text-xs text-text-secondary hover:text-text transition-colors focus-ring min-h-[36px]"
+                    aria-label="Browse sample documents"
                   >
                     <div className="flex items-center space-x-2 truncate min-w-0 pr-2">
-                      <FileText className={cn('h-3.5 w-3.5 shrink-0', isSelected ? 'text-accent' : 'text-text-tertiary')} />
-                      <span className="truncate">{sample.title}</span>
+                      <FileText className="h-3.5 w-3.5 shrink-0 text-text-tertiary" />
+                      <span>Browse sample corpora ({SAMPLE_DOCUMENTS.length})</span>
                     </div>
-                    <span className="text-2xs font-mono text-text-tertiary shrink-0 tabular-nums">
-                      ~{approxTokens.toLocaleString()} tok
-                    </span>
+                    <ChevronDown className="h-3.5 w-3.5 shrink-0 text-text-tertiary" />
                   </button>
-                );
-              })}
-            </div>
+                ) : (
+                  <div className="flex flex-col gap-0.5 border border-separator rounded-card bg-surface-2/40 p-1">
+                    <div className="flex items-center justify-between px-2 py-1 text-2xs text-text-tertiary border-b border-separator pb-1">
+                      <span className="font-medium text-text-secondary">Sample Corpora ({SAMPLE_DOCUMENTS.length})</span>
+                      <button
+                        type="button"
+                        onClick={() => setShowAllSamples(false)}
+                        className="text-accent hover:underline flex items-center gap-0.5 focus-ring rounded font-medium min-h-[24px] px-1 py-0.5"
+                      >
+                        <span>Hide list</span>
+                        <ChevronUp className="h-3 w-3" />
+                      </button>
+                    </div>
+                    {SAMPLE_DOCUMENTS.map((sample) => {
+                      const isSelected = sample.id === selectedSampleId;
+                      const approxTokens = Math.round(sample.content.length / 4);
+                      return (
+                        <button
+                          key={sample.id}
+                          onClick={() => {
+                            onSelectSample(sample.id);
+                            setShowAllSamples(false);
+                          }}
+                          className={cn(
+                            'flex items-center justify-between px-2.5 py-1.5 rounded-control text-left transition-colors active-press focus-ring text-xs border',
+                            isSelected
+                              ? 'bg-accent-subtle text-text font-medium border-accent/25 shadow-subtle'
+                              : 'text-text-secondary hover:text-text hover:bg-surface-2/80 border-transparent'
+                          )}
+                        >
+                          <div className="flex items-center space-x-2 truncate min-w-0 pr-2">
+                            <FileText className={cn('h-3.5 w-3.5 shrink-0', isSelected ? 'text-accent' : 'text-text-tertiary')} />
+                            <span className="truncate">{sample.title}</span>
+                          </div>
+                          <span className="text-2xs font-mono text-text-tertiary shrink-0 tabular-nums">
+                            ~{approxTokens.toLocaleString()} tok
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
 
             {/* Upload Button & Dropzone */}
             <div
@@ -337,6 +422,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
               </label>
             </div>
+            </>
+            )}
           </div>
 
           <div className="h-px bg-separator" />

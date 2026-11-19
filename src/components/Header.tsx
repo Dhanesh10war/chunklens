@@ -152,12 +152,28 @@ export const Header: React.FC<HeaderProps> = ({
             </Tooltip>
 
             {/* App Brand */}
-            <div className="flex items-center space-x-1.5 shrink-0">
-              <div className="h-6 w-6 rounded-control bg-surface-2 border border-separator flex items-center justify-center text-accent shrink-0">
-                <Layers className="h-3.5 w-3.5" />
+            {onOpenLandingPage ? (
+              <Tooltip content="Return to Overview & Landing" position="bottom">
+                <button
+                  type="button"
+                  onClick={onOpenLandingPage}
+                  className="flex items-center space-x-1.5 shrink-0 hover:opacity-85 active-press focus-ring rounded-control p-1 -m-1 transition-opacity text-left cursor-pointer"
+                  aria-label="ChunkLens Home (Return to landing overview)"
+                >
+                  <div className="h-6 w-6 rounded-control bg-surface-2 border border-separator flex items-center justify-center text-accent shrink-0">
+                    <Layers className="h-3.5 w-3.5" />
+                  </div>
+                  <h1 className="font-semibold text-sm tracking-tight text-text m-0 p-0 inline">ChunkLens</h1>
+                </button>
+              </Tooltip>
+            ) : (
+              <div className="flex items-center space-x-1.5 shrink-0">
+                <div className="h-6 w-6 rounded-control bg-surface-2 border border-separator flex items-center justify-center text-accent shrink-0">
+                  <Layers className="h-3.5 w-3.5" />
+                </div>
+                <h1 className="font-semibold text-sm tracking-tight text-text m-0 p-0 inline">ChunkLens</h1>
               </div>
-              <h1 className="font-semibold text-sm tracking-tight text-text m-0 p-0 inline">ChunkLens</h1>
-            </div>
+            )}
           </div>
 
           <span className="text-separator hidden md:inline shrink-0" aria-hidden="true">/</span>

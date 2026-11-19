@@ -50,6 +50,9 @@ export const AppContent: React.FC = () => {
   const { success } = useToast();
 
   const handleOpenLandingPage = () => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
     setCurrentView('landing');
     setCurrentLessonSlug(null);
     if (typeof window !== 'undefined' && window.history?.pushState) {
@@ -62,6 +65,9 @@ export const AppContent: React.FC = () => {
   };
 
   const handleOpenLearnView = (slug?: string | null) => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
     setCurrentView('learn');
     setCurrentLessonSlug(slug || null);
     if (typeof window !== 'undefined' && window.history?.pushState) {
@@ -96,6 +102,9 @@ export const AppContent: React.FC = () => {
         setWorkbenchSampleId(sampleId);
       }
     }
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
     setCurrentView('app');
     setCurrentLessonSlug(null);
     if (typeof window !== 'undefined' && window.history?.pushState) {
@@ -108,6 +117,9 @@ export const AppContent: React.FC = () => {
   };
 
   const handleLaunchApp = (sampleId?: string, newConfig?: ChunkingConfig) => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
     if (newConfig) {
       setWorkbenchConfig(newConfig);
       success('Applied calibrated preset to workbench');
@@ -163,6 +175,12 @@ export const AppContent: React.FC = () => {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
+  }, [currentView]);
 
   if (currentView === 'landing') {
     return (

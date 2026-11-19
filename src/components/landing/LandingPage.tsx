@@ -37,7 +37,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onOpenLea
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
+  }, [activeTab]);
+
   const handleSelectTab = (tab: LandingPageTab) => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
     setActiveTab(tab);
     if (typeof window !== 'undefined' && window.history?.pushState) {
       const url = new URL(window.location.href);

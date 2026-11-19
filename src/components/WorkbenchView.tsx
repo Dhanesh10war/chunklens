@@ -18,6 +18,11 @@ import { ChunkLoadErrorBoundary } from './ui/ChunkLoadErrorBoundary';
 import { ModalLoadingFallback } from './ui/ModalLoadingFallback';
 import { generateShareableUrl, parseSharedConfigFromUrl } from '../utils/shareUrl';
 import { copyToClipboard } from '../utils/clipboard';
+import { cn } from '../utils/cn';
+
+const DEFAULT_SIDEBAR_WIDTH = 300;
+const MIN_SIDEBAR_WIDTH = 240;
+const MAX_SIDEBAR_WIDTH = 480;
 
 // Lazy-load modals
 const prefetchCommandPalette = () =>
@@ -131,6 +136,95 @@ export const WorkbenchView: React.FC<WorkbenchViewProps> = ({
   const [isExportModalOpen, setIsExportModalOpen] = useState<boolean>(false);
   const [isTokenizerModalOpen, setIsTokenizerModalOpen] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'visualizer' | 'heatmap' | 'editor'>('visualizer');
+
+  // VS Code / Cursor-style draggable resizable sidebar
+  const [sidebarWidth, setSidebarWidth] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('chunklens_sidebar_width');
+        if (saved) {
+          const val = parseInt(saved, 10);
+          if (!isNaN(val) && val >= MIN_SIDEBAR_WIDTH && val <= MAX_SIDEBAR_WIDTH) {
+            return val;
+          }
+        }
+      } catch {}
+    }
+    return DEFAULT_SIDEBAR_WIDTH;
+  });
+
+  const [isResizingSidebar, setIsResizingSidebar] = useState(false);
+
+  const handleStartResize = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    setIsResizingSidebar(true);
+  };
+
+  const handleResetSidebarWidth = () => {
+    setSidebarWidth(DEFAULT_SIDEBAR_WIDTH);
+    try {
+      localStorage.setItem('chunklens_sidebar_width', String(DEFAULT_SIDEBAR_WIDTH));
+    } catch {}
+  };
+
+  const handleSplitterKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      setSidebarWidth((w) => {
+        const next = Math.max(MIN_SIDEBAR_WIDTH, w - 16);
+        try {
+          localStorage.setItem('chunklens_sidebar_width', String(next));
+        } catch {}
+        return next;
+      });
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      setSidebarWidth((w) => {
+        const next = Math.min(MAX_SIDEBAR_WIDTH, w + 16);
+        try {
+          localStorage.setItem('chunklens_sidebar_width', String(next));
+        } catch {}
+        return next;
+      });
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      handleResetSidebarWidth();
+    }
+  };
+
+  useEffect(() => {
+    if (!isResizingSidebar) return;
+
+    const handlePointerMove = (e: MouseEvent | TouchEvent) => {
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+      const clamped = Math.max(MIN_SIDEBAR_WIDTH, Math.min(MAX_SIDEBAR_WIDTH, clientX));
+      setSidebarWidth(clamped);
+    };
+
+    const handlePointerUp = () => {
+      setIsResizingSidebar(false);
+      try {
+        localStorage.setItem('chunklens_sidebar_width', String(sidebarWidth));
+      } catch {}
+    };
+
+    window.addEventListener('mousemove', handlePointerMove);
+    window.addEventListener('touchmove', handlePointerMove);
+    window.addEventListener('mouseup', handlePointerUp);
+    window.addEventListener('touchend', handlePointerUp);
+
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor = 'col-resize';
+
+    return () => {
+      window.removeEventListener('mousemove', handlePointerMove);
+      window.removeEventListener('touchmove', handlePointerMove);
+      window.removeEventListener('mouseup', handlePointerUp);
+      window.removeEventListener('touchend', handlePointerUp);
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
+    };
+  }, [isResizingSidebar, sidebarWidth]);
 
   const { success } = useToast();
 
@@ -249,7 +343,7 @@ export const WorkbenchView: React.FC<WorkbenchViewProps> = ({
       } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'e') {
         e.preventDefault();
         setIsExportModalOpen(true);
-      } else if (e.key === '[') {
+      } else if (e.key === '[' || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'b')) {
         e.preventDefault();
         setIsSidebarOpen((prev) => !prev);
       } else if (e.key === ']') {
@@ -442,7 +536,37 @@ export const WorkbenchView: React.FC<WorkbenchViewProps> = ({
           onToggleRememberDocument={setRememberDocument}
           onOpenTokenizerModal={() => setIsTokenizerModalOpen(true)}
           onPrefetchTokenizerModal={prefetchTokenizerModal}
+          sidebarWidth={sidebarWidth}
         />
+
+        {/* Draggable Vertical Splitter (VS Code / Cursor style) */}
+        {isSidebarOpen && (
+          <div
+            role="separator"
+            aria-orientation="vertical"
+            aria-label="Resize sidebar"
+            aria-valuenow={sidebarWidth}
+            aria-valuemin={MIN_SIDEBAR_WIDTH}
+            aria-valuemax={MAX_SIDEBAR_WIDTH}
+            tabIndex={0}
+            onMouseDown={handleStartResize}
+            onTouchStart={handleStartResize}
+            onDoubleClick={handleResetSidebarWidth}
+            onKeyDown={handleSplitterKeyDown}
+            title="Drag to resize sidebar (Double click to reset)"
+            className={cn(
+              "hidden lg:flex w-1.5 -ml-1 cursor-col-resize items-center justify-center bg-transparent transition-colors z-20 select-none group relative focus-ring",
+              isResizingSidebar && "bg-accent-subtle"
+            )}
+          >
+            <div
+              className={cn(
+                "h-full w-px bg-separator transition-colors group-hover:bg-accent",
+                isResizingSidebar && "w-0.5 bg-accent"
+              )}
+            />
+          </div>
+        )}
 
         {/* Hero Content Canvas */}
         <main className="flex-1 flex flex-col min-w-0 bg-bg-base overflow-hidden">
