@@ -55,6 +55,23 @@ test.describe('Zero Network Egress & Strict CSP (Item 3.1 Proof)', () => {
       await page.keyboard.press('Escape');
     }
 
+    // 5. Navigate to Learn Track curriculum map (?view=learn)
+    await page.goto('/?view=learn');
+    await page.waitForLoadState('networkidle');
+
+    // 6. Navigate to Lesson 1.1 (?view=learn&lesson=1-1-what-is-rag)
+    await page.goto('/?view=learn&lesson=1-1-what-is-rag');
+    await page.waitForLoadState('networkidle');
+
+    // 7. Navigate to Lesson 3.2 (?view=learn&lesson=3-2-the-size-trade-off) and interact with V2 Sandbox
+    await page.goto('/?view=learn&lesson=3-2-the-size-trade-off');
+    await page.waitForLoadState('networkidle');
+    const sandboxInput = page.locator('#v2-sandbox-input');
+    if (await sandboxInput.isVisible()) {
+      await sandboxInput.fill('Evaluating zero-egress sandboxed typing in ChunkLens Learn Track.');
+      await page.waitForTimeout(300);
+    }
+
     // Assert zero cross-origin or external requests occurred
     expect(crossOriginRequests).toEqual([]);
     expect(recordedRequests.some((url) => url.includes('fonts.googleapis.com'))).toBe(false);

@@ -139,6 +139,30 @@ async function runEgressTest() {
     await client.send('Page.navigate', { url: `${PREVIEW_URL}?view=app` });
     await new Promise((r) => setTimeout(r, 2500));
 
+    console.log('[Egress Test] Navigating to curriculum map (?view=learn)...');
+    await client.send('Page.navigate', { url: `${PREVIEW_URL}?view=learn` });
+    await new Promise((r) => setTimeout(r, 2000));
+
+    console.log('[Egress Test] Navigating to lesson 1.1 (?view=learn&lesson=1-1-what-is-rag)...');
+    await client.send('Page.navigate', { url: `${PREVIEW_URL}?view=learn&lesson=1-1-what-is-rag` });
+    await new Promise((r) => setTimeout(r, 2000));
+
+    console.log('[Egress Test] Navigating to lesson 3.2 (?view=learn&lesson=3-2-the-size-trade-off)...');
+    await client.send('Page.navigate', { url: `${PREVIEW_URL}?view=learn&lesson=3-2-the-size-trade-off` });
+    await new Promise((r) => setTimeout(r, 2000));
+
+    console.log('[Egress Test] Interacting with V2 Sandbox widget in lesson 3.2...');
+    await client.send('Runtime.evaluate', {
+      expression: `(() => {
+        const ta = document.getElementById('v2-sandbox-input');
+        if (ta) {
+          ta.value = 'Testing zero egress typing interaction with custom text input in ChunkLens Learn Track.';
+          ta.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      })()`,
+    });
+    await new Promise((r) => setTimeout(r, 1000));
+
     // Verify CSP meta tag exists in DOM
     const evalResult = await client.send('Runtime.evaluate', {
       expression: 'document.querySelector("meta[http-equiv=\'Content-Security-Policy\']")?.getAttribute("content") || ""',
