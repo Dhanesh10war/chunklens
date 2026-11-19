@@ -51,6 +51,17 @@ export default defineConfig(({ command }) => {
     build: {
       target: 'es2020',
       chunkSizeWarningLimit: 6000,
+      modulePreload: {
+        resolveDependencies(filename, deps, { hostId, hostType }) {
+          // Never inject modulepreload for heavy lazy chunks into HTML entry
+          return deps.filter(
+            (dep) =>
+              !dep.includes('tokenizer-tiktoken') &&
+              !dep.includes('pdf-engine') &&
+              !dep.includes('chunking.worker')
+          );
+        },
+      },
       rollupOptions: {
         output: {
           manualChunks: {

@@ -5,6 +5,7 @@ import { chunkRecursive } from '../../../engine/chunkers/recursiveChunker';
 import { chunkMarkdown } from '../../../engine/chunkers/markdownChunker';
 import { chunkSentence } from '../../../engine/chunkers/sentenceChunker';
 import { chunkTabular } from '../../../engine/chunkers/tabularChunker';
+import { setChunkerTokenizerContext } from '../../../engine/chunkers/context';
 import { ChunkingConfig, ChunkingStrategy, ChunkMetadata, ChunkUnit } from '../../../engine/types';
 import { SAMPLE_DOCUMENTS } from '../../../data/samples';
 import { generateShareableUrl } from '../../../utils/shareUrl';
@@ -112,10 +113,18 @@ export const V2ChunkSandbox: React.FC<V2ChunkSandboxProps> = ({
     }
   };
 
-  const handleConfirmTokenMode = () => {
+  const handleConfirmTokenMode = async () => {
     setUnit('tokens');
     setShowTokenWarning(false);
-    // In token mode with DI fallback, it operates safely with calibrated tokens
+    try {
+      const { countTokens, getTokenizer } = await import('../../../engine/tokenizers/tokenizer');
+      setChunkerTokenizerContext({
+        countTokens: (text, enc) => countTokens(text, enc as any),
+        getTokenizer: (enc) => getTokenizer(enc as any),
+      });
+    } catch (err) {
+      console.warn('Failed to dynamically load tokenizer in sandbox:', err);
+    }
   };
 
   const handlePresetChange = (sampleId: string) => {

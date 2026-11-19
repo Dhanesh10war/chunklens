@@ -1,0 +1,240 @@
+{
+  "first_learn_load": {
+    "rawBytes": 180050,
+    "compressedBytes": 180050,
+    "rawKb": "180.05",
+    "compressedKb": "180.05",
+    "tiktokenLoaded": false,
+    "pdfLoaded": false,
+    "workerLoaded": false,
+    "assets": [
+      {
+        "url": "http://127.0.0.1:4173/?view=learn",
+        "filename": "127.0.0.1:4173",
+        "encoded": 1137,
+        "raw": 1137,
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4173/theme-init.js",
+        "filename": "theme-init.js",
+        "encoded": 1056,
+        "raw": 1056,
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4173/assets/vendor-icons-DJdfRRoL.js",
+        "filename": "vendor-icons-DJdfRRoL.js",
+        "encoded": 8856,
+        "raw": 8856,
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4173/assets/index-C0PPGnK4.js",
+        "filename": "index-C0PPGnK4.js",
+        "encoded": 12802,
+        "raw": 12802,
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4173/assets/index-Dp1y8EXt.css",
+        "filename": "index-Dp1y8EXt.css",
+        "encoded": 9523,
+        "raw": 9523,
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4173/assets/vendor-react-CZFvxY8m.js",
+        "filename": "vendor-react-CZFvxY8m.js",
+        "encoded": 43614,
+        "raw": 43614,
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4173/assets/LearnView-Br3iEg_Z.css",
+        "filename": "LearnView-Br3iEg_Z.css",
+        "encoded": 1553,
+        "raw": 1553,
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4173/assets/samples-C0jZCb00.js",
+        "filename": "samples-C0jZCb00.js",
+        "encoded": 6511,
+        "raw": 6511,
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4173/assets/LearnView-YAIG7QSt.js",
+        "filename": "LearnView-YAIG7QSt.js",
+        "encoded": 21674,
+        "raw": 21674,
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4173/fonts/inter-400.woff2",
+        "filename": "inter-400.woff2",
+        "encoded": 24012,
+        "raw": 24012,
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4173/fonts/inter-500.woff2",
+        "filename": "inter-500.woff2",
+        "encoded": 24688,
+        "raw": 24688,
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4173/fonts/inter-600.woff2",
+        "filename": "inter-600.woff2",
+        "encoded": 24624,
+        "raw": 24624,
+        "status": 200
+      }
+    ]
+  },
+  "lesson_3_2_load": {
+    "rawBytes": 55773,
+    "compressedBytes": 55773,
+    "rawKb": "55.77",
+    "compressedKb": "55.77",
+    "tiktokenLoaded": false,
+    "assets": [
+      {
+        "url": "http://127.0.0.1:4173/?view=learn&lesson=3-2-the-size-trade-off",
+        "filename": "127.0.0.1:4173",
+        "encoded": 1137,
+        "raw": 1137,
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4173/theme-init.js",
+        "filename": "theme-init.js",
+        "encoded": 127,
+        "raw": 127,
+        "status": 304
+      },
+      {
+        "url": "http://127.0.0.1:4173/assets/index-C0PPGnK4.js",
+        "filename": "index-C0PPGnK4.js",
+        "encoded": 179,
+        "raw": 179,
+        "status": 304
+      },
+      {
+        "url": "http://127.0.0.1:4173/assets/vendor-icons-DJdfRRoL.js",
+        "filename": "vendor-icons-DJdfRRoL.js",
+        "encoded": 179,
+        "raw": 179,
+        "status": 304
+      },
+      {
+        "url": "http://127.0.0.1:4173/assets/vendor-react-CZFvxY8m.js",
+        "filename": "vendor-react-CZFvxY8m.js",
+        "encoded": 179,
+        "raw": 179,
+        "status": 304
+      },
+      {
+        "url": "http://127.0.0.1:4173/assets/index-Dp1y8EXt.css",
+        "filename": "index-Dp1y8EXt.css",
+        "encoded": 179,
+        "raw": 179,
+        "status": 304
+      },
+      {
+        "url": "http://127.0.0.1:4173/assets/LearnView-Br3iEg_Z.css",
+        "filename": "LearnView-Br3iEg_Z.css",
+        "encoded": 179,
+        "raw": 179,
+        "status": 304
+      },
+      {
+        "url": "http://127.0.0.1:4173/assets/LearnView-YAIG7QSt.js",
+        "filename": "LearnView-YAIG7QSt.js",
+        "encoded": 179,
+        "raw": 179,
+        "status": 304
+      },
+      {
+        "url": "http://127.0.0.1:4173/assets/samples-C0jZCb00.js",
+        "filename": "samples-C0jZCb00.js",
+        "encoded": 179,
+        "raw": 179,
+        "status": 304
+      },
+      {
+        "url": "http://127.0.0.1:4173/fonts/inter-400.woff2",
+        "filename": "inter-400.woff2",
+        "encoded": 179,
+        "raw": 179,
+        "status": 304
+      },
+      {
+        "url": "http://127.0.0.1:4173/assets/V2ChunkSandbox-C0ehNABA.js",
+        "filename": "V2ChunkSandbox-C0ehNABA.js",
+        "encoded": 3904,
+        "raw": 3904,
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4173/assets/WidgetContainer-gEh3ZDCG.js",
+        "filename": "WidgetContainer-gEh3ZDCG.js",
+        "encoded": 1264,
+        "raw": 1264,
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4173/assets/tabularChunker-D-CaQOfA.js",
+        "filename": "tabularChunker-D-CaQOfA.js",
+        "encoded": 4003,
+        "raw": 4003,
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4173/fonts/inter-500.woff2",
+        "filename": "inter-500.woff2",
+        "encoded": 179,
+        "raw": 179,
+        "status": 304
+      },
+      {
+        "url": "http://127.0.0.1:4173/fonts/inter-600.woff2",
+        "filename": "inter-600.woff2",
+        "encoded": 179,
+        "raw": 179,
+        "status": 304
+      },
+      {
+        "url": "http://127.0.0.1:4173/fonts/jetbrains-mono-400.woff2",
+        "filename": "jetbrains-mono-400.woff2",
+        "encoded": 21408,
+        "raw": 21408,
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4173/fonts/jetbrains-mono-500.woff2",
+        "filename": "jetbrains-mono-500.woff2",
+        "encoded": 22140,
+        "raw": 22140,
+        "status": 200
+      }
+    ]
+  },
+  "v2_char_interaction": {
+    "rawBytes": 0,
+    "compressedBytes": 0,
+    "rawKb": "0.00",
+    "compressedKb": "0.00",
+    "tiktokenLoaded": false,
+    "assets": []
+  },
+  "v2_token_interaction": {
+    "rawBytes": 0,
+    "compressedBytes": 0,
+    "rawKb": "0.00",
+    "compressedKb": "0.00",
+    "assets": []
+  }
+}
