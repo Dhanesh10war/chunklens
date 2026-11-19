@@ -349,7 +349,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Overflow Menu Trigger */}
           <div className="relative">
-            <Tooltip content="More actions" position="bottom">
+            <Tooltip content="More actions" position="bottom" disabled={isOverflowOpen}>
               <button
                 ref={overflowTriggerRef}
                 onClick={() => setIsOverflowOpen((prev) => !prev)}
@@ -545,7 +545,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                 <div className="my-1 border-t border-separator" />
 
-                {/* User Manual & RAG Academy */}
+                {/* User Manual & RAG Academy (only in menu when hidden from desktop toolbar) */}
                 {onOpenLearningModal && (
                   <button
                     role="menuitem"
@@ -554,7 +554,7 @@ export const Header: React.FC<HeaderProps> = ({
                       closeMenuAndReturnFocus();
                     }}
                     onMouseEnter={onPrefetchLearningModal}
-                    className="w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center justify-between transition-colors focus:bg-surface-2 focus:outline-none"
+                    className="w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex lg:hidden items-center justify-between transition-colors focus:bg-surface-2 focus:outline-none"
                   >
                     <span className="flex items-center space-x-2">
                       <BookOpen className="h-3.5 w-3.5 text-accent" />

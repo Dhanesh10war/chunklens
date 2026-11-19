@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import {
   ArrowRight,
   Check,
-  Sparkles,
+  SlidersHorizontal,
   DollarSign,
   SplitSquareVertical,
   ChevronDown,
@@ -33,51 +33,65 @@ const MINI_SAMPLES: Record<
     label: 'Legal Master Agreement',
     tag: 'Contract Clause',
     sampleId: 'legal-saas-agreement',
-    text: `1. INDEMNIFICATION AND WARRANTIES. Provider shall defend, indemnify, and hold harmless Customer from and against any third-party claims alleging that the Subscription Services infringe any valid patent or copyright.
+    text: `1. INDEMNIFICATION AND WARRANTIES. Provider shall defend, indemnify, and hold harmless Customer, its corporate affiliates, and their respective officers, directors, and employees from and against any third-party claims, proceedings, or demands alleging that the core Subscription Services infringe, misappropriate, or violate any valid patent, copyright, or trade secret.
 
-2. LIMITATION OF LIABILITY. IN NO EVENT SHALL EITHER PARTY BE LIABLE FOR ANY INDIRECT, INCIDENTAL, CONSEQUENTIAL, SPECIAL, OR PUNITIVE DAMAGES ARISING OUT OF THIS AGREEMENT.
+2. LIMITATION OF TOTAL LIABILITY. TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL EITHER PARTY BE LIABLE FOR ANY INDIRECT, INCIDENTAL, CONSEQUENTIAL, SPECIAL, PUNITIVE, OR EXEMPLARY DAMAGES, INCLUDING LOSS OF PROFITS, REVENUE, OR DATA, ARISING OUT OF OR IN CONNECTION WITH THIS ENTERPRISE AGREEMENT, REGARDLESS OF THE CAUSE OF ACTION.
 
-3. GOVERNING LAW AND DISPUTE RESOLUTION. This Agreement shall be governed by the laws of the State of Delaware, without regard to conflict of laws principles.`,
+3. GOVERNING LAW AND ARBITRATION. This Agreement, including all addenda and non-disclosure exhibits attached hereto, shall be construed in accordance with the substantive laws of the State of Delaware, USA, without giving effect to conflicts of laws provisions. Any unresolvable controversy shall be settled through binding commercial arbitration.`,
     blindSplits: [
-      `1. INDEMNIFICATION AND WARRANTIES. Provider shall defend, indemnify, and hold harmless Customer from and against any third-party claims alleging that the Subscription Services in`,
-      `fringe any valid patent or copyright.\n\n2. LIMITATION OF LIABILITY. IN NO EVENT SHALL EITHER PARTY BE LIABLE FOR ANY INDIRECT, INCIDENTAL, CONSEQUENTIAL, SPECIAL, OR PUNITIVE DAM`,
-      `AGES ARISING OUT OF THIS AGREEMENT.\n\n3. GOVERNING LAW AND DISPUTE RESOLUTION. This Agreement shall be governed by the laws of the State of Delaware, without regard to con`,
+      `1. INDEMNIFICATION AND WARRANTIES. Provider shall defend, indemnify, and hold harmless Customer, its corporate affiliates, and their respective officers, directors, and employees from and against any third-party claims, proceedings, or demands alleging that the core Subscription Services infringe, misappropriate, or violate any valid patent, copyright, or trade se`,
+      `cret.\n\n2. LIMITATION OF TOTAL LIABILITY. TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL EITHER PARTY BE LIABLE FOR ANY INDIRECT, INCIDENTAL, CONSEQUENTIAL, SPECIAL, PUNITIVE, OR EXEMPLARY DAMAGES, INCLUDING LOSS OF PROFITS, REVENUE, OR DATA, ARISING OUT OF OR IN CONNECTION WITH THIS ENTERPRISE AGREEMENT, REGARDLESS OF THE CAUSE OF ACTION.\n\n3. GOVERNING`,
+      ` LAW AND ARBITRATION. This Agreement, including all addenda and non-disclosure exhibits attached hereto, shall be construed in accordance with the substantive laws of the State of Delaware, USA, without giving effect to conflicts of laws provisions. Any unresolvable controversy shall be settled through binding commercial arbitration.`,
     ],
   },
   financial: {
     label: 'Financial Performance 10-Q',
     tag: 'Financial Disclosure',
     sampleId: 'financial-10k-q3',
-    text: `Operating Income for Q3 reached $14.2M, representing an increase compared to $11.1M in Q3 of the prior fiscal year.
+    text: `Consolidated Revenue for the third quarter rose 18.4% year-over-year to $48.2 million, surpassing consensus guidance. Subscription annual recurring revenue (ARR) accounted for 84% of total turnover, reflecting robust enterprise retention and expansion across our mid-market accounts.
 
-Gross Margin expanded, driven by customer expansion and automated infrastructure efficiencies.
+Operating Margin expanded 240 basis points to 22.8%, driven by structural cloud infrastructure cost reductions and heightened developer productivity. Gross profit reached $37.1 million, compared to $30.8 million in the corresponding prior-year quarter.
 
-Free Cash Flow generated during the nine months ended September 30 was $38.6M, compared to $22.4M for the same period last year.`,
+Operating Cash Flow generated during the nine months ended September 30 reached $38.6 million, up from $22.4 million in the prior period. Free cash flow conversion remained strong at 28% of net income, supporting ongoing capital allocation and infrastructure investments.`,
     blindSplits: [
-      `Operating Income for Q3 reached $14.2M, representing an increase compared to $11.1M in Q3 of the prior fiscal year.\n\nGross Margin expanded, driven by customer expansion and automated infrastructure efficiencies.`,
-      `Free Cash Flow generated during the nine months ended September 30 was $38.6M, comp`,
-      `ared to $22.4M for the same period last year.`,
+      `Consolidated Revenue for the third quarter rose 18.4% year-over-year to $48.2 million, surpassing consensus guidance. Subscription annual recurring revenue (ARR) accounted for 84% of total turnover, reflecting robust enterprise retention and expansion across our mid-`,
+      `market accounts.\n\nOperating Margin expanded 240 basis points to 22.8%, driven by structural cloud infrastructure cost reductions and heightened developer productivity. Gross profit reached $37.1 million, compared to $30.8 million in the corresponding prior-year quarter.\n\nOperating Cash`,
+      ` Flow generated during the nine months ended September 30 reached $38.6 million, up from $22.4 million in the prior period. Free cash flow conversion remained strong at 28% of net income, supporting ongoing capital allocation and infrastructure investments.`,
     ],
   },
   code: {
     label: 'Python Vector Search Service',
     tag: 'FastAPI + LangChain',
     sampleId: 'python-backend-service',
-    text: `from fastapi import FastAPI, HTTPException
+    text: `from fastapi import FastAPI, HTTPException, Depends
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
+from pydantic import BaseModel, Field
 
-app = FastAPI(title="Vector Retrieval API")
-vector_store = Chroma(collection_name="docs", embedding_function=OpenAIEmbeddings())
+app = FastAPI(title="Vector Retrieval API", version="2.0.0")
+vector_store = Chroma(collection_name="enterprise_docs", embedding_function=OpenAIEmbeddings())
 
-@app.post("/query")
-async def retrieve_context(query: str, top_k: int = 4):
-    results = vector_store.similarity_search_with_score(query, k=top_k)
-    return [{"chunk": doc.page_content, "score": score} for doc, score in results]`,
+class SearchRequest(BaseModel):
+    query: str = Field(..., min_length=3, max_length=512)
+    top_k: int = Field(default=4, ge=1, le=20)
+    score_threshold: float = Field(default=0.75, ge=0.0, le=1.0)
+
+class SearchHit(BaseModel):
+    chunk_id: str
+    content: str
+    similarity_score: float
+
+@app.post("/v1/retrieve", response_model=list[SearchHit])
+async def search_corpus(payload: SearchRequest):
+    raw_hits = vector_store.similarity_search_with_score(payload.query, k=payload.top_k)
+    return [
+        SearchHit(chunk_id=doc.metadata.get("id", "unknown"), content=doc.page_content, similarity_score=score)
+        for doc, score in raw_hits if score >= payload.score_threshold
+    ]`,
     blindSplits: [
-      `from fastapi import FastAPI, HTTPException\nfrom langchain_chroma import Chroma\nfrom langchain_openai import OpenAIEmbeddings\n\napp = FastAPI(title="Vector Retrieval API")\nvector_store = Chroma(coll`,
-      `ection_name="docs", embedding_function=OpenAIEmbeddings())\n\n@app.post("/query")\nasync def retrieve_context(query: str, top_k: int = 4):\n    results = vector_store.similarity_search_with_score(query, k=top_k)\n    return [{"ch`,
-      `unk": doc.page_content, "score": score} for doc, score in results]`,
+      `from fastapi import FastAPI, HTTPException, Depends\nfrom langchain_chroma import Chroma\nfrom langchain_openai import OpenAIEmbeddings\nfrom pydantic import BaseModel, Field\n\napp = FastAPI(title="Vector Retrieval API", version="2.0.0")\nvector_store = Chroma(collection_name="enterprise_docs", embedding_function=OpenAIEmbeddings())\n\nclass SearchRequest(Base`,
+      `Model):\n    query: str = Field(..., min_length=3, max_length=512)\n    top_k: int = Field(default=4, ge=1, le=20)\n    score_threshold: float = Field(default=0.75, ge=0.0, le=1.0)\n\nclass SearchHit(BaseModel):\n    chunk_id: str\n    content: str\n    similarity_score: float\n\n@app.post("/v1/retrieve", response_model=list[SearchHit])\nasync def search_corpus(payload: SearchRequest):`,
+      `\n    raw_hits = vector_store.similarity_search_with_score(payload.query, k=payload.top_k)\n    return [\n        SearchHit(chunk_id=doc.metadata.get("id", "unknown"), content=doc.page_content, similarity_score=score)\n        for doc, score in raw_hits if score >= payload.score_threshold\n    ]`,
     ],
   },
 };
@@ -88,7 +102,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
 }) => {
   // Interactive Mini-Chunker state
   const [selectedSampleKey, setSelectedSampleKey] = useState<string>('legal');
-  const [miniChunkSize, setMiniChunkSize] = useState<number>(220);
+  const [miniChunkSize, setMiniChunkSize] = useState<number>(110);
   const [splitterMode, setSplitterMode] = useState<'recursive' | 'blind'>('recursive');
   const [hoveredChunkIdx, setHoveredChunkIdx] = useState<number | null>(null);
 
@@ -196,11 +210,9 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
       <section className="relative pt-12 sm:pt-20 pb-16 px-4 sm:px-6 overflow-hidden hero-glow">
         <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
           {/* Security Trust Pill */}
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-surface-2 border border-separator text-xs font-mono mb-6 shadow-subtle select-none">
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-surface-2 border border-separator text-xs font-mono mb-6 shadow-subtle select-none">
             <span className="h-2 w-2 rounded-full bg-status-success inline-block animate-pulse" />
             <span className="font-medium text-text">100% Client-Side · Zero Network Egress</span>
-            <span className="text-separator hidden sm:inline">|</span>
-            <span className="text-2xs text-text-secondary font-mono hidden sm:inline">Zero Server Upload</span>
           </div>
 
           {/* Main Headline */}
@@ -241,7 +253,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs text-text-tertiary select-none font-mono">
             <div className="flex items-center justify-center space-x-1.5">
               <Check className="h-3.5 w-3.5 text-status-success-text" />
-              <span>Zero server upload</span>
+              <span>Private Browser Sandbox</span>
             </div>
             <div className="flex items-center justify-center space-x-1.5">
               <Check className="h-3.5 w-3.5 text-status-success-text" />
@@ -259,29 +271,55 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
         </div>
       </section>
 
-      {/* 2. INTERACTIVE PLAYGROUND SIMULATION (ILLUSTRATION) */}
+      {/* 2. INTERACTIVE SPLITTER SANDBOX */}
       <section className="py-14 px-4 sm:px-6 bg-surface-2/40 border-y border-separator">
         <div className="max-w-5xl mx-auto">
-          {/* Header & Controls Cluster */}
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6">
-            <div>
-              <div className="inline-flex items-center space-x-1.5 text-2xs font-mono text-accent mb-1 font-semibold">
-                <Sparkles className="h-3 w-3" />
-                <span>Illustration: Playground Simulation</span>
-              </div>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-text">
-                Live Document Chunking Simulation
-              </h2>
+          {/* Section Header */}
+          <div className="mb-6">
+            <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-surface-1 border border-separator text-2xs font-mono text-accent mb-2 font-semibold shadow-subtle">
+              <SlidersHorizontal className="h-3 w-3" />
+              <span>Interactive Engine Sandbox</span>
             </div>
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-text">
+              Live Document Chunking Simulation
+            </h2>
+            <p className="text-xs sm:text-sm text-text-secondary mt-1 max-w-2xl">
+              Inspect how recursive delimiters preserve semantic context versus how fixed-character slicing arbitrarily fractures clauses.
+            </p>
+          </div>
 
-            {/* Splitter Mode Comparison Switcher */}
-            <div className="flex items-center space-x-2 w-full lg:w-auto justify-between lg:justify-end">
-              <div className="flex items-center p-1 rounded-control bg-surface-1 border border-separator text-xs">
+          {/* Interactive Playground Box */}
+          <div className="rounded-card border border-separator bg-surface-1 shadow-card p-4 sm:p-6">
+            {/* Top Toolbar: Corpus Presets Tabs + Strategy Switcher */}
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 pb-4 mb-4 border-b border-separator">
+              <div className="flex items-center flex-wrap gap-2">
+                <span className="text-2xs font-mono font-medium text-text-tertiary">Corpus:</span>
+                <div className="flex items-center p-1 rounded-control bg-surface-2 border border-separator text-xs">
+                  {Object.entries(MINI_SAMPLES).map(([key, data]) => (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setSelectedSampleKey(key)}
+                      className={cn(
+                        'px-2.5 sm:px-3 py-1 rounded-control font-medium transition-all active-press text-xs',
+                        selectedSampleKey === key
+                          ? 'bg-surface-1 text-text font-semibold shadow-subtle border border-separator/80'
+                          : 'text-text-secondary hover:text-text'
+                      )}
+                    >
+                      {data.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Splitter Strategy Switcher */}
+              <div className="flex items-center p-1 rounded-control bg-surface-2 border border-separator text-xs self-stretch lg:self-auto justify-center">
                 <button
                   type="button"
                   onClick={() => setSplitterMode('recursive')}
                   className={cn(
-                    'px-3 py-1 rounded-control font-medium transition-all active-press flex items-center space-x-1.5',
+                    'px-3 py-1 rounded-control font-medium transition-all active-press flex items-center space-x-1.5 text-xs',
                     splitterMode === 'recursive'
                       ? 'bg-accent text-white shadow-subtle font-semibold'
                       : 'text-text-secondary hover:text-text'
@@ -294,7 +332,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
                   type="button"
                   onClick={() => setSplitterMode('blind')}
                   className={cn(
-                    'px-3 py-1 rounded-control font-medium transition-all active-press flex items-center space-x-1.5',
+                    'px-3 py-1 rounded-control font-medium transition-all active-press flex items-center space-x-1.5 text-xs',
                     splitterMode === 'blind'
                       ? 'bg-status-warn-subtle text-status-warn-text border border-status-warn/30 font-semibold'
                       : 'text-text-secondary hover:text-text'
@@ -304,39 +342,17 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
                   <span>Fixed Character Split</span>
                 </button>
               </div>
-
-              {/* Sample Selector Pills */}
-              <div className="flex flex-wrap items-center gap-1 bg-surface-1 p-1 rounded-control border border-separator text-xs">
-                {Object.entries(MINI_SAMPLES).map(([key, data]) => (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => setSelectedSampleKey(key)}
-                    className={cn(
-                      'px-2.5 py-1 rounded-control font-medium transition-all active-press',
-                      selectedSampleKey === key
-                        ? 'bg-surface-2 text-text font-semibold border border-separator'
-                        : 'text-text-secondary hover:text-text'
-                    )}
-                  >
-                    {data.tag}
-                  </button>
-                ))}
-              </div>
             </div>
-          </div>
 
-          {/* Interactive Playground Box */}
-          <div className="rounded-card border border-separator bg-surface-1 shadow-card p-4 sm:p-6">
             {/* Control Bar: Chunk Size Slider + Mode Indicator */}
             <div className="pb-4 mb-5 border-b border-separator flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs font-mono">
               <div className="flex items-center space-x-3 w-full sm:w-80">
                 <span className="text-text-secondary shrink-0">Target Budget:</span>
                 <input
                   type="range"
-                  min="80"
-                  max="450"
-                  step="20"
+                  min="60"
+                  max="240"
+                  step="10"
                   value={miniChunkSize}
                   onChange={(e) => setMiniChunkSize(Number(e.target.value))}
                   className="w-full accent-accent cursor-pointer"
@@ -350,13 +366,13 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
               {/* Status Pill */}
               <div className="flex items-center space-x-3 text-2xs">
                 <span className="text-text-tertiary">
-                  Partitions: <strong className="text-text font-semibold">{miniChunks.length} chunks</strong>
+                  Partitions: <strong className="text-text font-semibold">{miniChunks.length} {miniChunks.length === 1 ? 'chunk' : 'chunks'}</strong>
                 </span>
                 <span className="text-separator">|</span>
                 <span className="text-text-tertiary">
                   Strategy:{' '}
                   <strong className="text-text font-semibold">
-                    {splitterMode === 'recursive' ? 'Recursive Paragraph Delimiters' : 'Fixed Character Slicing'}
+                    {splitterMode === 'recursive' ? 'Recursive Paragraph Delimiters (\\n\\n)' : 'Uniform Character Slices'}
                   </strong>
                 </span>
               </div>
@@ -407,7 +423,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
                         />
                       </div>
 
-                      <p dir="auto" className="text-xs text-text-secondary font-mono leading-relaxed line-clamp-3">
+                      <p dir="auto" className="text-xs text-text-secondary font-mono leading-relaxed line-clamp-4">
                         {chunk.text}
                       </p>
                     </div>
@@ -933,7 +949,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
       <section className="py-20 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center space-x-1.5 text-2xs font-mono text-accent mb-2 font-semibold">
-            <Sparkles className="h-3.5 w-3.5" />
+            <Layers className="h-3.5 w-3.5" />
             <span>Product Architecture</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-text mb-3">

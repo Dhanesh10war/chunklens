@@ -62,11 +62,6 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({
             </div>
             <span className="font-semibold text-sm tracking-tight text-text">ChunkLens</span>
           </button>
-
-          <div className="hidden lg:inline-flex items-center space-x-1.5 px-2 py-0.5 rounded-full bg-surface-2 border border-separator text-2xs font-mono text-text-tertiary">
-            <span className="h-1.5 w-1.5 rounded-full bg-status-success inline-block animate-pulse" />
-            <span>Zero Egress</span>
-          </div>
         </div>
 
         {/* Nav Links (Desktop) */}

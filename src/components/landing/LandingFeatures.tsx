@@ -8,7 +8,6 @@ import {
   Activity,
   Code2,
   FileText,
-  Sparkles,
   Table,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
@@ -192,7 +191,7 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
             {/* Right Column: Simulated Chunks Output */}
             <div className="lg:col-span-7 bg-surface-2/40 rounded-panel border border-separator p-4 sm:p-5 space-y-3">
               <div className="flex items-center justify-between text-2xs font-mono text-text-tertiary pb-2 border-b border-separator">
-                <span>Illustration: Sample Partitions</span>
+                <span>Sample Partitions</span>
                 <span>Structural Preview</span>
               </div>
 
@@ -204,7 +203,7 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
                   <div className="flex items-center justify-between mb-1.5 text-2xs font-mono">
                     <span className="font-semibold text-text">{chunk.title}</span>
                     <span className="px-1.5 py-0.5 rounded-control bg-surface-2 text-text-secondary border border-separator">
-                      Illustration
+                      Preview
                     </span>
                   </div>
                   <p dir="auto" className="text-xs text-text-secondary font-mono leading-relaxed line-clamp-2">
@@ -217,13 +216,13 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
         </div>
       </div>
 
-      {/* INTERACTIVE BPE TOKENIZER VARIANCE INSPECTOR (ILLUSTRATION) */}
+      {/* INTERACTIVE BPE TOKENIZER VARIANCE INSPECTOR */}
       <div className="mb-16 p-6 sm:p-8 rounded-card border border-separator bg-surface-1 shadow-subtle">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-separator">
           <div>
             <div className="inline-flex items-center space-x-1.5 text-2xs font-mono text-accent mb-1 font-semibold">
-              <Sparkles className="h-3 w-3" />
-              <span>Token Inspector (Illustration)</span>
+              <Cpu className="h-3 w-3" />
+              <span>Exact Token Encoding Analysis</span>
             </div>
             <h3 className="text-xl font-bold text-text">OpenAI BPE Tokenizer Variance</h3>
             <p className="text-xs text-text-secondary mt-1">

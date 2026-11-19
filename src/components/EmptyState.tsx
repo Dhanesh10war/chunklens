@@ -3,7 +3,7 @@ import {
   Upload,
   ClipboardPaste,
   ArrowRight,
-  Sparkles,
+  SlidersHorizontal,
   Sliders,
   Check,
 } from 'lucide-react';
@@ -178,7 +178,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <h3 className="text-xs font-semibold text-text-primary flex items-center gap-1.5">
-                <Sparkles className="h-3.5 w-3.5 text-accent" />
+                <SlidersHorizontal className="h-3.5 w-3.5 text-accent" />
                 <span>Production RAG Archetype Presets</span>
               </h3>
               <p className="text-2xs text-text-secondary">
