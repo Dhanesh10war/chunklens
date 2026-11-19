@@ -15,11 +15,12 @@ describe('LandingPage (Multi-Page Product Architecture)', () => {
     expect(html).toContain('Launch Visualizer');
   });
 
-  it('renders open-source Roadmap & Community Ideas block with GitHub links (no pricing tiers or waitlists)', () => {
+  it('renders product architecture and engineering roadmap block (no pricing tiers or waitlists)', () => {
     const html = renderToString(<LandingPage onLaunchApp={vi.fn()} />);
 
-    expect(html).toContain('Roadmap &amp; Community Ideas');
-    expect(html).toContain('Share feedback on GitHub Discussions');
+    expect(html).toContain('Engineered for Production RAG');
+    expect(html).not.toContain('open-source');
+    expect(html).not.toContain('GitHub');
     expect(html).not.toContain('$29');
     expect(html).not.toContain('$99');
     expect(html).not.toContain('Waitlist');

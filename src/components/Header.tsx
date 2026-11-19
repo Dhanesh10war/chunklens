@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   Layers,
-  Github,
   Code2,
   SplitSquareVertical,
   Cpu,
@@ -152,22 +151,25 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             </Tooltip>
 
-            {/* App Brand + Version */}
+            {/* App Brand */}
             <div className="flex items-center space-x-1.5 shrink-0">
               <div className="h-6 w-6 rounded-control bg-surface-2 border border-separator flex items-center justify-center text-accent shrink-0">
                 <Layers className="h-3.5 w-3.5" />
               </div>
               <h1 className="font-semibold text-sm tracking-tight text-text m-0 p-0 inline">ChunkLens</h1>
-              <span className="text-xs font-mono text-text-secondary hidden xs:inline">{`v${__APP_VERSION__}`}</span>
             </div>
           </div>
 
           <span className="text-separator hidden md:inline shrink-0" aria-hidden="true">/</span>
 
           {/* Document Name & Reset */}
-          <div className="hidden md:flex items-center space-x-1.5 min-w-0 max-w-[120px] lg:max-w-[180px] xl:max-w-[240px] min-[1600px]:max-w-[360px] shrink">
-            <Tooltip content={documentTitle || 'No document loaded'} position="bottom">
-              <span className="text-xs text-text-secondary truncate font-mono min-w-0">
+          <div className="hidden md:flex items-center space-x-1.5 min-w-0 shrink">
+            <Tooltip
+              content={documentTitle || 'No document loaded'}
+              position="bottom"
+              wrapperClassName="min-w-0 max-w-[100px] lg:max-w-[150px] xl:max-w-[200px] min-[1600px]:max-w-[280px] shrink"
+            >
+              <span className="text-xs text-text-secondary truncate font-mono min-w-0 block">
                 {documentTitle || <span className="text-text-tertiary italic">No document</span>}
               </span>
             </Tooltip>
@@ -184,7 +186,7 @@ export const Header: React.FC<HeaderProps> = ({
                 className="h-6 px-1.5 rounded-control text-xs text-text-tertiary hover:text-text hover:bg-surface-2 flex items-center space-x-1 active-press focus-ring transition-colors shrink-0"
                 aria-label="Reset document"
               >
-                <RotateCcw className="h-3 w-3" />
+                <RotateCcw className="h-3 w-3 shrink-0" />
                 <span className="hidden lg:inline">Reset</span>
               </button>
             </Tooltip>
@@ -343,19 +345,6 @@ export const Header: React.FC<HeaderProps> = ({
             >
               {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
             </button>
-          </Tooltip>
-
-          {/* GitHub Source Link */}
-          <Tooltip content="GitHub repository" position="bottom" wrapperClassName="hidden min-[1600px]:inline-flex">
-            <a
-              href="https://github.com/Dhanesh10war/chunklens"
-              target="_blank"
-              rel="noreferrer"
-              className="h-8 w-8 rounded-control flex items-center justify-center text-text-secondary hover:text-text hover:bg-surface-2 transition-colors active-press focus-ring"
-              aria-label="View on GitHub"
-            >
-              <Github className="h-3.5 w-3.5" />
-            </a>
           </Tooltip>
 
           {/* Overflow Menu Trigger */}
@@ -591,19 +580,6 @@ export const Header: React.FC<HeaderProps> = ({
                     <span>Overview &amp; Features</span>
                   </button>
                 )}
-
-                {/* GitHub link */}
-                <a
-                  role="menuitem"
-                  href="https://github.com/Dhanesh10war/chunklens"
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() => closeMenuAndReturnFocus()}
-                  className="w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center space-x-2 transition-colors focus:bg-surface-2 focus:outline-none"
-                >
-                  <Github className="h-3.5 w-3.5 text-text-tertiary" />
-                  <span>GitHub Repository</span>
-                </a>
               </div>
             )}
           </div>

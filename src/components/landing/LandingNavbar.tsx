@@ -61,9 +61,6 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({
               <Layers className="h-4 w-4" />
             </div>
             <span className="font-semibold text-sm tracking-tight text-text">ChunkLens</span>
-            <span className="text-2xs font-mono text-text-tertiary px-1.5 py-0.5 rounded-control bg-surface-2 border border-separator hidden sm:inline">
-              v{__APP_VERSION__}
-            </span>
           </button>
 
           <div className="hidden lg:inline-flex items-center space-x-1.5 px-2 py-0.5 rounded-full bg-surface-2 border border-separator text-2xs font-mono text-text-tertiary">

@@ -20,7 +20,7 @@ describe('EmptyState', () => {
     expect(html).toContain('tabindex="0"');
     expect(html).toContain('Limit: 10 MB');
     expect(html).toContain('.pdf, .md, .csv, .json, .txt, .py, .ts, .js');
-    expect(html).toContain('100% client-side · zero network egress');
+    expect(html).not.toContain('100% client-side · zero network egress');
     expect(html).toContain('Choose file');
     expect(html).toContain('Tap to choose a file');
     expect(html).toContain('Drop your document here, or click to browse');

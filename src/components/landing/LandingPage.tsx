@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   Layers,
-  Github,
 } from 'lucide-react';
 import { LandingNavbar, LandingPageTab } from './LandingNavbar';
 import { LandingOverview } from './LandingOverview';
@@ -97,7 +96,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onOpenLea
                   <Layers className="h-3.5 w-3.5" />
                 </div>
                 <span className="font-semibold text-sm tracking-tight text-text">ChunkLens</span>
-                <span className="text-2xs font-mono text-text-tertiary">v{__APP_VERSION__}</span>
               </div>
               <p className="text-xs text-text-secondary leading-relaxed font-sans">
                 Interactive client-side document chunking visualizer &amp; token budget optimizer for modern RAG pipelines.
@@ -176,39 +174,33 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onOpenLea
                   </button>
                 </li>
                 <li>
-                  <a
-                    href="https://github.com/Dhanesh10war/chunklens/discussions"
-                    target="_blank"
-                    rel="noreferrer"
+                  <button
+                    type="button"
+                    onClick={() => (onOpenLearnTrack ? onOpenLearnTrack() : onLaunchApp())}
                     className="min-h-[28px] py-1 inline-flex items-center hover:text-text transition-colors focus-ring rounded"
                   >
-                    Roadmap &amp; Discussions
-                  </a>
+                    RAG Academy
+                  </button>
                 </li>
               </ul>
             </div>
 
-            {/* Open Source / Community */}
+            {/* Enterprise Security & Privacy */}
             <div className="space-y-2 text-xs">
-              <div className="font-semibold text-text font-mono text-2xs mb-2">Open Source</div>
+              <div className="font-semibold text-text font-mono text-2xs mb-2">Confidential by Design</div>
               <p className="text-2xs text-text-secondary leading-relaxed font-sans mb-3">
-                Released under the permissive MIT license. Contributions, suggestions, and custom splitter algorithms welcome.
+                Zero network egress architecture. Your documents and data never leave your browser sandbox.
               </p>
-              <a
-                href="https://github.com/Dhanesh10war/chunklens"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-control bg-surface-2 hover:bg-surface-3 border border-separator text-text transition-colors text-xs font-medium focus-ring"
-              >
-                <Github className="h-3.5 w-3.5" />
-                <span>GitHub Repository</span>
-              </a>
+              <div className="inline-flex items-center space-x-1.5 px-2.5 py-1.5 rounded-control bg-surface-2 border border-separator text-text text-2xs font-mono">
+                <span className="h-2 w-2 rounded-full bg-status-success inline-block animate-pulse" />
+                <span>Strict CSP Enforced</span>
+              </div>
             </div>
           </div>
 
           <div className="pt-6 border-t border-separator/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-2xs text-text-tertiary font-mono">
             <div>
-              &copy; {new Date().getFullYear()} ChunkLens. Released under MIT License.
+              &copy; {new Date().getFullYear()} ChunkLens. Zero-egress RAG optimization engine. All rights reserved.
             </div>
             <div className="flex items-center space-x-1">
               <span>Crafted for high-performance retrieval augmented generation</span>

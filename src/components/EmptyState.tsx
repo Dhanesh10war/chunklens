@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import {
   Upload,
   ClipboardPaste,
-  ShieldCheck,
   ArrowRight,
   Sparkles,
   Sliders,
@@ -86,10 +85,6 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 
         {/* Hero Banner */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono bg-status-success-subtle text-status-success-text border border-status-success/20 select-none">
-            <ShieldCheck className="h-3.5 w-3.5 text-status-success" />
-            <span>100% client-side · zero network egress</span>
-          </div>
           <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-text-primary">
             Document Chunking &amp; RAG Cost Workbench
           </h2>

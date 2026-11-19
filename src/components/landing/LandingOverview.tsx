@@ -16,7 +16,6 @@ import {
   Layers,
   AlertTriangle,
   FileCheck,
-  Github,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { cn } from '../../utils/cn';
@@ -99,8 +98,10 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
   const [overlapPct, setOverlapPct] = useState<number>(15);
   const [pricePerMillionInput, setPricePerMillionInput] = useState<string>('');
 
-  // Interactive Mini Heatmap hover state
+  // Interactive Mini Heatmap hover/selected state
   const [hoveredCell, setHoveredCell] = useState<{ r: number; c: number; score: number } | null>(null);
+  const [selectedCell, setSelectedCell] = useState<{ r: number; c: number; score: number }>({ r: 0, c: 1, score: 38 });
+  const activeHeatmapCell = hoveredCell || selectedCell;
 
   // FAQ state
   const [activeFaq, setActiveFaq] = useState<number | null>(0);
@@ -305,7 +306,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
               </div>
 
               {/* Sample Selector Pills */}
-              <div className="hidden sm:flex items-center space-x-1 bg-surface-1 p-1 rounded-control border border-separator text-xs">
+              <div className="flex flex-wrap items-center gap-1 bg-surface-1 p-1 rounded-control border border-separator text-xs">
                 {Object.entries(MINI_SAMPLES).map(([key, data]) => (
                   <button
                     key={key}
@@ -365,6 +366,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {miniChunks.map((chunk, idx) => {
                 const isHovered = hoveredChunkIdx === idx;
+                const fillRatio = Math.min(100, Math.round((chunk.approxTokens / miniChunkSize) * 100));
                 return (
                   <div
                     key={chunk.id}
@@ -380,7 +382,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
                     )}
                   >
                     <div>
-                      <div className="flex items-center justify-between mb-2 text-2xs font-mono">
+                      <div className="flex items-center justify-between mb-1.5 text-2xs font-mono">
                         <span className="font-semibold text-text">Chunk #{idx + 1}</span>
                         <span
                           className={cn(
@@ -393,13 +395,25 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
                           ~{chunk.approxTokens} tok
                         </span>
                       </div>
+
+                      {/* Visual token budget fill bar */}
+                      <div className="w-full bg-surface-2 rounded-full h-1 mb-2.5 overflow-hidden">
+                        <div
+                          className={cn(
+                            'h-full rounded-full transition-all duration-150',
+                            chunk.isSevered ? 'bg-status-warn' : 'bg-accent'
+                          )}
+                          style={{ width: `${fillRatio}%` }}
+                        />
+                      </div>
+
                       <p dir="auto" className="text-xs text-text-secondary font-mono leading-relaxed line-clamp-3">
                         {chunk.text}
                       </p>
                     </div>
 
                     <div className="mt-3 pt-2 border-t border-separator/60 flex items-center justify-between text-2xs font-mono text-text-tertiary">
-                      <span>Status:</span>
+                      <span>Boundary:</span>
                       <span
                         className={cn(
                           'font-semibold',
@@ -536,9 +550,35 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
 
                 {/* Input 4: Embedding Price per 1M Tokens (No default) */}
                 <div>
-                  <label htmlFor="model-price-input" className="text-xs font-semibold text-text block mb-1">
-                    Your Model Price per 1,000,000 Tokens (USD)
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label htmlFor="model-price-input" className="text-xs font-semibold text-text">
+                      Embedding Model Rate per 1M Tokens (USD)
+                    </label>
+                    <span className="text-2xs font-mono text-text-tertiary hidden sm:inline">Reference Rates:</span>
+                  </div>
+                  {/* Model Rate Chips */}
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {[
+                      { label: 'text-3-small ($0.02)', val: '0.02' },
+                      { label: 'text-3-large ($0.13)', val: '0.13' },
+                      { label: 'Cohere v3 ($0.10)', val: '0.10' },
+                      { label: 'Voyage 3 ($0.12)', val: '0.12' },
+                    ].map((preset) => (
+                      <button
+                        key={preset.val}
+                        type="button"
+                        onClick={() => setPricePerMillionInput(preset.val)}
+                        className={cn(
+                          'px-2 py-0.5 rounded text-2xs font-mono border transition-all active-press',
+                          pricePerMillionInput === preset.val
+                            ? 'bg-accent text-white border-accent font-semibold shadow-subtle'
+                            : 'bg-surface-2 hover:bg-surface-3 text-text-secondary border-separator'
+                        )}
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
                   <div className="relative">
                     <span className="absolute left-3 top-2 text-xs font-mono text-text-tertiary">$</span>
                     <input
@@ -553,7 +593,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
                     />
                   </div>
                   <span className="text-2xs text-text-tertiary font-mono block mt-1">
-                    Enter the exact rate from your embedding model provider.
+                    Select a reference rate or enter custom provider pricing.
                   </span>
                 </div>
               </div>
@@ -711,7 +751,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
               {/* 4x4 Grid (7 cols) */}
               <div className="md:col-span-7 flex justify-center">
-                <div className="inline-block p-2 rounded-control bg-surface-2 border border-separator select-none">
+                <div className="inline-block p-2.5 rounded-control bg-surface-2 border border-separator select-none shadow-subtle">
                   {/* Column Headers */}
                   <div className="grid grid-cols-5 gap-1.5 mb-1.5 text-2xs font-mono text-text-tertiary text-center">
                     <span />
@@ -726,13 +766,15 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
                       <span className="text-2xs font-mono text-text-tertiary text-center w-6">#{rIdx + 1}</span>
                       {row.map((score, cIdx) => {
                         const isSelf = rIdx === cIdx;
-                        const isHovered = hoveredCell?.r === rIdx && hoveredCell?.c === cIdx;
+                        const isSelected = activeHeatmapCell.r === rIdx && activeHeatmapCell.c === cIdx;
                         return (
                           <button
                             key={`cell-${rIdx}-${cIdx}`}
                             type="button"
+                            onClick={() => setSelectedCell({ r: rIdx, c: cIdx, score })}
                             onMouseEnter={() => setHoveredCell({ r: rIdx, c: cIdx, score })}
                             onMouseLeave={() => setHoveredCell(null)}
+                            aria-label={`Chunk ${rIdx + 1} to Chunk ${cIdx + 1}: ${score}% lexical overlap`}
                             className={cn(
                               'h-9 w-9 sm:h-11 sm:w-11 rounded font-mono text-2xs flex items-center justify-center transition-all focus-ring active-press',
                               isSelf
@@ -742,7 +784,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
                                 : score >= 20
                                 ? 'bg-[var(--heat-mid)] text-text font-medium'
                                 : 'bg-[var(--heat-low)] text-text-secondary border border-separator/50',
-                              isHovered && 'ring-2 ring-accent scale-105 z-10'
+                              isSelected && 'ring-2 ring-accent scale-105 z-10 shadow-subtle'
                             )}
                           >
                             {score}%
@@ -755,31 +797,69 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
               </div>
 
               {/* Inspection Card (5 cols) */}
-              <div className="md:col-span-5 p-4 rounded-control bg-surface-2 border border-separator text-xs space-y-3 font-mono">
-                <div className="text-2xs text-text-tertiary border-b border-separator pb-1.5 font-semibold">
-                  Cell Inspection Inspector
+              <div className="md:col-span-5 p-5 rounded-control bg-surface-2 border border-separator text-xs space-y-3 font-mono shadow-subtle">
+                <div className="flex items-center justify-between text-2xs text-text-tertiary border-b border-separator pb-2 font-semibold">
+                  <span>Pair Continuity Diagnostics</span>
+                  <span className="text-text-secondary">Chunk #{activeHeatmapCell.r + 1} &harr; #{activeHeatmapCell.c + 1}</span>
                 </div>
-                {hoveredCell ? (
-                  <div className="space-y-2">
-                    <div className="text-sm font-bold text-text">
-                      Chunk #{hoveredCell.r + 1} &harr; Chunk #{hoveredCell.c + 1}
-                    </div>
-                    <div className="text-accent text-base font-extrabold tabular-nums">
-                      {hoveredCell.score}% Lexical Overlap
-                    </div>
-                    <p className="text-2xs text-text-secondary font-sans leading-relaxed">
-                      {hoveredCell.score === 100
-                        ? 'Self similarity diagonal: perfect 1.0 cosine match.'
-                        : hoveredCell.score >= 40
-                        ? 'Moderate cross-chunk overlap. Context is well preserved across the partition boundary.'
-                        : 'Low similarity. Chunks discuss distinct sub-topics without wasteful redundancy.'}
-                    </p>
+                <div className="space-y-2.5">
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-xs font-semibold text-text">Lexical Overlap</span>
+                    <span className="text-accent text-base font-extrabold tabular-nums">
+                      {activeHeatmapCell.score}%
+                    </span>
                   </div>
-                ) : (
-                  <p className="text-2xs text-text-tertiary font-sans leading-relaxed italic">
-                    Hover over any cell in the 4x4 matrix to inspect cross-chunk cosine similarity in real time.
+
+                  {/* Progress bar */}
+                  <div className="w-full bg-surface-1 rounded-full h-1.5 overflow-hidden border border-separator/40">
+                    <div
+                      className={cn(
+                        'h-full rounded-full transition-all duration-200',
+                        activeHeatmapCell.score === 100
+                          ? 'bg-accent'
+                          : activeHeatmapCell.score >= 40
+                          ? 'bg-status-success'
+                          : activeHeatmapCell.score >= 20
+                          ? 'bg-status-warn'
+                          : 'bg-text-tertiary'
+                      )}
+                      style={{ width: `${activeHeatmapCell.score}%` }}
+                    />
+                  </div>
+
+                  <div className="pt-1">
+                    <span
+                      className={cn(
+                        'inline-block px-2 py-0.5 rounded-full text-2xs font-semibold font-mono',
+                        activeHeatmapCell.score === 100
+                          ? 'bg-accent-subtle text-accent border border-accent/25'
+                          : activeHeatmapCell.score >= 40
+                          ? 'bg-status-success-subtle text-status-success-text border border-status-success/25'
+                          : activeHeatmapCell.score >= 20
+                          ? 'bg-status-warn-subtle text-status-warn-text border border-status-warn/25'
+                          : 'bg-surface-1 text-text-tertiary border border-separator'
+                      )}
+                    >
+                      {activeHeatmapCell.score === 100
+                        ? 'Identity Diagonal'
+                        : activeHeatmapCell.score >= 40
+                        ? 'Strong Topical Vocabulary Bridge'
+                        : activeHeatmapCell.score >= 20
+                        ? 'Balanced Boundary Transition'
+                        : 'Distinct Topical Domain'}
+                    </span>
+                  </div>
+
+                  <p className="text-2xs text-text-secondary font-sans leading-relaxed pt-1">
+                    {activeHeatmapCell.score === 100
+                      ? 'Self similarity diagonal: perfect 1.0 cosine match.'
+                      : activeHeatmapCell.score >= 40
+                      ? 'High cross-chunk overlap. Context is well preserved across the partition boundary, ensuring fact continuity.'
+                      : activeHeatmapCell.score >= 20
+                      ? 'Optimal boundary transition. Chunks maintain context continuity without wasteful duplicate token inflation.'
+                      : 'Low similarity. Chunks discuss distinct sub-topics without wasteful redundancy.'}
                   </p>
-                )}
+                </div>
               </div>
             </div>
           </div>
@@ -849,59 +929,59 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
         </div>
       </section>
 
-      {/* 5. ROADMAP & COMMUNITY IDEAS */}
+      {/* 5. PRODUCT ROADMAP & UPCOMING CAPABILITIES */}
       <section className="py-20 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center space-x-1.5 text-2xs font-mono text-accent mb-2 font-semibold">
             <Sparkles className="h-3.5 w-3.5" />
-            <span>Open Source Roadmap</span>
+            <span>Product Architecture</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-text mb-3">
-            Roadmap &amp; Community Ideas
+            Engineered for Production RAG
           </h2>
           <p className="text-xs sm:text-sm text-text-secondary max-w-xl mx-auto mb-8 leading-relaxed font-sans">
-            ChunkLens is 100% free, client-side, and open-source. Help shape our upcoming features—tell us what you need for your RAG pipelines.
+            ChunkLens is a zero-egress, client-side RAG engineering engine. Inspect boundaries, eliminate context fractures, and prevent silent token inflation before data reaches your vector store.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 text-left">
             <div className="p-4 rounded-card border border-separator bg-surface-1 shadow-subtle">
               <span className="font-semibold text-text text-xs block mb-1">Batch Document Evaluation</span>
               <p className="text-2xs text-text-secondary leading-relaxed">
-                Evaluating multi-document corpora and folder uploads in local memory.
+                Evaluating multi-document corpora and directory structures within isolated local browser memory.
               </p>
             </div>
             <div className="p-4 rounded-card border border-separator bg-surface-1 shadow-subtle">
-              <span className="font-semibold text-text text-xs block mb-1">Retrieval Simulator</span>
+              <span className="font-semibold text-text text-xs block mb-1">Vector Retrieval Simulator</span>
               <p className="text-2xs text-text-secondary leading-relaxed">
-                Testing top-k query matching directly against client-side chunk vectors.
+                Benchmarking dense top-k query matching directly against client-side chunk embedding vectors.
               </p>
             </div>
             <div className="p-4 rounded-card border border-separator bg-surface-1 shadow-subtle">
               <span className="font-semibold text-text text-xs block mb-1">Custom Tokenizer Encodings</span>
               <p className="text-2xs text-text-secondary leading-relaxed">
-                Configuring custom vocabulary tables and delimiter grammars for specialized models.
+                Configuring custom vocabulary tables and delimiter grammars for proprietary enterprise models.
               </p>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <a
-              href="https://github.com/Dhanesh10war/chunklens/discussions"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-control text-xs font-semibold bg-surface-2 hover:bg-surface-3 border border-separator text-text transition-colors active-press focus-ring shadow-subtle"
+            <Button
+              variant="primary"
+              size="md"
+              onClick={() => onLaunchApp()}
+              icon={<ArrowRight className="h-4 w-4" />}
+              className="px-6 py-2.5 rounded-control text-xs font-semibold shadow-subtle"
             >
-              <Github className="h-4 w-4" />
-              <span>Share feedback on GitHub Discussions</span>
-            </a>
-            <a
-              href="https://github.com/Dhanesh10war/chunklens/issues"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-control text-xs font-medium text-text-secondary hover:text-text hover:bg-surface-2 transition-colors px-4 py-2"
+              <span>Launch Visualizer</span>
+            </Button>
+            <button
+              type="button"
+              onClick={() => onNavigatePage('features')}
+              className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-control text-xs font-medium bg-surface-2 hover:bg-surface-3 border border-separator text-text transition-colors focus-ring"
             >
-              <span>Open an Issue</span>
-            </a>
+              <Cpu className="h-4 w-4 text-accent" />
+              <span>Explore Chunking Engines</span>
+            </button>
           </div>
         </div>
       </section>

@@ -69,9 +69,10 @@ describe('Header Component (Responsive Priority & Overflow Menu - Item 3.6)', ()
     expect(html).toContain('aria-haspopup="menu"');
   });
 
-  it('renders injected __APP_VERSION__ next to brand title (Item B1)', () => {
+  it('renders clean brand title without explicit version tag', () => {
     const html = renderToString(<Header {...defaultProps} />);
-    expect(html).toContain(`v${__APP_VERSION__}`);
+    expect(html).toContain('ChunkLens');
+    expect(html).not.toContain(`v${__APP_VERSION__}`);
   });
 
   it('renders share configuration button when onShareClick handler is provided', () => {
