@@ -4,7 +4,7 @@ const path = require('path');
 const os = require('os');
 const fs = require('fs');
 
-const CHROME_PATH = process.env.CHROME_PATH || path.join(os.homedir(), '.cache/ms-playwright/chromium-1254/chrome-linux64/chrome');
+const CHROME_PATH = process.env.PW_CHROME_PATH || undefined;
 const PREVIEW_PORT = 4173;
 const PREVIEW_URL = `http://127.0.0.1:${PREVIEW_PORT}`;
 

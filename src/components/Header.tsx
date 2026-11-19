@@ -140,30 +140,32 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="h-[52px] border-b border-separator surface-translucent sticky top-0 z-30 select-none flex items-center px-3 sm:px-4 pl-safe pr-safe">
       <div className="w-full flex items-center justify-between gap-1.5 sm:gap-2 lg:gap-3 min-w-0">
         {/* Left Cluster: Sidebar Toggle, Brand + Version, Document Title & Reset */}
-        <div className="flex items-center gap-3 min-w-0 shrink">
-          <Tooltip content={isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'} shortcut="[" position="bottom">
-            <button
-              onClick={onToggleSidebar}
-              className="h-8 w-8 rounded-control flex items-center justify-center text-text-secondary hover:text-text hover:bg-surface-2 transition-colors active-press focus-ring shrink-0"
-              aria-label={isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
-            >
-              {isSidebarOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeft className="h-4 w-4" />}
-            </button>
-          </Tooltip>
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 shrink">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <Tooltip content={isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'} shortcut="[" position="bottom">
+              <button
+                onClick={onToggleSidebar}
+                className="h-8 w-8 rounded-control flex items-center justify-center text-text-secondary hover:text-text hover:bg-surface-2 transition-colors active-press focus-ring shrink-0"
+                aria-label={isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+              >
+                {isSidebarOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeft className="h-4 w-4" />}
+              </button>
+            </Tooltip>
 
-          {/* App Brand + Version */}
-          <div className="flex items-center space-x-1.5 shrink-0">
-            <div className="h-6 w-6 rounded-control bg-surface-2 border border-separator flex items-center justify-center text-accent shrink-0">
-              <Layers className="h-3.5 w-3.5" />
+            {/* App Brand + Version */}
+            <div className="flex items-center space-x-1.5 shrink-0">
+              <div className="h-6 w-6 rounded-control bg-surface-2 border border-separator flex items-center justify-center text-accent shrink-0">
+                <Layers className="h-3.5 w-3.5" />
+              </div>
+              <h1 className="font-semibold text-sm tracking-tight text-text m-0 p-0 inline">ChunkLens</h1>
+              <span className="text-xs font-mono text-text-secondary hidden xs:inline">{`v${__APP_VERSION__}`}</span>
             </div>
-            <h1 className="font-semibold text-sm tracking-tight text-text m-0 p-0 inline">ChunkLens</h1>
-            <span className="text-xs font-mono text-text-secondary hidden xs:inline">{`v${__APP_VERSION__}`}</span>
           </div>
 
-          <span className="text-separator hidden md:inline" aria-hidden="true">/</span>
+          <span className="text-separator hidden md:inline shrink-0" aria-hidden="true">/</span>
 
           {/* Document Name & Reset */}
-          <div className="hidden md:flex items-center space-x-1.5 min-w-0 max-w-[120px] lg:max-w-[200px] xl:max-w-[300px] min-[1400px]:max-w-[400px]">
+          <div className="hidden md:flex items-center space-x-1.5 min-w-0 max-w-[120px] lg:max-w-[180px] xl:max-w-[240px] min-[1600px]:max-w-[360px] shrink">
             <Tooltip content={documentTitle || 'No document loaded'} position="bottom">
               <span className="text-xs text-text-secondary truncate font-mono min-w-0">
                 {documentTitle || <span className="text-text-tertiary italic">No document</span>}
@@ -205,7 +207,7 @@ export const Header: React.FC<HeaderProps> = ({
                   value: 'heatmap',
                   label: (
                     <span>
-                      <span className="hidden min-[1400px]:inline">Similarity </span>
+                      <span className="hidden min-[1600px]:inline">Similarity </span>
                       <span className="hidden xs:inline">Heatmap</span>
                     </span>
                   ),
@@ -215,7 +217,7 @@ export const Header: React.FC<HeaderProps> = ({
                   value: 'editor',
                   label: (
                     <span>
-                      <span className="hidden min-[1400px]:inline">Edit Raw </span>
+                      <span className="hidden min-[1600px]:inline">Edit Raw </span>
                       <span className="hidden xs:inline">Text</span>
                     </span>
                   ),
@@ -241,40 +243,40 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={onOpenCommandPalette}
                 onMouseEnter={onPrefetchCommandPalette}
                 onFocus={onPrefetchCommandPalette}
-                className="flex items-center space-x-1.5 h-8 px-2 min-[1400px]:px-2.5 rounded-control bg-surface-2 border border-separator text-text-secondary hover:text-text hover:bg-surface-3 text-xs font-mono transition-colors active-press focus-ring"
+                className="flex items-center space-x-1.5 h-8 px-2 min-[1600px]:px-2.5 rounded-control bg-surface-2 border border-separator text-text-secondary hover:text-text hover:bg-surface-3 text-xs font-mono transition-colors active-press focus-ring"
                 aria-label="Open command palette"
               >
                 <Command className="h-3.5 w-3.5 shrink-0 text-text-tertiary" />
-                <span className="hidden min-[1400px]:inline">Quick Actions</span>
-                <kbd className="hidden min-[1400px]:inline text-2xs px-1 py-0.5 rounded bg-surface-1 dark:bg-surface-3 border border-separator text-text-secondary">
+                <span className="hidden min-[1600px]:inline">Quick Actions</span>
+                <kbd className="hidden min-[1600px]:inline text-2xs px-1 py-0.5 rounded bg-surface-1 dark:bg-surface-3 border border-separator text-text-secondary">
                   ⌘K
                 </kbd>
               </button>
             </Tooltip>
           )}
 
-          {/* Tokenizers Comparison: Icon-only at <1400px, Full above */}
+          {/* Tokenizers Comparison: Icon-only at <1600px, Full above */}
           {onTokenizerClick && (
             <Tooltip content="Compare multi-model token variance and embedding costs" position="bottom" wrapperClassName="hidden lg:inline-flex">
               <button
                 onClick={onTokenizerClick}
                 onMouseEnter={onPrefetchTokenizer}
                 onFocus={onPrefetchTokenizer}
-                className="h-8 w-8 min-[1400px]:w-auto min-[1400px]:px-2.5 rounded-control bg-transparent hover:bg-surface-2 text-text-secondary hover:text-text border border-transparent flex items-center justify-center min-[1400px]:space-x-1.5 text-xs font-medium transition-colors active-press focus-ring"
+                className="h-8 w-8 min-[1600px]:w-auto min-[1600px]:px-2.5 rounded-control bg-transparent hover:bg-surface-2 text-text-secondary hover:text-text border border-transparent flex items-center justify-center min-[1600px]:space-x-1.5 text-xs font-medium transition-colors active-press focus-ring"
                 aria-label="Compare tokenizers and embedding costs"
               >
                 <Cpu className="h-3.5 w-3.5" />
-                <span className="hidden min-[1400px]:inline">Tokenizers</span>
+                <span className="hidden min-[1600px]:inline">Tokenizers</span>
               </button>
             </Tooltip>
           )}
 
-          {/* Compare Benchmark Mode: Icon-only at <1400px */}
+          {/* Compare Benchmark Mode: Icon-only at <1600px */}
           <Tooltip content="Side-by-side benchmark comparison" position="bottom" wrapperClassName="hidden lg:inline-flex">
             <button
               onClick={onToggleCompare}
               className={cn(
-                'h-8 w-8 min-[1400px]:w-auto min-[1400px]:px-2.5 rounded-control border flex items-center justify-center min-[1400px]:space-x-1.5 text-xs font-medium transition-colors active-press focus-ring',
+                'h-8 w-8 min-[1600px]:w-auto min-[1600px]:px-2.5 rounded-control border flex items-center justify-center min-[1600px]:space-x-1.5 text-xs font-medium transition-colors active-press focus-ring',
                 isCompareMode
                   ? 'bg-accent-subtle border-accent/30 text-accent'
                   : 'bg-transparent border-transparent hover:bg-surface-2 text-text-secondary hover:text-text'
@@ -282,22 +284,22 @@ export const Header: React.FC<HeaderProps> = ({
               aria-label="Toggle side-by-side comparison"
             >
               <SplitSquareVertical className="h-3.5 w-3.5" />
-              <span className="hidden min-[1400px]:inline">Compare</span>
+              <span className="hidden min-[1600px]:inline">Compare</span>
             </button>
           </Tooltip>
 
-          {/* User Manual & RAG Academy: Icon-only at <1400px, Full above */}
+          {/* User Manual & RAG Academy: Icon-only at <1600px, Full above */}
           {onOpenLearningModal && (
             <Tooltip content="User manual & RAG academy" shortcut="?" position="bottom" wrapperClassName="hidden lg:inline-flex">
               <button
                 onClick={onOpenLearningModal}
                 onMouseEnter={onPrefetchLearningModal}
                 onFocus={onPrefetchLearningModal}
-                className="h-8 w-8 min-[1400px]:w-auto min-[1400px]:px-2.5 rounded-control bg-transparent hover:bg-surface-2 text-text-secondary hover:text-text border border-transparent flex items-center justify-center min-[1400px]:space-x-1.5 text-xs font-medium transition-colors active-press focus-ring"
+                className="h-8 w-8 min-[1600px]:w-auto min-[1600px]:px-2.5 rounded-control bg-transparent hover:bg-surface-2 text-text-secondary hover:text-text border border-transparent flex items-center justify-center min-[1600px]:space-x-1.5 text-xs font-medium transition-colors active-press focus-ring"
                 aria-label="Open User Manual and RAG Academy"
               >
                 <BookOpen className="h-3.5 w-3.5 text-accent" />
-                <span className="hidden min-[1400px]:inline">Academy</span>
+                <span className="hidden min-[1600px]:inline">Academy</span>
               </button>
             </Tooltip>
           )}
@@ -307,11 +309,11 @@ export const Header: React.FC<HeaderProps> = ({
             <Tooltip content="Share configuration: copy link" position="bottom" wrapperClassName="hidden lg:inline-flex">
               <button
                 onClick={onShareClick}
-                className="h-8 w-8 min-[1400px]:w-auto min-[1400px]:px-2.5 rounded-control bg-transparent hover:bg-surface-2 text-text-secondary hover:text-text border border-transparent flex items-center justify-center min-[1400px]:space-x-1.5 text-xs font-medium transition-colors active-press focus-ring"
+                className="h-8 w-8 min-[1600px]:w-auto min-[1600px]:px-2.5 rounded-control bg-transparent hover:bg-surface-2 text-text-secondary hover:text-text border border-transparent flex items-center justify-center min-[1600px]:space-x-1.5 text-xs font-medium transition-colors active-press focus-ring"
                 aria-label="Share configuration: copy link"
               >
                 <Share2 className="h-3.5 w-3.5" />
-                <span className="hidden min-[1400px]:inline">Share</span>
+                <span className="hidden min-[1600px]:inline">Share</span>
               </button>
             </Tooltip>
           )}
@@ -344,7 +346,7 @@ export const Header: React.FC<HeaderProps> = ({
           </Tooltip>
 
           {/* GitHub Source Link */}
-          <Tooltip content="GitHub repository" position="bottom" wrapperClassName="hidden min-[1400px]:inline-flex">
+          <Tooltip content="GitHub repository" position="bottom" wrapperClassName="hidden min-[1600px]:inline-flex">
             <a
               href="https://github.com/Dhanesh10war/chunklens"
               target="_blank"

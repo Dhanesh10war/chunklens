@@ -1,25 +1,8 @@
 import { defineConfig } from '@playwright/test';
-import os from 'os';
-import path from 'path';
-import fs from 'fs';
 
-// Config portability: Optional environment variable PW_CHROME_PATH,
-// falling back to local cached chromium if headless shell is not present.
-const fallbackChrome = path.join(
-  os.homedir(),
-  '.cache/ms-playwright/chromium-1254/chrome-linux64/chrome'
-);
-const fallbackPuppeteerChrome = path.join(
-  os.homedir(),
-  '.cache/puppeteer/chrome/linux-146.0.7680.153/chrome-linux64/chrome'
-);
-const executablePath =
-  process.env.PW_CHROME_PATH ||
-  (fs.existsSync(fallbackChrome)
-    ? fallbackChrome
-    : fs.existsSync(fallbackPuppeteerChrome)
-    ? fallbackPuppeteerChrome
-    : undefined);
+// Config portability: Optional environment variable PW_CHROME_PATH.
+// When omitted, Playwright defaults to its own browser binaries.
+const executablePath = process.env.PW_CHROME_PATH || undefined;
 
 // Proxy detection: Apply loopback bypass only when a proxy is configured in the environment
 const hasProxy = Boolean(

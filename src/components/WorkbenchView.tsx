@@ -42,6 +42,20 @@ export interface WorkbenchViewProps {
   onOpenLearnTrack: (slug?: string | null) => void;
   initialSampleId?: string | null;
   initialConfig?: ChunkingConfig | null;
+  initialSessionState?: {
+    rawText: string;
+    documentTitle: string;
+    selectedSampleId: string | null;
+    detectedFormat: DetectedFormatInfo | null;
+    config: ChunkingConfig;
+  } | null;
+  onSessionChange?: (session: {
+    rawText: string;
+    documentTitle: string;
+    selectedSampleId: string | null;
+    detectedFormat: DetectedFormatInfo | null;
+    config: ChunkingConfig;
+  }) => void;
 }
 
 export const WorkbenchView: React.FC<WorkbenchViewProps> = ({
@@ -49,20 +63,51 @@ export const WorkbenchView: React.FC<WorkbenchViewProps> = ({
   onOpenLearnTrack,
   initialSampleId: propInitialSampleId,
   initialConfig: propInitialConfig,
+  initialSessionState,
+  onSessionChange,
 }) => {
-  // Load restored session or default sample
-  const initialSession = useMemo(() => loadStoredSession(), []);
+  // Load restored session: prioritize in-memory parent state, then tab-scoped sessionStorage, then localStorage
+  const initialSession = useMemo(() => {
+    if (initialSessionState) {
+      return {
+        ...loadStoredSession(),
+        ...initialSessionState,
+      };
+    }
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      try {
+        const tabRaw = window.sessionStorage.getItem('chunklens_tab_doc');
+        if (tabRaw) {
+          const tabParsed = JSON.parse(tabRaw);
+          if (tabParsed && typeof tabParsed.rawText === 'string') {
+            return {
+              ...loadStoredSession(),
+              ...tabParsed,
+            };
+          }
+        }
+      } catch {
+        // ignore sessionStorage error
+      }
+    }
+    return loadStoredSession();
+  }, [initialSessionState]);
 
   const [rememberDocument, setRememberDocument] = useState<boolean>(
     Boolean(initialSession.rememberDocument)
   );
+  const isExplicitEmpty = propInitialSampleId === null;
   const [selectedSampleId, setSelectedSampleId] = useState<string | null>(
-    propInitialSampleId !== undefined ? propInitialSampleId : initialSession.selectedSampleId
+    isExplicitEmpty ? null : (propInitialSampleId !== undefined ? propInitialSampleId : initialSession.selectedSampleId)
   );
-  const [documentTitle, setDocumentTitle] = useState<string>(initialSession.documentTitle);
-  const [rawText, setRawText] = useState<string>(initialSession.rawText || '');
+  const [documentTitle, setDocumentTitle] = useState<string>(
+    isExplicitEmpty ? '' : initialSession.documentTitle
+  );
+  const [rawText, setRawText] = useState<string>(
+    isExplicitEmpty ? '' : (initialSession.rawText || '')
+  );
   const [detectedFormat, setDetectedFormat] = useState<DetectedFormatInfo | null>(
-    initialSession.detectedFormat || (initialSession.rawText ? detectFileFormat(initialSession.documentTitle, initialSession.rawText) : null)
+    isExplicitEmpty ? null : (initialSession.detectedFormat || (initialSession.rawText ? detectFileFormat(initialSession.documentTitle, initialSession.rawText) : null))
   );
 
   // Chunking parameters
@@ -125,7 +170,25 @@ export const WorkbenchView: React.FC<WorkbenchViewProps> = ({
       rememberDocument,
       sidebarCollapsed: !isSidebarOpen,
     });
-  }, [selectedSampleId, documentTitle, rawText, config, detectedFormat, rememberDocument, isSidebarOpen]);
+    // Also keep parent session state and tab storage in sync so switching to Learn view never loses active work
+    onSessionChange?.({
+      rawText,
+      documentTitle,
+      selectedSampleId,
+      detectedFormat,
+      config,
+    });
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      try {
+        window.sessionStorage.setItem(
+          'chunklens_tab_doc',
+          JSON.stringify({ rawText, documentTitle, selectedSampleId, detectedFormat, config })
+        );
+      } catch {
+        // ignore sessionStorage write errors
+      }
+    }
+  }, [selectedSampleId, documentTitle, rawText, config, detectedFormat, rememberDocument, isSidebarOpen, onSessionChange]);
 
   // Check URL on initial load for shareable configuration state
   useEffect(() => {
@@ -261,6 +324,19 @@ export const WorkbenchView: React.FC<WorkbenchViewProps> = ({
     }
   };
 
+  useEffect(() => {
+    if (propInitialSampleId !== undefined) {
+      if (propInitialSampleId === null) {
+        setRawText('');
+        setSelectedSampleId(null);
+        setDocumentTitle('');
+        setDetectedFormat(null);
+      } else {
+        handleSelectSample(propInitialSampleId);
+      }
+    }
+  }, [propInitialSampleId]);
+
   // Shared Document Upload Hook (for Sidebar and Empty-State dropzone)
   const {
     uploadError,
@@ -287,6 +363,11 @@ export const WorkbenchView: React.FC<WorkbenchViewProps> = ({
 
   const handleClearSavedData = () => {
     clearStoredSession();
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      try {
+        window.sessionStorage.removeItem('chunklens_tab_doc');
+      } catch {}
+    }
     setRememberDocument(false);
     setSelectedSampleId(DEFAULT_SESSION.selectedSampleId);
     setDocumentTitle(DEFAULT_SESSION.documentTitle);

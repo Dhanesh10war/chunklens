@@ -33,11 +33,19 @@ All commits were recorded locally on branch `content/learn` (stacked on `feature
 
 | # | Item / Decision | Architectural Rationale | Impact / Verification |
 |---|---|---|---|
-| **D1** | **Lazy-Loading Workbench View (`WorkbenchView.tsx`)** | Previously, `AppContent` mounted the heavy chunking worker, state, and upload hooks unconditionally at root. Extracting `WorkbenchView` keeps the root router shell minimal (`35.72 kB`). | First `?view=learn` wire payload dropped by 93.5% (from 2.78 MB to 180 kB). Neither tiktoken, pdf-engine, nor workers load until user visits workbench or runs a token simulation. |
+| **D1** | **Lazy-Loading Workbench View (`WorkbenchView.tsx`)** | Previously, `AppContent` mounted the heavy chunking worker, state, and upload hooks unconditionally at root. Extracting `WorkbenchView` keeps the root router shell minimal (`35.78 kB`). | Main chunk reduced; workbench moved to a lazy chunk (`110.08 kB`). Total initial JS for `?view=app` is `145.86 kB` (vs `136.00 kB` in v0.3). First `?view=learn` uncompressed transfer dropped from 2.78 MB to 180 kB. Neither tiktoken, pdf-engine, nor workers load until user visits workbench or runs a token simulation. |
 | **D2** | **Vite `modulePreload.filter` Configuration** | Vite's default crawler automatically injected `<link rel="modulepreload">` for all chunks into `dist/index.html`. We explicitly filtered out `tokenizer-tiktoken`, `pdf-engine`, and `chunking.worker`. | Verified in `dist/index.html`: only `index.js`, `vendor-react`, and `vendor-icons` are preloaded for the root app shell. |
 | **D3** | **Dynamic Tokenizer Injection in V2 Sandbox** | When a reader switches the V2 Sandbox from character mode to token mode, `V2ChunkSandbox` prompts for confirmation and dynamically imports `tokenizer.ts`, wiring it into `setChunkerTokenizerContext`. | Verified by chunk analysis: `V2ChunkSandbox` bundle (`12.25 kB`) does not statically import `tokenizer-tiktoken`. |
 | **D4** | **WCAG 2.2 Target Size & Contrast Adjustments** | Sliders in `V2ChunkSandbox` were given `minHeight: 28px` to guarantee $\ge 24\text{px}$ touch targets under SC 2.5.8. Range inputs, subtle text, and badges were styled with high-contrast palette tokens (`.learn-primary-btn`, `.learn-subtle-text`). Header logo was converted to semantic div to eliminate target collision with sidebar collapse. | Verified via Playwright Axe audit: 0 violations across 1440px and 375px viewports in light and dark themes. |
 | **D5** | **Keyboard-Scrollable Container ARIA Semantics** | Axe-core flagged `scrollable-region-focusable` on markdown code blocks, SVG diagrams, and data tables. Added `tabIndex={0}`, `role="region"`, and explicit `aria-label` to all scrollable elements. | Verified via Playwright Axe audit across desktop and mobile. |
+| **D6** | **Active Document In-Memory & Session Preservation** | When readers switch between the workbench and Learn Track, `App.tsx` retains active document state in memory and tab-scoped `sessionStorage`, so returning to the app never loses in-progress unsaved documents. | Verified via automated smoke test suite. |
+
+---
+
+## Claims and Content Verification Register
+
+> **Clarification on Verification Artifacts:**
+> The file `docs/learn/CLAIMS_TO_VERIFY.md` serves as an active **register of claims still needing empirical verification and peer source attribution**, rather than proof of correctness. All claims in canonical lessons 1.1 and 3.2 are cross-referenced with academic citations (Lewis et al. 2020, Robertson et al. 2009) or marked explicitly in the claims register for ongoing verification. No unverifiable guarantees or marketing superlatives are permitted in lesson content.
 
 ---
 
@@ -45,16 +53,21 @@ All commits were recorded locally on branch `content/learn` (stacked on `feature
 
 Measurements conducted on production build via headless Chrome CDP socket (`node --experimental-websocket scripts/measure-cdp-bytes.cjs`):
 
-| Phase | Wire Transferred | Uncompressed Raw | tiktoken Loaded | pdf Loaded | worker Loaded | Egress Bytes | Status |
+| Phase | Wire Transferred (Uncompressed Raw)* | Compressed (gzip/brotli)** | tiktoken Loaded | pdf Loaded | worker Loaded | Egress Bytes | Status |
 |---|---|---|---|---|---|---|---|
-| **1. First `?view=learn` Load (Cold)** | **180.05 kB** | 180.05 kB | **NO** | **NO** | **NO** | 0 B | **PASS** |
-| **2. Lesson 3.2 Load (with V2 sandbox chunk)** | **55.77 kB** | 55.77 kB | **NO** | **NO** | **NO** | 0 B | **PASS** |
-| **3. First V2 Interaction in Character Mode** | **0.00 kB** | 0.00 kB | **NO** | **NO** | **NO** | 0 B | **PASS** |
-| **4. Token Mode Activation (with local dynamic import)** | **0.00 kB** | 0.00 kB | Local chunk | **NO** | **NO** | 0 B | **PASS** |
+| **1. First `?view=learn` Load (Cold)** | **180.05 kB** | *UNMEASURED* | **NO** | **NO** | **NO** | 0 B | **PASS** |
+| **2. Lesson 3.2 Load (with V2 sandbox chunk)** | **55.77 kB** | *UNMEASURED* | **NO** | **NO** | **NO** | 0 B | **PASS** |
+| **3. First V2 Interaction in Character Mode** | **0.00 kB** | **0.00 kB** | **NO** | **NO** | **NO** | 0 B | **PASS** |
+| **4. Token Mode Activation (with local dynamic import)** | **0.00 kB** | **0.00 kB** | Local chunk | **NO** | **NO** | 0 B | **PASS** |
+
+*\*Note on wire vs raw bytes:* Because Vite preview serves uncompressed static files locally over loopback without on-the-fly HTTP gzip compression, wire bytes match raw uncompressed disk bytes.
+*\*\*Compressed bytes:* Marked *UNMEASURED* because they were not measured behind a compressing reverse proxy (such as nginx/caddy with brotli/gzip enabled).
 
 ### Chunk Sizes of Learning Assets
-- `index.js` (App shell router): **35.72 kB** (gzip: **12.43 kB**)
-- `LearnView.js` (Curriculum platform, map, progress): **71.87 kB** (gzip: **21.29 kB**)
+- `index.js` (App shell router): **35.78 kB** (gzip: **12.45 kB**)
+- `WorkbenchView.js` (Workbench workspace chunk): **110.08 kB** (gzip: **26.88 kB**)
+- Total initial JS for `?view=app` (`index.js` + `WorkbenchView.js`): **145.86 kB** (Budget: $\le 165\text{ kB}$; v0.3 monolithic main was **136.00 kB**)
+- `LearnView.js` (Curriculum platform, map, progress): **71.87 kB** (gzip: **21.30 kB**)
 - `LearnView.css` (Learn Track stylesheet): **4.57 kB** (gzip: **1.19 kB**)
 - `V1PipelineFlowExplorer.js` (V1 widget): **8.61 kB** (gzip: **2.95 kB**)
 - `V2ChunkSandbox.js` (V2 sandbox widget): **12.25 kB** (gzip: **3.53 kB**)
@@ -80,11 +93,14 @@ Executed across 20 iterations using `scripts/bench-chunkers.ts`:
 
 ## Honest Ratchet Table (v0.3 Baseline vs. P0 Milestone)
 
-| Metric | v0.3 Baseline | Prior to P0 Refactor | P0 Milestone Result | Ratchet Direction | Status |
+| Metric | v0.3 Baseline | Prior to P0 Refactor | P0 Milestone Result | Ratchet Direction / Honest Comparison | Status |
 |---|---|---|---|---|---|
-| **Main JS Bundle (raw)** | 136.00 kB | 169.83 kB | **35.72 kB** | **-73.7%** vs v0.3 | **PASS** (Budget <= 185 kB) |
+| **Main JS Bundle (raw)** | 136.00 kB (monolithic) | 169.83 kB (monolithic) | **35.78 kB** | Main chunk reduced; workbench moved to a lazy chunk | **PASS** (Budget <= 185 kB) |
+| **WorkbenchView Chunk (raw)** | N/A | N/A | **110.08 kB** | Lazy chunk for ?view=app workbench | **PASS** (Budget <= 120 kB) |
+| **Total Initial JS for ?view=app** | 136.00 kB | 169.83 kB | **145.86 kB** | Main (35.78 kB) + Workbench (110.08 kB) | **PASS** (Budget <= 165 kB) |
 | **Main CSS Bundle (raw)** | 44.97 kB | 44.97 kB | **44.82 kB** | **-0.15 kB** | **PASS** (Budget <= 45 kB) |
-| **Initial `?view=learn` Wire Transfer** | N/A | 2,788.53 kB | **180.05 kB** | **-93.5%** | **PASS** |
+| **Initial `?view=learn` Wire Transfer** | N/A | 2,788.53 kB | **180.05 kB** | Reduced by 2.6 MB (tiktoken excluded) | **PASS** |
+| **Compressed Bytes (gzip/brotli)** | N/A | N/A | *UNMEASURED** | Measured behind compressing server needed | Marked UNMEASURED |
 | **tiktoken Loaded on First Learn View** | N/A | YES | **NO** | Eliminated | **PASS** |
 | **pdf Engine Loaded on First Learn View** | N/A | NO | **NO** | Invariant | **PASS** |
 | **Chunking Worker Loaded on Learn View** | N/A | YES | **NO** | Eliminated | **PASS** |
@@ -95,16 +111,21 @@ Executed across 20 iterations using `scripts/bench-chunkers.ts`:
 | **Golden Characterization Invariants** | 0 | 120 tests | **120 tests** | **+120 tests** | **PASS** (100% invariant) |
 | **Banned Design-Language Terms** | 10+ occurrences | 0 | **0** | Scrubbed clean | **PASS** |
 
+*\*Note:* Compressed transfer sizes are explicitly marked UNMEASURED because Vite preview serves raw loopback bytes without compression.
+
 ---
 
-## Visual Verification Artifacts Captured
+## Visual Verification Artifacts Captured (20 Screenshots)
 
-Visual screenshots generated via Playwright and stored in `docs/design/learn/`:
-1. `docs/design/learn/01-curriculum-map-desktop-1440-dark.png` — Curriculum map with progress rings, path selector (Beginner/Builder/Operator), and 8 module sections in dark mode.
-2. `docs/design/learn/02-curriculum-map-mobile-375-light.png` — Responsive single-column mobile view at 375px in light mode with no horizontal overflow.
-3. `docs/design/learn/03-lesson-1-1-v1-pipeline-desktop-dark.png` — Lesson 1.1 with interactive 5-stage SVG RAG Pipeline Simulator and data table fallback.
-4. `docs/design/learn/04-lesson-3-2-v2-sandbox-desktop-dark.png` — Lesson 3.2 with Live Chunking Sandbox (sliders, live chunk preview, token cost metrics).
-5. `docs/design/learn/05-quiz-feedback-accessible-desktop-dark.png` — Accessible quiz evaluation with color-independent icons and live feedback.
+The full set of 20 high-fidelity visual screenshots across 5 views, 2 viewports (1440px & 375px), and 2 themes (dark & light) is stored in `docs/design/learn/`:
+
+| View / Target | 1440px Dark | 1440px Light | 375px Dark | 375px Light |
+|---|---|---|---|---|
+| **1. Curriculum Map** | `01-curriculum-map-1440-dark.png` | `02-curriculum-map-1440-light.png` | `03-curriculum-map-375-dark.png` | `04-curriculum-map-375-light.png` |
+| **2. Lesson 1.1** | `05-lesson-1-1-1440-dark.png` | `06-lesson-1-1-1440-light.png` | `07-lesson-1-1-375-dark.png` | `08-lesson-1-1-375-light.png` |
+| **3. Lesson 3.2** | `09-lesson-3-2-1440-dark.png` | `10-lesson-3-2-1440-light.png` | `11-lesson-3-2-375-dark.png` | `12-lesson-3-2-375-light.png` |
+| **4. V1 Pipeline Simulator** | `13-v1-pipeline-1440-dark.png` | `14-v1-pipeline-1440-light.png` | `15-v1-pipeline-375-dark.png` | `16-v1-pipeline-375-light.png` |
+| **5. V2 Live Sandbox** | `17-v2-sandbox-1440-dark.png` | `18-v2-sandbox-1440-light.png` | `19-v2-sandbox-375-dark.png` | `20-v2-sandbox-375-light.png` |
 
 ---
 

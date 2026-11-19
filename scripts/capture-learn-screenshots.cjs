@@ -18,8 +18,9 @@ async function main() {
   // Wait for preview server to start
   await new Promise((resolve) => setTimeout(resolve, 2000));
 
+  const executablePath = process.env.PW_CHROME_PATH || undefined;
   const browser = await chromium.launch({
-    executablePath: '/home/drago/.cache/ms-playwright/chromium-1254/chrome-linux64/chrome',
+    ...(executablePath ? { executablePath } : {}),
     headless: true,
   });
 

@@ -45,6 +45,7 @@ export const AppContent: React.FC = () => {
 
   const [workbenchSampleId, setWorkbenchSampleId] = useState<string | null | undefined>(undefined);
   const [workbenchConfig, setWorkbenchConfig] = useState<ChunkingConfig | null>(null);
+  const [workbenchSessionState, setWorkbenchSessionState] = useState<any>(null);
 
   const { success } = useToast();
 
@@ -76,15 +77,43 @@ export const AppContent: React.FC = () => {
     }
   };
 
+  const handleLaunchFromLanding = (sampleId?: string, newConfig?: ChunkingConfig) => {
+    if (!sampleId && !newConfig) {
+      setWorkbenchSampleId(null);
+      setWorkbenchConfig(null);
+      setWorkbenchSessionState(null);
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        try {
+          window.sessionStorage.removeItem('chunklens_tab_doc');
+        } catch {}
+      }
+    } else {
+      if (newConfig) {
+        setWorkbenchConfig(newConfig);
+        success('Applied calibrated preset to workbench');
+      }
+      if (sampleId) {
+        setWorkbenchSampleId(sampleId);
+      }
+    }
+    setCurrentView('app');
+    setCurrentLessonSlug(null);
+    if (typeof window !== 'undefined' && window.history?.pushState) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('view', 'app');
+      url.searchParams.delete('lesson');
+      url.hash = '';
+      window.history.pushState({}, '', url.toString());
+    }
+  };
+
   const handleLaunchApp = (sampleId?: string, newConfig?: ChunkingConfig) => {
     if (newConfig) {
       setWorkbenchConfig(newConfig);
       success('Applied calibrated preset to workbench');
     }
-    if (sampleId) {
+    if (sampleId !== undefined) {
       setWorkbenchSampleId(sampleId);
-    } else if (!newConfig) {
-      setWorkbenchSampleId(null);
     }
     setCurrentView('app');
     setCurrentLessonSlug(null);
@@ -140,7 +169,7 @@ export const AppContent: React.FC = () => {
       <ChunkLoadErrorBoundary fallbackTitle="Failed to load Landing Page">
         <Suspense fallback={<ModalLoadingFallback label="Loading ChunkLens..." />}>
           <LandingPage
-            onLaunchApp={handleLaunchApp}
+            onLaunchApp={handleLaunchFromLanding}
             onOpenLearnTrack={handleOpenLearnView}
           />
         </Suspense>
@@ -171,6 +200,8 @@ export const AppContent: React.FC = () => {
           onOpenLearnTrack={handleOpenLearnView}
           initialSampleId={workbenchSampleId}
           initialConfig={workbenchConfig}
+          initialSessionState={workbenchSessionState}
+          onSessionChange={setWorkbenchSessionState}
         />
       </Suspense>
     </ChunkLoadErrorBoundary>

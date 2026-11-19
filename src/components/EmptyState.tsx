@@ -100,16 +100,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 
         {/* Primary Upload Dropzone */}
         <div
-          tabIndex={0}
-          role="button"
-          aria-label="Upload document file (PDF, Markdown, CSV, JSON, code, or text)"
           onClick={() => fileInputRef.current?.click()}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              fileInputRef.current?.click();
-            }
-          }}
           onDragOver={(e) => {
             e.preventDefault();
             setIsDragOver(true);
@@ -170,6 +161,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
               type="button"
               variant="secondary"
               size="sm"
+              aria-label="Upload document file (PDF, Markdown, CSV, JSON, code, or text)"
               onClick={(e) => {
                 e.stopPropagation();
                 fileInputRef.current?.click();
