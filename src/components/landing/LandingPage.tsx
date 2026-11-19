@@ -13,9 +13,10 @@ import { ChunkingConfig } from '../../engine/types';
 
 interface LandingPageProps {
   onLaunchApp: (sampleId?: string, config?: ChunkingConfig) => void;
+  onOpenLearnTrack?: (slug?: string) => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onOpenLearnTrack }) => {
   const [activeTab, setActiveTab] = useState<LandingPageTab>(() => {
     if (typeof window !== 'undefined') {
       const hash = window.location.hash.replace('#', '');
@@ -80,6 +81,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
           <LandingDocs
             onLaunchApp={() => onLaunchApp()}
             onApplyConfig={(config) => onLaunchApp(undefined, config)}
+            onOpenLearnTrack={onOpenLearnTrack}
           />
         )}
       </main>

@@ -30,8 +30,8 @@ const prefetchSimilarityHeatmap = () =>
   import('./components/SimilarityHeatmap').then((m) => ({ default: m.SimilarityHeatmap }));
 const prefetchTokenizerModal = () =>
   import('./components/TokenizerComparisonModal').then((m) => ({ default: m.TokenizerComparisonModal }));
-const prefetchLearningModal = () =>
-  import('./components/learning/LearningModal').then((m) => ({ default: m.LearningModal }));
+const prefetchLearnView = () =>
+  import('./components/learning/LearnView').then((m) => ({ default: m.LearnView }));
 const prefetchLandingPage = () =>
   import('./components/landing/LandingPage').then((m) => ({ default: m.LandingPage }));
 
@@ -40,7 +40,7 @@ const ComparisonView = React.lazy(prefetchComparisonView);
 const ExportModal = React.lazy(prefetchExportModal);
 const SimilarityHeatmap = React.lazy(prefetchSimilarityHeatmap);
 const TokenizerComparisonModal = React.lazy(prefetchTokenizerModal);
-const LearningModal = React.lazy(prefetchLearningModal);
+const LearnView = React.lazy(prefetchLearnView);
 const LandingPage = React.lazy(prefetchLandingPage);
 
 export const AppContent: React.FC = () => {
@@ -75,11 +75,20 @@ export const AppContent: React.FC = () => {
   const [isCompareMode, setIsCompareMode] = useState<boolean>(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState<boolean>(false);
   const [isTokenizerModalOpen, setIsTokenizerModalOpen] = useState<boolean>(false);
-  const [isLearningModalOpen, setIsLearningModalOpen] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'visualizer' | 'heatmap' | 'editor'>('visualizer');
-  const [currentView, setCurrentView] = useState<'app' | 'landing'>(() => {
+  const [currentLessonSlug, setCurrentLessonSlug] = useState<string | null>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
+      return params.get('lesson');
+    }
+    return null;
+  });
+  const [activeTab, setActiveTab] = useState<'visualizer' | 'heatmap' | 'editor'>('visualizer');
+  const [currentView, setCurrentView] = useState<'app' | 'landing' | 'learn'>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('view') === 'learn' || window.location.hash === '#learn') {
+        return 'learn';
+      }
       if (params.get('view') === 'app' || window.location.hash === '#app') {
         return 'app';
       }
@@ -94,9 +103,27 @@ export const AppContent: React.FC = () => {
 
   const handleOpenLandingPage = () => {
     setCurrentView('landing');
+    setCurrentLessonSlug(null);
     if (typeof window !== 'undefined' && window.history?.pushState) {
       const url = new URL(window.location.href);
       url.searchParams.delete('view');
+      url.searchParams.delete('lesson');
+      url.hash = '';
+      window.history.pushState({}, '', url.toString());
+    }
+  };
+
+  const handleOpenLearnView = (slug?: string | null) => {
+    setCurrentView('learn');
+    setCurrentLessonSlug(slug || null);
+    if (typeof window !== 'undefined' && window.history?.pushState) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('view', 'learn');
+      if (slug) {
+        url.searchParams.set('lesson', slug);
+      } else {
+        url.searchParams.delete('lesson');
+      }
       url.hash = '';
       window.history.pushState({}, '', url.toString());
     }
@@ -115,9 +142,11 @@ export const AppContent: React.FC = () => {
     }
     setActiveTab('visualizer');
     setCurrentView('app');
+    setCurrentLessonSlug(null);
     if (typeof window !== 'undefined' && window.history?.pushState) {
       const url = new URL(window.location.href);
       url.searchParams.set('view', 'app');
+      url.searchParams.delete('lesson');
       url.hash = '';
       window.history.pushState({}, '', url.toString());
     }
@@ -126,10 +155,16 @@ export const AppContent: React.FC = () => {
   useEffect(() => {
     const handlePopState = () => {
       const params = new URLSearchParams(window.location.search);
-      if (params.get('view') === 'app' || window.location.hash === '#app') {
+      const view = params.get('view');
+      if (view === 'learn' || window.location.hash === '#learn') {
+        setCurrentView('learn');
+        setCurrentLessonSlug(params.get('lesson'));
+      } else if (view === 'app' || window.location.hash === '#app') {
         setCurrentView('app');
+        setCurrentLessonSlug(null);
       } else {
         setCurrentView('landing');
+        setCurrentLessonSlug(null);
       }
     };
     window.addEventListener('popstate', handlePopState);
@@ -243,7 +278,7 @@ export const AppContent: React.FC = () => {
         setIsInspectorOpen((prev) => !prev);
       } else if (e.key === '?' || (e.shiftKey && e.key === '/')) {
         e.preventDefault();
-        setIsLearningModalOpen((prev) => !prev);
+        handleOpenLearnView();
       } else if (e.key === 'Escape') {
         if (selectedChunkId) {
           e.preventDefault();
@@ -369,7 +404,42 @@ export const AppContent: React.FC = () => {
     return (
       <ChunkLoadErrorBoundary fallbackTitle="Failed to load Landing Page">
         <Suspense fallback={<ModalLoadingFallback label="Loading ChunkLens..." />}>
-          <LandingPage onLaunchApp={handleLaunchAppFromLanding} />
+          <LandingPage
+            onLaunchApp={handleLaunchAppFromLanding}
+            onOpenLearnTrack={handleOpenLearnView}
+          />
+        </Suspense>
+      </ChunkLoadErrorBoundary>
+    );
+  }
+
+  if (currentView === 'learn') {
+    return (
+      <ChunkLoadErrorBoundary fallbackTitle="Failed to load Learn Track">
+        <Suspense fallback={<ModalLoadingFallback label="Loading Learn Track..." />}>
+          <LearnView
+            currentLessonSlug={currentLessonSlug}
+            onNavigateLesson={(slug) => handleOpenLearnView(slug)}
+            onLaunchWorkbench={(shareUrl) => {
+              if (shareUrl) {
+                try {
+                  const parsed = parseSharedConfigFromUrl(shareUrl);
+                  if (parsed) {
+                    if (parsed.sampleId) {
+                      handleSelectSample(parsed.sampleId);
+                    }
+                    if (parsed.config && Object.keys(parsed.config).length > 0) {
+                      setConfig((prev) => ({ ...prev, ...parsed.config }));
+                    }
+                  }
+                } catch (e) {
+                  console.warn('Failed to parse share url:', e);
+                }
+              }
+              handleLaunchAppFromLanding();
+            }}
+            onOpenLanding={handleOpenLandingPage}
+          />
         </Suspense>
       </ChunkLoadErrorBoundary>
     );
@@ -391,11 +461,11 @@ export const AppContent: React.FC = () => {
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         onOpenLandingPage={handleOpenLandingPage}
         onShareClick={handleShareSetup}
-        onOpenLearningModal={() => setIsLearningModalOpen(true)}
+        onOpenLearningModal={() => handleOpenLearnView()}
         onPrefetchExport={prefetchExportModal}
         onPrefetchCommandPalette={prefetchCommandPalette}
         onPrefetchTokenizer={prefetchTokenizerModal}
-        onPrefetchLearningModal={prefetchLearningModal}
+        onPrefetchLearningModal={prefetchLearnView}
         activeTab={activeTab}
         onChangeTab={setActiveTab}
         onClearSavedData={handleClearSavedData}
@@ -578,7 +648,7 @@ export const AppContent: React.FC = () => {
               }}
               onOpenExport={() => setIsExportModalOpen(true)}
               onOpenTokenizer={() => setIsTokenizerModalOpen(true)}
-              onOpenLearningModal={() => setIsLearningModalOpen(true)}
+              onOpenLearningModal={() => handleOpenLearnView()}
               onSelectTab={setActiveTab}
               onToggleCompare={() => setIsCompareMode(!isCompareMode)}
               onClearSavedData={handleClearSavedData}
@@ -612,23 +682,6 @@ export const AppContent: React.FC = () => {
               rawText={rawText}
               chunks={chunkingResult.chunks}
               baselineEncoding={config.encoding}
-            />
-          )}
-        </Suspense>
-      </ChunkLoadErrorBoundary>
-
-      {/* User Manual & RAG Academy Modal */}
-      <ChunkLoadErrorBoundary fallbackTitle="Failed to load User Manual & RAG Academy">
-        <Suspense fallback={isLearningModalOpen ? <ModalLoadingFallback label="Loading academy & manual..." /> : null}>
-          {isLearningModalOpen && (
-            <LearningModal
-              isOpen={isLearningModalOpen}
-              onClose={() => setIsLearningModalOpen(false)}
-              onApplyConfig={(newConfig) => {
-                setConfig(newConfig);
-                setIsLearningModalOpen(false);
-                success('Applied chunking strategy to workbench');
-              }}
             />
           )}
         </Suspense>

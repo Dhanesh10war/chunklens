@@ -71,7 +71,7 @@ export const DOMAIN_PRESETS: DomainPreset[] = [
       separators: ['. ', '? ', '! ', '\n', ' '],
     },
     rationale:
-      'FAQ queries ("What is your refund policy?") benefit from short, high-density chunks with minimal noise. A 256-token ceiling guarantees that retrieved context matches user intent directly.',
+      'FAQ queries ("What is your refund policy?") benefit from short, high-density chunks with minimal noise. A 256-token ceiling helps ensure that retrieved context matches user intent directly.',
   },
   {
     id: 'academic-research',

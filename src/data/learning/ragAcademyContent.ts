@@ -11,7 +11,7 @@ export const RAG_ACADEMY_MODULES: RagAcademyModule[] = [
     keyTakeaways: [
       'Small chunks (128–256 tokens) yield high vector retrieval precision but risk losing critical surrounding context.',
       'Large chunks (1024–2048 tokens) capture complex context but dilute vector embeddings and increase LLM inference cost.',
-      'Medium chunks (384–512 tokens) with 10%–15% overlap represent the proven benchmark for general QA pipelines.',
+      'Medium chunks (384–512 tokens) with 10%–15% overlap represent a widely effective baseline for general QA pipelines.',
     ],
     sections: [
       {

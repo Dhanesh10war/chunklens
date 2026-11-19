@@ -80,7 +80,7 @@ splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
           'Structured spreadsheets and CSV tables present unique challenges for vector search: if a chunk starts mid-table without column headers, numeric values lose their meaning. ChunkLens tabular mode attaches header rows to every chunk partition, preserving column association across split table boundaries.',
         callout: {
           type: 'note',
-          text: 'When indexing financial data or tabular matrices, always use row-aware chunking to guarantee header preservation.',
+          text: 'When indexing financial data or tabular matrices, row-aware chunking helps ensure header preservation.',
         },
       },
     ],
@@ -96,12 +96,12 @@ splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
       {
         heading: '1. Why Character Splitting Leads to Pipeline Failures',
         content:
-          'A common pitfall in AI pipelines is configuring chunk size in characters (e.g. 1,000 characters). Because token density varies drastically depending on whitespace, code formatting, unicode symbols, and multilingual text, a 1,000-character chunk can represent anywhere from 180 tokens (dense English prose) to 850 tokens (heavily indented code, JSON, or non-Latin scripts). ChunkLens evaluates partitions directly in real BPE tokens to guarantee model compliance.',
+          'A common pitfall in AI pipelines is configuring chunk size in characters (e.g. 1,000 characters). Because token density varies drastically depending on whitespace, code formatting, unicode symbols, and multilingual text, a 1,000-character chunk can represent anywhere from 180 tokens (dense English prose) to 850 tokens (heavily indented code, JSON, or non-Latin scripts). ChunkLens evaluates partitions directly in real BPE tokens to verify model compliance.',
       },
       {
         heading: '2. Supported Encodings in ChunkLens',
         content:
-          '• o200k_base: State-of-the-art Byte-Pair Encoding used in leading frontier multimodal LLMs. Highly optimized for multilingual compression and source code.\n• cl100k_base: The industry benchmark tokenizer used across dense embedding models and modern frontier chat models.\n• Llama / Open-Weights Approximation: 32k/128k vocabulary tokenizer used in open-source model ecosystems.\n• Claude / Anthropic Approximation: Character-to-token ratio calibration modeled on frontier conversational assistants.',
+          '• o200k_base: Byte-Pair Encoding used in leading frontier multimodal LLMs. Highly optimized for multilingual compression and source code.\n• cl100k_base: The widely adopted tokenizer used across dense embedding models and modern frontier chat models.\n• Llama / Open-Weights Approximation: 32k/128k vocabulary tokenizer used in open-source model ecosystems.\n• Claude / Anthropic Approximation: Character-to-token ratio calibration modeled on frontier conversational assistants.',
       },
       {
         heading: '3. Measuring Tokenizer Variance Across Models',
@@ -167,7 +167,7 @@ splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
   {
     id: 'zero-egress-security-model',
     title: 'Zero-Egress Architecture & Native PDF Processing',
-    summary: 'How ChunkLens processes documents completely inside your browser with strict isolation guarantees.',
+    summary: 'How ChunkLens processes documents completely inside your browser with strict local isolation.',
     badge: 'Security',
     category: 'security',
     readTime: '3 min read',

@@ -11,15 +11,19 @@ import {
 import { Button } from '../ui/Button';
 import { cn } from '../../utils/cn';
 import { copyToClipboard } from '../../utils/clipboard';
-import { LearningCenterView } from '../learning/LearningCenterView';
 import { ChunkingConfig } from '../../engine/types';
 
 interface LandingDocsProps {
   onLaunchApp: () => void;
   onApplyConfig?: (config: ChunkingConfig) => void;
+  onOpenLearnTrack?: (slug?: string) => void;
 }
 
-export const LandingDocs: React.FC<LandingDocsProps> = ({ onLaunchApp, onApplyConfig }) => {
+export const LandingDocs: React.FC<LandingDocsProps> = ({
+  onLaunchApp,
+  onApplyConfig: _onApplyConfig,
+  onOpenLearnTrack,
+}) => {
   const [activeTab, setActiveTab] = useState<'langchain-python' | 'llamaindex' | 'langchain-js'>('langchain-python');
   const [copiedCode, setCopiedCode] = useState(false);
 
@@ -78,13 +82,6 @@ console.log(\`Generated \${docs.length} partitions.\`);`,
     }
   };
 
-  const handleApplyPreset = (config: ChunkingConfig) => {
-    if (onApplyConfig) {
-      onApplyConfig(config);
-    }
-    onLaunchApp();
-  };
-
   return (
     <div className="py-12 px-4 sm:px-6 max-w-6xl mx-auto font-sans">
       {/* Header */}
@@ -101,13 +98,47 @@ console.log(\`Generated \${docs.length} partitions.\`);`,
         </p>
       </div>
 
-      {/* Main Interactive Learning Hub */}
-      <div className="mb-16">
-        <LearningCenterView
-          onApplyConfig={handleApplyPreset}
-          defaultTab="manual"
-          className="bg-transparent"
-        />
+      {/* Main Interactive Learn Track Showcase */}
+      <div className="mb-16 p-6 sm:p-8 rounded-card border border-separator bg-surface-1 shadow-card">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-control bg-accent-subtle text-accent text-2xs font-mono font-semibold mb-3 border border-accent/30">
+              <BookOpen className="h-3 w-3" />
+              <span>Interactive Curriculum</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold text-text mb-2">
+              ChunkLens Learn Track: Interactive RAG Masterclass
+            </h2>
+            <p className="text-sm text-text-secondary leading-relaxed mb-4">
+              Step through our visual curriculum featuring step-by-step pipeline simulations, client-side chunking execution, token geometry comparisons, and guided self-check quizzes.
+            </p>
+            <div className="flex flex-wrap gap-2 text-xs">
+              <span className="px-2.5 py-1 rounded-control bg-surface-2 text-text border border-separator font-medium">
+                Module 1: RAG Foundations
+              </span>
+              <span className="px-2.5 py-1 rounded-control bg-surface-2 text-text border border-separator font-medium">
+                Module 3: Size Trade-Offs
+              </span>
+              <span className="px-2.5 py-1 rounded-control bg-surface-2 text-text border border-separator font-medium">
+                Live Browser Sandboxes
+              </span>
+            </div>
+          </div>
+
+          <a
+            href="?view=learn"
+            onClick={(e) => {
+              if (onOpenLearnTrack) {
+                e.preventDefault();
+                onOpenLearnTrack();
+              }
+            }}
+            className="px-5 py-2.5 rounded-control bg-accent hover:bg-accent-hover text-white text-sm font-semibold transition-all shadow-subtle inline-flex items-center space-x-2 shrink-0 active-press focus-ring"
+          >
+            <span>Explore Learn Track</span>
+            <span>→</span>
+          </a>
+        </div>
       </div>
 
       {/* Quick Code Export Showcase */}
