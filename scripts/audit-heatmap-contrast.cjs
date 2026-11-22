@@ -77,15 +77,45 @@ function mixOklch(c1, c2, p) {
   return [L, C, H];
 }
 
+function hexToRgbLin(hex) {
+  const clean = hex.replace('#', '');
+  const r = parseInt(clean.substring(0, 2), 16) / 255;
+  const g = parseInt(clean.substring(2, 4), 16) / 255;
+  const b = parseInt(clean.substring(4, 6), 16) / 255;
+  const srgbToLinear = (c) => (c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
+  return [srgbToLinear(r), srgbToLinear(g), srgbToLinear(b)];
+}
+
+function hexToOklch(hex) {
+  const [rLin, gLin, bLin] = hexToRgbLin(hex);
+  const l_ = Math.cbrt(0.4122214708 * rLin + 0.5363325363 * gLin + 0.0514459929 * bLin);
+  const m_ = Math.cbrt(0.2119034982 * rLin + 0.6806995451 * gLin + 0.1073969566 * bLin);
+  const s_ = Math.cbrt(0.0883024619 * rLin + 0.2817188376 * gLin + 0.6299787005 * bLin);
+
+  const L = 0.2104542553 * l_ + 0.7936177850 * m_ - 0.0040720468 * s_;
+  const a = 1.9779984951 * l_ - 2.4285922050 * m_ + 0.4505937099 * s_;
+  const b = 0.0259040371 * l_ + 0.7827717662 * m_ - 0.8086757660 * s_;
+
+  const C = Math.sqrt(a * a + b * b);
+  let H = (Math.atan2(b, a) * 180) / Math.PI;
+  if (H < 0) H += 360;
+  return [L, C, H];
+}
+
 // --- Parse Tokens from src/index.css ---
 
 function parseOklchToken(block, tokenName) {
   const regex = new RegExp(`${tokenName}:\\s*oklch\\(\\s*([\\d.]+)\\s+([\\d.]+)\\s+([\\d.]+)(?:\\s*\\/\\s*[\\d.]+)?\\s*\\);`);
   const match = block.match(regex);
-  if (!match) {
-    throw new Error(`Token ${tokenName} not found in css block`);
+  if (match) {
+    return [parseFloat(match[1]), parseFloat(match[2]), parseFloat(match[3])];
   }
-  return [parseFloat(match[1]), parseFloat(match[2]), parseFloat(match[3])];
+  const hexRegex = new RegExp(`${tokenName}:\\s*(#[0-9a-fA-F]{6});`);
+  const hexMatch = block.match(hexRegex);
+  if (hexMatch) {
+    return hexToOklch(hexMatch[1]);
+  }
+  throw new Error(`Token ${tokenName} not found in css block`);
 }
 
 function loadTokensFromCss() {

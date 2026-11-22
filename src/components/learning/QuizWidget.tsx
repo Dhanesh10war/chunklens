@@ -68,14 +68,14 @@ export const QuizWidget: React.FC<QuizWidgetProps> = ({ quizId }) => {
     <div
       role="region"
       aria-label={quiz.title}
-      className="learn-quiz my-6 p-5 sm:p-6 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl"
+      className="learn-quiz my-6 p-5 sm:p-6 bg-surface-1 border border-separator rounded-xl shadow-card"
     >
-      <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
+      <div className="flex items-center justify-between mb-4 pb-3 border-b border-separator">
         <div className="flex items-center gap-2">
-          <span className="px-2 py-0.5 text-xs font-semibold rounded bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
+          <span className="px-2 py-0.5 text-xs font-semibold rounded bg-accent-subtle text-accent border border-accent/25">
             Self-Check
           </span>
-          <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">
+          <h3 className="text-base sm:text-lg font-semibold text-text">
             {quiz.title}
           </h3>
         </div>
@@ -83,8 +83,8 @@ export const QuizWidget: React.FC<QuizWidgetProps> = ({ quizId }) => {
           <span
             className={`text-sm font-medium px-2.5 py-0.5 rounded-full ${
               score === quiz.questions.length
-                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-                : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                ? 'bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border border-emerald-500/25'
+                : 'bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/25'
             }`}
           >
             Score: {score}/{quiz.questions.length}
@@ -103,8 +103,8 @@ export const QuizWidget: React.FC<QuizWidgetProps> = ({ quizId }) => {
 
           return (
             <fieldset key={question.id} className="border-0 p-0 m-0">
-              <legend className="text-sm sm:text-base font-medium text-slate-900 dark:text-slate-100 mb-3">
-                <span className="font-semibold text-slate-500 dark:text-slate-400 mr-1.5">
+              <legend className="text-sm sm:text-base font-medium text-text mb-3">
+                <span className="font-semibold text-text-muted mr-1.5">
                   {qIdx + 1}.
                 </span>
                 {question.prompt}
@@ -114,21 +114,21 @@ export const QuizWidget: React.FC<QuizWidgetProps> = ({ quizId }) => {
                 {question.options.map((option) => {
                   const isSelected = selectedOptionId === option.id;
                   let optionClass =
-                    'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700';
+                    'border-separator bg-surface-1 hover:border-text-secondary/40 text-text-secondary';
 
                   if (submitted) {
                     if (option.isCorrect) {
                       optionClass =
-                        'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/30 text-emerald-900 dark:text-emerald-200';
+                        'border-emerald-500 bg-emerald-500/10 text-emerald-950 dark:text-emerald-200';
                     } else if (isSelected && !option.isCorrect) {
                       optionClass =
-                        'border-red-400 bg-red-50/50 dark:bg-red-950/30 text-red-900 dark:text-red-200';
+                        'border-red-400 bg-red-500/10 text-red-950 dark:text-red-200';
                     } else {
-                      optionClass = 'opacity-60 border-slate-200 dark:border-slate-800';
+                      optionClass = 'opacity-60 border-separator';
                     }
                   } else if (isSelected) {
                     optionClass =
-                      'border-indigo-600 dark:border-indigo-500 bg-indigo-50/40 dark:bg-indigo-950/30 ring-1 ring-indigo-500';
+                      'border-accent bg-accent-subtle ring-1 ring-accent text-text';
                   }
 
                   return (
@@ -143,9 +143,9 @@ export const QuizWidget: React.FC<QuizWidgetProps> = ({ quizId }) => {
                         checked={isSelected}
                         disabled={submitted}
                         onChange={() => handleSelectOption(question.id, option.id)}
-                        className="mt-0.5 text-indigo-600 focus:ring-indigo-500 focus:ring-2 w-4 h-4 cursor-pointer"
+                        className="mt-0.5 text-accent accent-accent focus-ring w-4 h-4 cursor-pointer"
                       />
-                      <span className="flex-1 text-slate-800 dark:text-slate-200 leading-snug">
+                      <span className="flex-1 text-text leading-snug">
                         {option.text}
                       </span>
                     </label>
@@ -157,8 +157,8 @@ export const QuizWidget: React.FC<QuizWidgetProps> = ({ quizId }) => {
                 <div
                   className={`mt-2.5 p-3 rounded-lg text-xs sm:text-sm leading-relaxed border ${
                     selectedOption.isCorrect
-                      ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-100'
-                      : 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100'
+                      ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-950 dark:text-emerald-100'
+                      : 'bg-amber-500/10 border-amber-500/25 text-amber-950 dark:text-amber-100'
                   }`}
                 >
                   <span className="font-semibold block mb-0.5">
@@ -172,13 +172,13 @@ export const QuizWidget: React.FC<QuizWidgetProps> = ({ quizId }) => {
         })}
       </div>
 
-      <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3">
+      <div className="mt-6 pt-4 border-t border-separator flex items-center justify-between gap-3">
         {!submitted ? (
           <button
             type="button"
             disabled={!allAnswered}
             onClick={handleCheckAnswers}
-            className="px-4 py-2 text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-[40px] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            className="px-4 py-2 text-sm font-medium rounded-lg text-white bg-accent hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-[40px] focus-ring"
           >
             Check Answers
           </button>
@@ -186,7 +186,7 @@ export const QuizWidget: React.FC<QuizWidgetProps> = ({ quizId }) => {
           <button
             type="button"
             onClick={handleReset}
-            className="px-4 py-2 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors min-h-[40px] focus:outline-none focus:ring-2 focus:ring-slate-500"
+            className="px-4 py-2 text-sm font-medium rounded-lg text-text-secondary bg-surface-1 border border-separator hover:bg-surface-2 transition-colors min-h-[40px] focus-ring"
           >
             Retry Quiz
           </button>

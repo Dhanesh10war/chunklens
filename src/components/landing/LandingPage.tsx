@@ -1,7 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Layers,
-} from 'lucide-react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { ChunkLensLogo } from '../ui/ChunkLensLogo';
 import { LandingNavbar, LandingPageTab } from './LandingNavbar';
 import { LandingOverview } from './LandingOverview';
 import { LandingFeatures } from './LandingFeatures';
@@ -10,12 +8,17 @@ import { LandingSecurity } from './LandingSecurity';
 import { LandingDocs } from './LandingDocs';
 import { ChunkingConfig } from '../../engine/types';
 
+const ProWaitlistModal = React.lazy(() =>
+  import('../pro/ProWaitlistModal').then((m) => ({ default: m.ProWaitlistModal }))
+);
+
 interface LandingPageProps {
   onLaunchApp: (sampleId?: string, config?: ChunkingConfig) => void;
   onOpenLearnTrack?: (slug?: string) => void;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onOpenLearnTrack }) => {
+  const [isProModalOpen, setIsProModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<LandingPageTab>(() => {
     if (typeof window !== 'undefined') {
       const hash = window.location.hash.replace('#', '');
@@ -66,6 +69,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onOpenLea
         activeTab={activeTab}
         onSelectTab={handleSelectTab}
         onLaunchApp={onLaunchApp}
+        onOpenProModal={() => setIsProModalOpen(true)}
       />
 
       {/* 2. Main Page Content (Switching based on activeTab) */}
@@ -100,12 +104,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onOpenLea
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
             {/* Brand Column */}
             <div className="space-y-3 md:col-span-1">
-              <div className="flex items-center space-x-2">
-                <div className="h-6 w-6 rounded-control bg-surface-2 border border-separator flex items-center justify-center text-accent">
-                  <Layers className="h-3.5 w-3.5" />
+              <button
+                type="button"
+                onClick={() => handleSelectTab('overview')}
+                className="flex items-center space-x-2 text-left focus-ring rounded group"
+                aria-label="ChunkLens Home Overview"
+              >
+                <div className="h-6 w-6 rounded-control bg-surface-2 border border-separator flex items-center justify-center shrink-0">
+                  <ChunkLensLogo className="h-3.5 w-3.5" />
                 </div>
-                <span className="font-semibold text-sm tracking-tight text-text">ChunkLens</span>
-              </div>
+                <span className="font-semibold text-sm tracking-tight text-text group-hover:text-accent transition-colors">ChunkLens</span>
+              </button>
               <p className="text-xs text-text-secondary leading-relaxed font-sans">
                 Interactive client-side document chunking visualizer &amp; token budget optimizer for modern RAG pipelines.
               </p>
@@ -146,6 +155,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onOpenLea
                     className="min-h-[28px] py-1 inline-flex items-center hover:text-text transition-colors focus-ring rounded"
                   >
                     Use Cases
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => setIsProModalOpen(true)}
+                    className="min-h-[28px] py-1 inline-flex items-center text-text-secondary hover:text-text hover:underline transition-colors focus-ring rounded"
+                  >
+                    Pro &amp; Enterprise
                   </button>
                 </li>
                 <li>
@@ -217,6 +235,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onOpenLea
           </div>
         </div>
       </footer>
+
+      {/* Pro & Enterprise Early Access Modal */}
+      {isProModalOpen && (
+        <Suspense fallback={null}>
+          <ProWaitlistModal
+            isOpen={isProModalOpen}
+            onClose={() => setIsProModalOpen(false)}
+          />
+        </Suspense>
+      )}
     </div>
   );
 };

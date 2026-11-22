@@ -55,7 +55,7 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
                 key={idx}
                 type="button"
                 onClick={() => onNavigateLesson && onNavigateLesson(lessonSlug)}
-                className="text-blue-600 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+                className="text-accent underline hover:opacity-80 font-medium"
               >
                 {token.text}
               </button>
@@ -67,7 +67,7 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
               href={token.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+              className="text-accent underline hover:opacity-80 font-medium"
             >
               {token.text}
             </a>
@@ -153,16 +153,16 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
         return (
           <blockquote
             key={index}
-            className="my-4 pl-4 border-l-4 border-indigo-500 italic text-slate-600 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-900/30 py-1.5 rounded-r"
+            className="my-4 pl-4 border-l-4 border-accent italic text-text-secondary bg-surface-2/40 py-1.5 rounded-r"
           >
             {renderInlineTokens(parseInline(block.text))}
           </blockquote>
         );
       case 'table':
         return (
-          <div key={index} tabIndex={0} role="region" aria-label="Content table" className="my-5 overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-500">
-            <table className="w-full text-left text-sm text-slate-700 dark:text-slate-300 border-collapse">
-              <thead className="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 font-semibold">
+          <div key={index} tabIndex={0} role="region" aria-label="Content table" className="my-5 overflow-x-auto rounded-lg border border-separator focus-ring">
+            <table className="w-full text-left text-sm text-text-secondary border-collapse">
+              <thead className="bg-surface-2 border-b border-separator text-text font-semibold">
                 <tr>
                   {block.headers.map((h, hIdx) => (
                     <th key={hIdx} className="px-3.5 py-2.5">
@@ -171,9 +171,9 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+              <tbody className="divide-y divide-separator/60">
                 {block.rows.map((row, rIdx) => (
-                  <tr key={rIdx} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
+                  <tr key={rIdx} className="hover:bg-surface-2/50">
                     {row.map((cell, cIdx) => (
                       <td key={cIdx} className="px-3.5 py-2.5">
                         {renderInlineTokens(parseInline(cell))}
@@ -187,10 +187,10 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
         );
       case 'callout': {
         const typeStyles = {
-          note: 'bg-blue-50/60 dark:bg-blue-950/30 border-blue-500 text-blue-900 dark:text-blue-200',
-          tip: 'bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-500 text-emerald-900 dark:text-emerald-200',
-          warning: 'bg-amber-50/60 dark:bg-amber-950/30 border-amber-500 text-amber-900 dark:text-amber-200',
-          info: 'bg-indigo-50/60 dark:bg-indigo-950/30 border-indigo-500 text-indigo-900 dark:text-indigo-200',
+          note: 'bg-surface-2 border-separator text-text',
+          tip: 'bg-emerald-500/10 border-emerald-500 text-emerald-950 dark:text-emerald-200',
+          warning: 'bg-amber-500/10 border-amber-500 text-amber-950 dark:text-amber-200',
+          info: 'bg-accent-subtle border-accent text-text',
         }[block.calloutType];
 
         return (
@@ -282,16 +282,16 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
         return (
           <div
             key={index}
-            className="my-5 p-4 sm:p-5 rounded-xl border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/30 dark:bg-indigo-950/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+            className="my-5 p-4 sm:p-5 rounded-xl border border-separator bg-surface-2/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
           >
             <div>
-              <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 block mb-1">
+              <span className="text-xs font-semibold text-accent block mb-1">
                 Workbench Experiment
               </span>
-              <h4 className="font-semibold text-slate-900 dark:text-slate-100 text-base">
+              <h4 className="font-semibold text-text text-base">
                 Try this configuration in ChunkLens
               </h4>
-              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+              <p className="text-xs text-text-secondary mt-0.5">
                 Preset: <span className="font-medium">{sample.title}</span> ({sample.category}) • {strategy} ({chunkSize}/{chunkOverlap})
               </p>
             </div>
@@ -303,7 +303,7 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
                   onLaunchWorkbench(shareUrl);
                 }
               }}
-              className="px-4 py-2 rounded-lg learn-primary-btn text-xs sm:text-sm font-medium transition-colors inline-flex items-center gap-1.5 min-h-[38px] shadow-sm whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              className="px-4 py-2 rounded-lg learn-primary-btn text-xs sm:text-sm font-medium transition-colors inline-flex items-center gap-1.5 min-h-[38px] shadow-sm whitespace-nowrap focus-ring"
             >
               <span>Open in Workbench</span>
               <span>→</span>

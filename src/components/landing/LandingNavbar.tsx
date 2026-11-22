@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Layers,
   Sun,
   Moon,
   ArrowRight,
@@ -11,9 +10,11 @@ import {
   BookOpen,
   Briefcase,
   Home,
+  Terminal,
 } from 'lucide-react';
 import { useTheme } from '../../utils/theme';
 import { Button } from '../ui/Button';
+import { ChunkLensLogo } from '../ui/ChunkLensLogo';
 import { cn } from '../../utils/cn';
 
 export type LandingPageTab = 'overview' | 'features' | 'use-cases' | 'security' | 'docs';
@@ -22,12 +23,14 @@ interface LandingNavbarProps {
   activeTab: LandingPageTab;
   onSelectTab: (tab: LandingPageTab) => void;
   onLaunchApp: (sampleId?: string) => void;
+  onOpenProModal?: () => void;
 }
 
 export const LandingNavbar: React.FC<LandingNavbarProps> = ({
   activeTab,
   onSelectTab,
   onLaunchApp,
+  onOpenProModal,
 }) => {
   const { isDark, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -57,8 +60,8 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({
             className="flex items-center space-x-2.5 shrink-0 focus-ring rounded-control text-left"
             aria-label="ChunkLens Home Overview"
           >
-            <div className="h-7 w-7 rounded-control bg-surface-2 border border-separator flex items-center justify-center text-accent shrink-0 shadow-subtle">
-              <Layers className="h-4 w-4" />
+            <div className="h-7 w-7 rounded-control bg-surface-2 border border-separator flex items-center justify-center shrink-0 shadow-subtle">
+              <ChunkLensLogo className="h-4 w-4" />
             </div>
             <span className="font-semibold text-sm tracking-tight text-text">ChunkLens</span>
           </button>
@@ -92,6 +95,20 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({
 
         {/* Right Controls */}
         <div className="flex items-center space-x-2">
+          {/* Pro & Enterprise Editions Modal Trigger */}
+          {onOpenProModal && (
+            <button
+              type="button"
+              onClick={onOpenProModal}
+              className="px-2.5 py-1.5 rounded-control text-xs font-medium text-text-secondary hover:text-text hover:bg-surface-2 border border-separator transition-colors flex items-center space-x-1.5 focus-ring active-press"
+              aria-label="View ChunkLens Pro and Enterprise Editions"
+            >
+              <Terminal className="h-3.5 w-3.5 text-accent shrink-0" />
+              <span className="hidden sm:inline">Pro &amp; Enterprise</span>
+              <span className="sm:hidden">Pro</span>
+            </button>
+          )}
+
           {/* Theme Toggle */}
           <button
             type="button"
@@ -148,6 +165,19 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({
               </button>
             );
           })}
+          {onOpenProModal && (
+            <button
+              type="button"
+              onClick={() => {
+                onOpenProModal();
+                setMobileMenuOpen(false);
+              }}
+              className="w-full px-3 py-2 rounded-control text-xs font-medium text-text-secondary hover:text-text hover:bg-surface-2 text-left flex items-center space-x-2.5 transition-colors focus-ring"
+            >
+              <Terminal className="h-3.5 w-3.5 text-accent" />
+              <span>Pro &amp; Enterprise Editions</span>
+            </button>
+          )}
           <div className="pt-2 border-t border-separator">
             <Button
               variant="primary"

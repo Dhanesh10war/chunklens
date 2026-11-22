@@ -44,6 +44,9 @@ export default defineConfig(({ command }) => {
       host: '127.0.0.1',
       port: 4173,
       allowedHosts: true,
+      headers: {
+        'Content-Security-Policy': buildCspString({ isMeta: false }),
+      },
     },
     test: {
       exclude: ['**/node_modules/**', '**/dist/**', '**/*.spec.ts'],

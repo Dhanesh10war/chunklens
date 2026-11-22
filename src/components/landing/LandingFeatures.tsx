@@ -105,7 +105,7 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ onLaunchApp })
       <div className="text-center max-w-3xl mx-auto mb-14">
         <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-control bg-accent-subtle text-accent text-2xs font-mono font-semibold mb-3 border border-accent/25">
           <Cpu className="h-3 w-3" />
-          <span>Core Splitting Architecture</span>
+          <span>Splitting Algorithms</span>
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-text mb-4 title-tracking">
           Five Purpose-Built Strategies. Zero Guesswork.

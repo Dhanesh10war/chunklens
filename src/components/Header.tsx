@@ -16,10 +16,12 @@ import {
   Share2,
   Trash2,
   BookOpen,
+  Terminal,
 } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Tooltip } from './ui/Tooltip';
 import { SegmentedControl } from './ui/SegmentedControl';
+import { ChunkLensLogo } from './ui/ChunkLensLogo';
 import { PrivacyPopover } from './PrivacyPopover';
 import { useTheme } from '../utils/theme';
 import { DetectedFormatInfo } from '../utils/fileFormatDetector';
@@ -39,6 +41,7 @@ interface HeaderProps {
   onOpenLandingPage?: () => void;
   onShareClick?: () => void;
   onOpenLearningModal?: () => void;
+  onOpenProModal?: () => void;
   onPrefetchExport?: () => void;
   onPrefetchCommandPalette?: () => void;
   onPrefetchTokenizer?: () => void;
@@ -62,6 +65,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenLandingPage,
   onShareClick,
   onOpenLearningModal,
+  onOpenProModal,
   onPrefetchExport,
   onPrefetchCommandPalette,
   onPrefetchTokenizer,
@@ -160,16 +164,16 @@ export const Header: React.FC<HeaderProps> = ({
                   className="flex items-center space-x-1.5 shrink-0 hover:opacity-85 active-press focus-ring rounded-control p-1 -m-1 transition-opacity text-left cursor-pointer"
                   aria-label="ChunkLens Home (Return to landing overview)"
                 >
-                  <div className="h-6 w-6 rounded-control bg-surface-2 border border-separator flex items-center justify-center text-accent shrink-0">
-                    <Layers className="h-3.5 w-3.5" />
+                  <div className="h-6 w-6 rounded-control bg-surface-2 border border-separator flex items-center justify-center shrink-0">
+                    <ChunkLensLogo className="h-3.5 w-3.5" />
                   </div>
                   <h1 className="font-semibold text-sm tracking-tight text-text m-0 p-0 inline">ChunkLens</h1>
                 </button>
               </Tooltip>
             ) : (
               <div className="flex items-center space-x-1.5 shrink-0">
-                <div className="h-6 w-6 rounded-control bg-surface-2 border border-separator flex items-center justify-center text-accent shrink-0">
-                  <Layers className="h-3.5 w-3.5" />
+                <div className="h-6 w-6 rounded-control bg-surface-2 border border-separator flex items-center justify-center shrink-0">
+                  <ChunkLensLogo className="h-3.5 w-3.5" />
                 </div>
                 <h1 className="font-semibold text-sm tracking-tight text-text m-0 p-0 inline">ChunkLens</h1>
               </div>
@@ -318,6 +322,20 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <BookOpen className="h-3.5 w-3.5 text-accent" />
                 <span className="hidden min-[1600px]:inline">Academy</span>
+              </button>
+            </Tooltip>
+          )}
+
+          {/* Pro & Enterprise Editions */}
+          {onOpenProModal && (
+            <Tooltip content="ChunkLens Pro & Enterprise Editions" position="bottom" wrapperClassName="hidden sm:inline-flex">
+              <button
+                onClick={onOpenProModal}
+                className="h-8 px-2.5 rounded-control bg-surface-2 hover:bg-surface-3 text-text-secondary hover:text-text border border-separator flex items-center space-x-1.5 text-xs font-medium transition-colors active-press focus-ring"
+                aria-label="View ChunkLens Pro and Enterprise Editions"
+              >
+                <Terminal className="h-3.5 w-3.5 text-accent shrink-0" />
+                <span>Pro</span>
               </button>
             </Tooltip>
           )}
@@ -512,7 +530,7 @@ export const Header: React.FC<HeaderProps> = ({
                   }}
                   className="lg:hidden w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center space-x-2 transition-colors focus:bg-surface-2 focus:outline-none"
                 >
-                  {isDark ? <Sun className="h-3.5 w-3.5 text-amber-400" /> : <Moon className="h-3.5 w-3.5 text-indigo-400" />}
+                  {isDark ? <Sun className="h-3.5 w-3.5 text-accent" /> : <Moon className="h-3.5 w-3.5 text-accent" />}
                   <span>{isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}</span>
                 </button>
 
@@ -559,6 +577,23 @@ export const Header: React.FC<HeaderProps> = ({
                   </button>
                 )}
 
+                {/* Pro & Enterprise Editions (visible in menu only on mobile when hidden from toolbar) */}
+                {onOpenProModal && (
+                  <button
+                    role="menuitem"
+                    onClick={() => {
+                      onOpenProModal();
+                      closeMenuAndReturnFocus();
+                    }}
+                    className="w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex sm:hidden items-center justify-between transition-colors focus:bg-surface-2 focus:outline-none"
+                  >
+                    <span className="flex items-center space-x-2">
+                      <Terminal className="h-3.5 w-3.5 text-text-tertiary" />
+                      <span>Pro &amp; Enterprise</span>
+                    </span>
+                  </button>
+                )}
+
                 <div className="my-1 border-t border-separator" />
 
                 {/* User Manual & RAG Academy (only in menu when hidden from desktop toolbar) */}
@@ -592,7 +627,7 @@ export const Header: React.FC<HeaderProps> = ({
                     }}
                     className="w-full px-3 py-1.5 text-left text-xs text-text-secondary hover:text-text hover:bg-surface-2 flex items-center space-x-2 transition-colors focus:bg-surface-2 focus:outline-none"
                   >
-                    <Layers className="h-3.5 w-3.5 text-accent" />
+                    <ChunkLensLogo className="h-3.5 w-3.5 shrink-0" />
                     <span>Overview &amp; Features</span>
                   </button>
                 )}

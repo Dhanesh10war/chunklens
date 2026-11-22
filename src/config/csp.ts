@@ -10,7 +10,7 @@ export const CSP_DIRECTIVES: Record<string, string[]> = {
   'font-src': ["'self'"],
   'img-src': ["'self'", 'data:', 'blob:'],
   'worker-src': ["'self'", 'blob:'],
-  'connect-src': ["'none'"], // ZERO cross-origin and zero network egress
+  'connect-src': ["'self'", 'https://api.web3forms.com'], // contact inquiries relay
   'object-src': ["'none'"],
   'base-uri': ["'self'"],
   'form-action': ["'none'"],

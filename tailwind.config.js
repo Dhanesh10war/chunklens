@@ -26,6 +26,7 @@ export default {
           primary: 'var(--text)',
           secondary: 'var(--text-secondary)',
           tertiary: 'var(--text-tertiary)',
+          muted: 'var(--text-muted)',
         },
 
         // Unified System Accent
@@ -107,6 +108,7 @@ export default {
       },
       fontFamily: {
         sans: ['"Inter"', 'system-ui', 'sans-serif'],
+        serif: ['"Instrument Serif"', 'Newsreader', '"Iowan Old Style"', 'Georgia', 'serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       borderRadius: {

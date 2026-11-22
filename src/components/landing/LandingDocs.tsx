@@ -104,7 +104,7 @@ console.log(\`Generated \${docs.length} partitions.\`);`,
           <div className="max-w-2xl">
             <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-control bg-accent-subtle text-accent text-2xs font-mono font-semibold mb-3 border border-accent/30">
               <BookOpen className="h-3 w-3" />
-              <span>Interactive Curriculum</span>
+              <span>Academy Curriculum</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-bold text-text mb-2">
               ChunkLens Learn Track: Interactive RAG Masterclass

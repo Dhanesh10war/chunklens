@@ -31,7 +31,7 @@ describe('LandingPage (Multi-Page Product Architecture)', () => {
 
     expect(html).toContain('Live Document Chunking Simulation');
     expect(html).toContain('Target Budget');
-    expect(html).toContain('Step-by-Step Cost Calculator');
+    expect(html).toContain('Token Economics');
     expect(html).toContain('Monthly Ingested Documents');
   });
 

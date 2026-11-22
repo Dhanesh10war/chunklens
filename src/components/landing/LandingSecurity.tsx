@@ -20,7 +20,13 @@ interface LandingSecurityProps {
 export const LandingSecurity: React.FC<LandingSecurityProps> = ({ onLaunchApp }) => {
   const [copiedCurl, setCopiedCurl] = useState(false);
 
-  const curlTest = `curl -sI <your-site-url> | grep -i content-security-policy
+  // Dynamically resolve current origin so visitors can copy & paste the exact runnable command
+  const siteUrl =
+    typeof window !== 'undefined' && window.location?.origin && window.location.origin !== 'null'
+      ? window.location.origin
+      : 'https://chunklens.com';
+
+  const curlTest = `curl -sI ${siteUrl} | grep -i content-security-policy
 # Expected response header:
 # Content-Security-Policy: ${STRICT_CSP_HEADER}`;
 

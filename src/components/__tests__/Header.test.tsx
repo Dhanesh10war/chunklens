@@ -87,4 +87,13 @@ describe('Header Component (Responsive Priority & Overflow Menu - Item 3.6)', ()
     const html = renderToString(<Header {...defaultProps} onClearSavedData={onClear} />);
     expect(html).toContain('aria-label="More actions"');
   });
+
+  it('renders Pro button in toolbar with sm breakpoint when onOpenProModal is provided', () => {
+    const onOpenPro = vi.fn();
+    const html = renderToString(<Header {...defaultProps} onOpenProModal={onOpenPro} />);
+    // Toolbar button has hidden sm:inline-flex to appear on desktop and stay off mobile toolbar
+    expect(html).toContain('hidden sm:inline-flex');
+    expect(html).toContain('aria-label="View ChunkLens Pro and Enterprise Editions"');
+    expect(html).toContain('Pro');
+  });
 });

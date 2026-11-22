@@ -137,8 +137,8 @@ export const V1PipelineFlowExplorer: React.FC = () => {
               aria-pressed={isActive}
               className={`p-2 sm:p-2.5 rounded-lg border text-left transition-all min-h-[44px] flex flex-col justify-between ${
                 isActive
-                  ? 'border-indigo-600 dark:border-indigo-500 bg-indigo-50/70 dark:bg-indigo-950/40 text-indigo-950 dark:text-indigo-100 ring-2 ring-indigo-500/20'
-                  : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
+                  ? 'border-accent bg-accent-subtle text-text ring-2 ring-accent/20 font-semibold'
+                  : 'border-separator bg-surface-1 text-text-secondary hover:border-text-secondary'
               }`}
             >
               <span className="text-xs font-mono font-semibold block opacity-70">
@@ -223,13 +223,13 @@ export const V1PipelineFlowExplorer: React.FC = () => {
       </div>
 
       {/* Active Stage Detail Card */}
-      <div className="p-4 sm:p-5 rounded-xl border border-indigo-100 dark:border-indigo-900/60 bg-indigo-50/20 dark:bg-indigo-950/20">
+      <div className="p-4 sm:p-5 rounded-xl border border-separator bg-surface-2/40">
         <div className="flex items-start justify-between gap-3 mb-3">
           <div>
-            <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+            <span className="text-xs font-semibold text-accent">
               Stage 0{currentStage.id}
             </span>
-            <h5 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
+            <h5 className="text-base sm:text-lg font-bold text-text">
               {currentStage.name}
             </h5>
           </div>
@@ -239,7 +239,7 @@ export const V1PipelineFlowExplorer: React.FC = () => {
               disabled={activeStageId === 1}
               onClick={handlePrev}
               aria-label="Previous pipeline stage"
-              className="p-1.5 rounded border border-slate-300 dark:border-slate-700 disabled:opacity-40 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 min-h-[32px] min-w-[32px] flex items-center justify-center text-xs"
+              className="p-1.5 rounded border border-separator disabled:opacity-40 hover:bg-surface-2 text-text min-h-[32px] min-w-[32px] flex items-center justify-center text-xs"
             >
               ←
             </button>

@@ -8,7 +8,7 @@ const CSP_DIRECTIVES = {
   'font-src': ["'self'"],
   'img-src': ["'self'", 'data:', 'blob:'],
   'worker-src': ["'self'", 'blob:'],
-  'connect-src': ["'none'"],
+  'connect-src': ["'self'", 'https://api.web3forms.com'],
   'object-src': ["'none'"],
   'base-uri': ["'self'"],
   'form-action': ["'none'"],

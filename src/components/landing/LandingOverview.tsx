@@ -1,8 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import {
   ArrowRight,
-  Check,
-  SlidersHorizontal,
   DollarSign,
   SplitSquareVertical,
   ChevronDown,
@@ -12,7 +10,6 @@ import {
   Shield,
   Briefcase,
   BookOpen,
-  Grid3X3,
   Layers,
   AlertTriangle,
   FileCheck,
@@ -96,10 +93,106 @@ async def search_corpus(payload: SearchRequest):
   },
 };
 
+const HERO_STRATEGIES = [
+  {
+    id: 'recursive',
+    label: 'RecursiveCharacter • 512 / 50',
+    totalTokens: '512 tokens',
+    amberRatio: '48%',
+    sageRatio: '52%',
+    chunk1: {
+      tag: 'CHUNK 01 • 248 TOKENS',
+      snippets: [
+        { text: 'The document text block sliced, bound more. ' },
+        { text: 'exemplary colonizing slicing same and of vector stores', highlight: 'amber' },
+        { text: ', which other statuses to highlight and vector boundaries and partition alert, agreement and processors of structured, edges, and while interpreting, the balance is added, and attention intake ' },
+        { text: 'coding losses, interactive', highlight: 'amber' },
+        { text: ', mand size and zero categories to and of query noticing of webpage. Inspect every split before embedding.' },
+      ],
+    },
+    chunk2: {
+      tag: 'CHUNK 02 • 256 TOKENS',
+      snippets: [
+        { text: 'The document officer of an class ' },
+        { text: 'focus engines to deliver aware', highlight: 'sage' },
+        { text: '. Semantic similarity tokens is at safe base software from mots insighting and ' },
+        { text: 'contextual highlight exemplary', highlight: 'sage' },
+        { text: '. These tree ordering in semantic chunks, process video students of essential overriding highlighting approach to ' },
+        { text: 'bioengineering bounding for exampless', highlight: 'sage' },
+        { text: '. Therearen and tokens attributed to vector stores for ranking check.' },
+      ],
+    },
+    overlap: '48 TOKENS',
+    statusRight: 'TOKENS / 52 TOKENS',
+  },
+  {
+    id: 'semantic',
+    label: 'Semantic • 512 / 50',
+    totalTokens: '512 tokens',
+    amberRatio: '60%',
+    sageRatio: '40%',
+    chunk1: {
+      tag: 'CHUNK 01 • 312 TOKENS',
+      snippets: [
+        { text: '1. INDEMNIFICATION AND WARRANTIES. Provider shall ' },
+        { text: 'defend, indemnify, and hold harmless Customer', highlight: 'amber' },
+        { text: ', its corporate affiliates, and their respective officers, directors, and employees from and against any third-party claims or proceedings alleging that the core ' },
+        { text: 'Subscription Services infringe or violate', highlight: 'amber' },
+        { text: ' any valid patent or trade secret.' },
+      ],
+    },
+    chunk2: {
+      tag: 'CHUNK 02 • 200 TOKENS',
+      snippets: [
+        { text: '2. LIMITATION OF TOTAL LIABILITY. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL ' },
+        { text: 'EITHER PARTY BE LIABLE FOR INDIRECT OR CONSEQUENTIAL DAMAGES', highlight: 'sage' },
+        { text: ', INCLUDING LOSS OF PROFITS OR DATA, ARISING OUT OF OR IN CONNECTION WITH THIS ENTERPRISE AGREEMENT, ' },
+        { text: 'REGARDLESS OF THE LEGAL CAUSE OF ACTION', highlight: 'sage' },
+        { text: '.' },
+      ],
+    },
+    overlap: '50 TOKENS',
+    statusRight: 'BOUNDARY: CLAUSE-ALIGNED',
+  },
+  {
+    id: 'markdown',
+    label: 'MarkdownHeader • 256 / 32',
+    totalTokens: '256 tokens',
+    amberRatio: '50%',
+    sageRatio: '50%',
+    chunk1: {
+      tag: 'CHUNK 01 • 124 TOKENS',
+      snippets: [
+        { text: '# Section 1: Authentication & Headers\n' },
+        { text: 'All API requests must include a Bearer token', highlight: 'amber' },
+        { text: ' in the Authorization header. Rate limits are strictly calibrated at ' },
+        { text: '10,000 req/min per tenant', highlight: 'amber' },
+        { text: ' across multi-region edge gateways.' },
+      ],
+    },
+    chunk2: {
+      tag: 'CHUNK 02 • 132 TOKENS',
+      snippets: [
+        { text: '## Section 2: Collection Upsert & Ingestion\n' },
+        { text: 'Upserts are idempotent when providing unique chunk IDs', highlight: 'sage' },
+        { text: '. Payloads exceeding 10MB are automatically ' },
+        { text: 'stream-parsed client-side in Web Workers', highlight: 'sage' },
+        { text: ' to prevent main-thread latency spikes.' },
+      ],
+    },
+    overlap: '32 TOKENS',
+    statusRight: 'BOUNDARY: HEADER-PRESERVED',
+  },
+];
+
 export const LandingOverview: React.FC<LandingOverviewProps> = ({
   onLaunchApp,
   onNavigatePage,
 }) => {
+  // Hero Preview Strategy state
+  const [heroStrategyIndex, setHeroStrategyIndex] = useState<number>(0);
+  const activeHeroStrategy = HERO_STRATEGIES[heroStrategyIndex];
+
   // Interactive Mini-Chunker state
   const [selectedSampleKey, setSelectedSampleKey] = useState<string>('legal');
   const [miniChunkSize, setMiniChunkSize] = useState<number>(110);
@@ -206,66 +299,142 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
 
   return (
     <div className="flex flex-col font-sans">
-      {/* 1. HERO SECTION WITH RADIAL GLOW & LIVE METRICS */}
-      <section className="relative pt-12 sm:pt-20 pb-16 px-4 sm:px-6 overflow-hidden hero-glow">
-        <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
-          {/* Security Trust Pill */}
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-surface-2 border border-separator text-xs font-mono mb-6 shadow-subtle select-none">
-            <span className="h-2 w-2 rounded-full bg-status-success inline-block animate-pulse" />
-            <span className="font-medium text-text">100% Client-Side · Zero Network Egress</span>
-          </div>
+      {/* 1. ASYMMETRIC SPLIT HERO (45% Left / 55% Right) */}
+      <section className="relative pt-8 sm:pt-14 pb-14 px-4 sm:px-6 border-b border-separator">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center lg:items-start gap-10 lg:gap-12">
+          {/* Left Column (45%) */}
+          <div className="w-full lg:w-[45%] text-left flex flex-col">
+            {/* Eyebrow */}
+            <div className="font-mono text-xs font-semibold text-accent mb-3 select-none">
+              100% Client-Side · Zero Network Egress
+            </div>
 
-          {/* Main Headline */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-text leading-[1.12] mb-5 title-tracking">
-            Stop Guessing Your RAG Chunks.{' '}
-            <span className="text-accent block sm:inline">Visualize &amp; Optimize First.</span>
-          </h1>
+            {/* Editorial Display H1 */}
+            <h1 className="font-serif font-normal text-3xl sm:text-5xl lg:text-[3.25rem] leading-[1.08] tracking-tight text-text mb-5">
+              Stop Guessing Your RAG Chunks. Inspect Every Split Before Embedding.
+            </h1>
 
-          {/* Subheadline */}
-          <p className="text-sm sm:text-lg text-text-secondary max-w-2xl mx-auto mb-8 leading-relaxed font-sans">
-            Eliminate severed context boundaries and unoptimized token waste before saving to vector stores.
-            Tune chunk strategies, token limits, and boundary continuity in real time on your machine.
-          </p>
+            {/* Engineer-Focused Subheadline */}
+            <p className="text-sm sm:text-base text-text-secondary leading-relaxed mb-8 max-w-xl font-sans">
+              See exact cl100k_base token counts, catch mid-sentence boundary breaks, and export clean Python or TypeScript splitter configs directly in your browser.
+            </p>
 
-          {/* Primary Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto justify-center mb-10">
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={() => onLaunchApp()}
-              icon={<ArrowRight className="h-4 w-4" />}
-              className="w-full sm:w-auto px-6 py-2.5 rounded-control text-sm font-semibold shadow-card group"
-            >
-              <span>Launch Visualizer</span>
-            </Button>
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-8">
+              <button
+                type="button"
+                onClick={() => onLaunchApp()}
+                className="px-5 py-2.5 rounded-lg bg-accent hover:bg-accent-hover text-white text-sm font-semibold transition-colors shadow-sm flex items-center justify-center gap-2 group focus-ring min-h-[42px]"
+              >
+                <span>Launch Visualizer</span>
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </button>
 
-            <button
-              type="button"
-              onClick={() => onLaunchApp('legal-saas-agreement')}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-control text-sm font-medium bg-surface-2 hover:bg-surface-3 border border-separator text-text transition-colors active-press focus-ring flex items-center justify-center space-x-1.5"
-            >
-              <FileCheck className="h-4 w-4 text-accent" />
-              <span>Try with Legal Agreement</span>
-            </button>
-          </div>
+              <button
+                type="button"
+                onClick={() => onLaunchApp('legal-saas-agreement')}
+                className="px-5 py-2.5 rounded-lg bg-surface-1 hover:bg-surface-2 border border-separator text-text text-sm font-medium transition-colors active-press focus-ring flex items-center justify-center gap-2 min-h-[42px]"
+              >
+                <FileCheck className="h-4 w-4 text-accent" />
+                <span>Try with Legal Agreement</span>
+              </button>
+            </div>
 
-          {/* Micro-proof points */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs text-text-tertiary select-none font-mono">
-            <div className="flex items-center justify-center space-x-1.5">
-              <Check className="h-3.5 w-3.5 text-status-success-text" />
+            {/* Metadata Spec Line */}
+            <div className="text-2xs sm:text-xs text-text-secondary font-mono select-none flex flex-wrap items-center gap-x-2.5 gap-y-1">
               <span>Private Browser Sandbox</span>
-            </div>
-            <div className="flex items-center justify-center space-x-1.5">
-              <Check className="h-3.5 w-3.5 text-status-success-text" />
+              <span>•</span>
               <span>Exact BPE Tokenizers</span>
-            </div>
-            <div className="flex items-center justify-center space-x-1.5">
-              <Check className="h-3.5 w-3.5 text-status-success-text" />
+              <span>•</span>
               <span>5 Chunking Strategies</span>
-            </div>
-            <div className="flex items-center justify-center space-x-1.5">
-              <Check className="h-3.5 w-3.5 text-status-success-text" />
+              <span>•</span>
               <span>1-Click Code Export</span>
+            </div>
+          </div>
+
+          {/* Right Column (55%): Live Interactive RAG Chunk Inspector Preview */}
+          <div className="w-full lg:w-[55%]">
+            <div className="rounded-xl border border-separator bg-surface-1 shadow-card overflow-hidden text-xs flex flex-col">
+              {/* Card Header Bar */}
+              <div className="p-3 bg-surface-2/60 border-b border-separator flex flex-wrap items-center justify-between gap-2">
+                {/* Interactive Strategy Dropdown */}
+                <div className="relative">
+                  <select
+                    value={heroStrategyIndex}
+                    onChange={(e) => setHeroStrategyIndex(Number(e.target.value))}
+                    aria-label="Select preview chunking strategy"
+                    className="appearance-none font-mono text-2xs font-medium pl-2.5 pr-7 py-1.5 rounded-md border border-separator bg-surface-1 text-text hover:bg-surface-2 transition-colors cursor-pointer focus-ring"
+                  >
+                    {HERO_STRATEGIES.map((s, idx) => (
+                      <option key={s.id} value={idx}>
+                        {s.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="h-3 w-3 text-text-muted absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </div>
+
+                {/* Token Distribution Metric & Segmented Bar */}
+                <div className="flex items-center gap-2 font-mono text-2xs text-text-secondary">
+                  <span>Token distribution</span>
+                  <div className="h-2 w-24 rounded-full bg-surface-3 overflow-hidden flex" aria-hidden="true">
+                    <div style={{ width: activeHeroStrategy.amberRatio }} className="h-full bg-[var(--chunk-0)]" />
+                    <div style={{ width: activeHeroStrategy.sageRatio }} className="h-full bg-[var(--chunk-1)]" />
+                  </div>
+                  <span className="tabular-nums font-semibold text-text">{activeHeroStrategy.totalTokens}</span>
+                </div>
+              </div>
+
+              {/* Stacked Live Chunks */}
+              <div className="p-3.5 space-y-3 bg-surface-1">
+                {/* Chunk 1 (Warm Amber) */}
+                <div className="rounded-lg overflow-hidden border border-[var(--chunk-0)]/30">
+                  <div className="px-3 py-1.5 bg-[var(--chunk-0-bg)] text-text font-mono text-2xs font-semibold flex items-center justify-between border-b border-[var(--chunk-0)]/20">
+                    <span>{activeHeroStrategy.chunk1.tag}</span>
+                  </div>
+                  <div className="p-3 bg-surface-1 font-mono text-2xs sm:text-xs leading-relaxed text-text">
+                    {activeHeroStrategy.chunk1.snippets.map((sn, sIdx) =>
+                      sn.highlight === 'amber' ? (
+                        <mark
+                          key={sIdx}
+                          className="bg-[var(--chunk-0-bg)] text-text px-1 py-0.5 rounded font-medium not-italic"
+                        >
+                          {sn.text}
+                        </mark>
+                      ) : (
+                        <span key={sIdx}>{sn.text}</span>
+                      )
+                    )}
+                  </div>
+                </div>
+
+                {/* Chunk 2 (Soft Sage) */}
+                <div className="rounded-lg overflow-hidden border border-[var(--chunk-1)]/30">
+                  <div className="px-3 py-1.5 bg-[var(--chunk-1-bg)] text-text font-mono text-2xs font-semibold flex items-center justify-between border-b border-[var(--chunk-1)]/20">
+                    <span>{activeHeroStrategy.chunk2.tag}</span>
+                  </div>
+                  <div className="p-3 bg-surface-1 font-mono text-2xs sm:text-xs leading-relaxed text-text">
+                    {activeHeroStrategy.chunk2.snippets.map((sn, sIdx) =>
+                      sn.highlight === 'sage' ? (
+                        <mark
+                          key={sIdx}
+                          className="bg-[var(--chunk-1-bg)] text-text px-1 py-0.5 rounded font-medium not-italic"
+                        >
+                          {sn.text}
+                        </mark>
+                      ) : (
+                        <span key={sIdx}>{sn.text}</span>
+                      )
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Status Ribbon */}
+              <div className="px-3.5 py-2 bg-surface-2/60 border-t border-separator flex items-center justify-between text-2xs font-mono text-text-secondary select-none">
+                <span>OVERLAP: {activeHeroStrategy.overlap}</span>
+                <span>{activeHeroStrategy.statusRight}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -276,11 +445,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
         <div className="max-w-5xl mx-auto">
           {/* Section Header */}
           <div className="mb-6">
-            <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-surface-1 border border-separator text-2xs font-mono text-accent mb-2 font-semibold shadow-subtle">
-              <SlidersHorizontal className="h-3 w-3" />
-              <span>Interactive Engine Sandbox</span>
-            </div>
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-text">
+            <h2 className="text-2xl sm:text-3xl font-serif font-normal tracking-tight text-text">
               Live Document Chunking Simulation
             </h2>
             <p className="text-xs sm:text-sm text-text-secondary mt-1 max-w-2xl">
@@ -293,7 +458,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
             {/* Top Toolbar: Corpus Presets Tabs + Strategy Switcher */}
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 pb-4 mb-4 border-b border-separator">
               <div className="flex items-center flex-wrap gap-2">
-                <span className="text-2xs font-mono font-medium text-text-tertiary">Corpus:</span>
+                <span className="text-2xs font-mono font-medium text-text-secondary">Corpus:</span>
                 <div className="flex items-center p-1 rounded-control bg-surface-2 border border-separator text-xs">
                   {Object.entries(MINI_SAMPLES).map(([key, data]) => (
                     <button
@@ -469,9 +634,9 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
           <div className="text-center max-w-xl mx-auto mb-10">
             <div className="inline-flex items-center space-x-1.5 text-2xs font-mono text-accent mb-1 font-semibold">
               <Calculator className="h-3.5 w-3.5" />
-              <span>Step-by-Step Cost Calculator</span>
+              <span>Token Economics</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-text mb-2">
+            <h2 className="text-2xl sm:text-3xl font-serif font-normal tracking-tight text-text mb-2">
               Embedding Ingestion Cost Formula
             </h2>
             <p className="text-xs sm:text-sm text-text-secondary">
@@ -693,8 +858,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
       <section className="py-16 px-4 sm:px-6 bg-surface-2/30 border-y border-separator">
         <div className="max-w-6xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-14">
-            <span className="text-xs font-mono text-accent font-semibold">Core Product Rationale</span>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-text mt-1 mb-2">
+            <h2 className="text-2xl sm:text-3xl font-serif font-normal tracking-tight text-text mb-2">
               Three Failures Solved by Visual Chunking
             </h2>
             <p className="text-xs sm:text-sm text-text-secondary">
@@ -753,10 +917,6 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
           <div className="p-6 rounded-card border border-separator bg-surface-1 shadow-subtle">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-5 pb-4 border-b border-separator">
               <div>
-                <div className="inline-flex items-center space-x-1.5 text-2xs font-mono text-accent mb-1 font-semibold">
-                  <Grid3X3 className="h-3.5 w-3.5" />
-                  <span>Interactive Heatmap Preview</span>
-                </div>
                 <h3 className="text-base font-bold text-text">Cross-Chunk Lexical Overlap Matrix</h3>
               </div>
               <div className="text-2xs font-mono text-text-tertiary">
@@ -769,7 +929,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
               <div className="md:col-span-7 flex justify-center">
                 <div className="inline-block p-2.5 rounded-control bg-surface-2 border border-separator select-none shadow-subtle">
                   {/* Column Headers */}
-                  <div className="grid grid-cols-5 gap-1.5 mb-1.5 text-2xs font-mono text-text-tertiary text-center">
+                  <div className="grid grid-cols-5 gap-1.5 mb-1.5 text-2xs font-mono text-text-secondary text-center">
                     <span />
                     <span>#1</span>
                     <span>#2</span>
@@ -779,7 +939,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
 
                   {miniHeatmapData.map((row, rIdx) => (
                     <div key={`row-${rIdx}`} className="grid grid-cols-5 gap-1.5 mb-1.5 items-center">
-                      <span className="text-2xs font-mono text-text-tertiary text-center w-6">#{rIdx + 1}</span>
+                      <span className="text-2xs font-mono text-text-secondary text-center w-6">#{rIdx + 1}</span>
                       {row.map((score, cIdx) => {
                         const isSelf = rIdx === cIdx;
                         const isSelected = activeHeatmapCell.r === rIdx && activeHeatmapCell.c === cIdx;
@@ -814,7 +974,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
 
               {/* Inspection Card (5 cols) */}
               <div className="md:col-span-5 p-5 rounded-control bg-surface-2 border border-separator text-xs space-y-3 font-mono shadow-subtle">
-                <div className="flex items-center justify-between text-2xs text-text-tertiary border-b border-separator pb-2 font-semibold">
+                <div className="flex items-center justify-between text-2xs text-text-secondary border-b border-separator pb-2 font-semibold">
                   <span>Pair Continuity Diagnostics</span>
                   <span className="text-text-secondary">Chunk #{activeHeatmapCell.r + 1} &harr; #{activeHeatmapCell.c + 1}</span>
                 </div>
@@ -948,11 +1108,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
       {/* 5. PRODUCT ROADMAP & UPCOMING CAPABILITIES */}
       <section className="py-20 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center space-x-1.5 text-2xs font-mono text-accent mb-2 font-semibold">
-            <Layers className="h-3.5 w-3.5" />
-            <span>Product Architecture</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-text mb-3">
+          <h2 className="text-2xl sm:text-3xl font-serif font-normal tracking-tight text-text mb-3">
             Engineered for Production RAG
           </h2>
           <p className="text-xs sm:text-sm text-text-secondary max-w-xl mx-auto mb-8 leading-relaxed font-sans">
@@ -1006,7 +1162,7 @@ export const LandingOverview: React.FC<LandingOverviewProps> = ({
       <section className="py-16 px-4 sm:px-6 bg-surface-2/30 border-t border-separator">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold tracking-tight text-text mb-2">Frequently Asked Questions</h2>
+            <h2 className="text-2xl font-serif font-normal tracking-tight text-text mb-2">Frequently Asked Questions</h2>
             <p className="text-xs sm:text-sm text-text-secondary">
               Everything you need to know about ChunkLens architecture, security, and integration.
             </p>

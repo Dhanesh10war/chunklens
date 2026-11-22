@@ -37,7 +37,7 @@ describe('Learn Track Curriculum & View Components', () => {
     expect(html).toContain('Module 1: RAG Foundations');
     expect(html).toContain('1.1 What is RAG? (Retrieval-Augmented Generation)');
     expect(html).toContain('3.2 The Chunk Size Trade-Off: Precision vs Context');
-    expect(html).toContain('Planned');
+    expect(html).toContain('Available');
   });
 
   it('renders Lesson 1.1 with breadcrumbs, TL;DR, and key takeaways', () => {

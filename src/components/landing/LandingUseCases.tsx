@@ -105,7 +105,7 @@ export const LandingUseCases: React.FC<LandingUseCasesProps> = ({ onLaunchApp })
       <div className="text-center max-w-3xl mx-auto mb-14">
         <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-control bg-accent-subtle text-accent text-2xs font-mono font-semibold mb-3 border border-accent/25">
           <Briefcase className="h-3 w-3" />
-          <span>Production RAG Verticals</span>
+          <span>Enterprise Archetypes</span>
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-text mb-4">
           Engineered for High-Stakes RAG Workflows

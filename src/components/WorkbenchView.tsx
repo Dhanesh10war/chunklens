@@ -35,12 +35,15 @@ const prefetchSimilarityHeatmap = () =>
   import('./SimilarityHeatmap').then((m) => ({ default: m.SimilarityHeatmap }));
 const prefetchTokenizerModal = () =>
   import('./TokenizerComparisonModal').then((m) => ({ default: m.TokenizerComparisonModal }));
+const prefetchProModal = () =>
+  import('./pro/ProWaitlistModal').then((m) => ({ default: m.ProWaitlistModal }));
 
 const CommandPalette = React.lazy(prefetchCommandPalette);
 const ComparisonView = React.lazy(prefetchComparisonView);
 const ExportModal = React.lazy(prefetchExportModal);
 const SimilarityHeatmap = React.lazy(prefetchSimilarityHeatmap);
 const TokenizerComparisonModal = React.lazy(prefetchTokenizerModal);
+const ProWaitlistModal = React.lazy(prefetchProModal);
 
 export interface WorkbenchViewProps {
   onOpenLanding: () => void;
@@ -135,6 +138,7 @@ export const WorkbenchView: React.FC<WorkbenchViewProps> = ({
   const [isCompareMode, setIsCompareMode] = useState<boolean>(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState<boolean>(false);
   const [isTokenizerModalOpen, setIsTokenizerModalOpen] = useState<boolean>(false);
+  const [isProModalOpen, setIsProModalOpen] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'visualizer' | 'heatmap' | 'editor'>('visualizer');
 
   // VS Code / Cursor-style draggable resizable sidebar
@@ -508,6 +512,7 @@ export const WorkbenchView: React.FC<WorkbenchViewProps> = ({
         onOpenLandingPage={onOpenLanding}
         onShareClick={handleShareSetup}
         onOpenLearningModal={() => onOpenLearnTrack()}
+        onOpenProModal={() => setIsProModalOpen(true)}
         onPrefetchExport={prefetchExportModal}
         onPrefetchCommandPalette={prefetchCommandPalette}
         onPrefetchTokenizer={prefetchTokenizerModal}
@@ -758,6 +763,18 @@ export const WorkbenchView: React.FC<WorkbenchViewProps> = ({
               rawText={rawText}
               chunks={chunkingResult.chunks}
               baselineEncoding={config.encoding}
+            />
+          )}
+        </Suspense>
+      </ChunkLoadErrorBoundary>
+
+      {/* Pro & Enterprise Early Access Waitlist Modal */}
+      <ChunkLoadErrorBoundary fallbackTitle="Failed to load Pro Options">
+        <Suspense fallback={isProModalOpen ? <ModalLoadingFallback label="Loading Pro options..." /> : null}>
+          {isProModalOpen && (
+            <ProWaitlistModal
+              isOpen={isProModalOpen}
+              onClose={() => setIsProModalOpen(false)}
             />
           )}
         </Suspense>

@@ -25,11 +25,11 @@ test.describe('Zero Network Egress & Strict CSP (Item 3.1 Proof)', () => {
     await page.goto('/?view=app');
     await page.waitForLoadState('networkidle');
 
-    // Verify CSP meta tag exists in DOM with connect-src 'none'
+    // Verify CSP meta tag exists in DOM with strict connect-src allowing only self and forms relay
     const cspMeta = await page.$('meta[http-equiv="Content-Security-Policy"]');
     expect(cspMeta).not.toBeNull();
     const cspContent = await cspMeta?.getAttribute('content');
-    expect(cspContent).toContain("connect-src 'none'");
+    expect(cspContent).toContain("connect-src 'self' https://api.web3forms.com");
     expect(cspContent).toContain("worker-src 'self' blob:");
     expect(cspContent).toContain("font-src 'self'");
 

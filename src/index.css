@@ -4,6 +4,14 @@
 
 /* Self-Hosted Fonts (Zero Network Egress) */
 @font-face {
+  font-family: 'Instrument Serif';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/InstrumentSerif-Regular.woff2') format('woff2');
+}
+
+@font-face {
   font-family: 'Inter';
   font-weight: 400;
   font-display: swap;
@@ -47,27 +55,28 @@
 :root,
 [data-theme="light"],
 .light {
-  /* Core Surfaces (Light) */
-  --bg: oklch(0.97 0.002 270);
-  --surface-1: oklch(1 0 0);
-  --surface-2: oklch(0.955 0.003 270);
-  --surface-3: oklch(0.93 0.004 270);
-  --surface-toolbar: oklch(1 0 0 / 0.78);
+  /* Core Surfaces (Warm Editorial Paper) */
+  --bg: #FAF9F6;
+  --surface-1: #FFFFFF;
+  --surface-2: #F3F1EC;
+  --surface-3: #ECE9E2;
+  --surface-toolbar: rgba(250, 249, 246, 0.85);
 
-  /* Typography - Tuned for WCAG 2.2 AA (>= 4.5:1 body text in both modes) */
-  --text: oklch(0.22 0.005 270);           /* 15.9:1 vs bg, 17.4:1 vs surface-1 */
-  --text-secondary: oklch(0.42 0.01 270);  /* 7.2:1 vs bg, 7.8:1 vs surface-1 */
-  --text-tertiary: oklch(0.50 0.01 270);   /* 5.3:1 vs bg, 4.9:1 vs chunk tints */
-  --text-accent: oklch(0.48 0.16 255);     /* >= 5.4:1 vs all light surfaces */
+  /* Typography */
+  --text: #18181B;
+  --text-secondary: #52525B;
+  --text-muted: #64646D;
+  --text-tertiary: #64646D;
+  --text-accent: #B83D14;
 
   /* Hairlines and Separators */
-  --separator: oklch(0 0 0 / 0.08);
-  --separator-subtle: oklch(0 0 0 / 0.04);
+  --separator: #E6E1D8;
+  --separator-subtle: rgba(230, 225, 216, 0.6);
 
-  /* Unified System Accent (In-gamut sRGB, >= 4.5:1 vs #FFFFFF) */
-  --accent: oklch(0.50 0.16 255);
-  --accent-hover: oklch(0.45 0.16 255);
-  --accent-subtle: oklch(0.50 0.16 255 / 0.10);
+  /* Unified System Accent (Terracotta #D94E1F, tested in primitives.test.tsx) */
+  --accent: oklch(0.55 0.18 38);
+  --accent-hover: #C2410C;
+  --accent-subtle: rgba(217, 78, 31, 0.08);
   --accent-ring: var(--accent);
   --on-accent: #FFFFFF;
 
@@ -94,53 +103,54 @@
   --status-error-text: oklch(0.45 0.18 25);
   --status-danger: var(--status-error);
 
-  /* Light Shadows: Soft and layered */
-  --shadow-subtle: 0 1px 2px 0 oklch(0 0 0 / 0.05);
-  --shadow-card: 0 1px 3px 0 oklch(0 0 0 / 0.04), 0 4px 12px 0 oklch(0 0 0 / 0.03);
-  --shadow-elevated: 0 4px 14px 0 oklch(0 0 0 / 0.08), 0 1px 2px 0 oklch(0 0 0 / 0.04);
-  --shadow-modal: 0 12px 32px 0 oklch(0 0 0 / 0.12), 0 2px 6px 0 oklch(0 0 0 / 0.04);
+  /* Light Shadows: Soft and crisp hairlines */
+  --shadow-subtle: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 4px 12px 0 rgba(0, 0, 0, 0.02);
+  --shadow-elevated: 0 4px 14px 0 rgba(0, 0, 0, 0.06), 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-modal: 0 12px 32px 0 rgba(0, 0, 0, 0.10), 0 2px 6px 0 rgba(0, 0, 0, 0.04);
 
-  /* 6 Equal Lightness/Chroma Data Viz Chunk Colors (L=0.62, C=0.14) */
-  --chunk-0: oklch(0.62 0.14 255);
-  --chunk-0-bg: oklch(0.62 0.14 255 / 0.10);
-  --chunk-1: oklch(0.62 0.14 190);
-  --chunk-1-bg: oklch(0.62 0.14 190 / 0.10);
-  --chunk-2: oklch(0.62 0.14 150);
-  --chunk-2-bg: oklch(0.62 0.14 150 / 0.10);
-  --chunk-3: oklch(0.62 0.14 85);
-  --chunk-3-bg: oklch(0.62 0.14 85 / 0.10);
-  --chunk-4: oklch(0.62 0.14 25);
-  --chunk-4-bg: oklch(0.62 0.14 25 / 0.10);
-  --chunk-5: oklch(0.62 0.14 330);
-  --chunk-5-bg: oklch(0.62 0.14 330 / 0.10);
+  /* Semantic Chunk Palette (Warm Editorial Paper) */
+  --chunk-0: #92400E;
+  --chunk-0-bg: #FEF3C7;
+  --chunk-1: #166534;
+  --chunk-1-bg: #DCFCE7;
+  --chunk-2: #D94E1F;
+  --chunk-2-bg: rgba(217, 78, 31, 0.12);
+  --chunk-3: #475569;
+  --chunk-3-bg: #F1F5F9;
+  --chunk-4: #65A30D;
+  --chunk-4-bg: #ECFCCB;
+  --chunk-5: #B45309;
+  --chunk-5-bg: #FFEDD5;
 
   /* Compatibility Semantic Aliases */
-  --border-hover: oklch(0 0 0 / 0.16);
+  --border-hover: rgba(0, 0, 0, 0.16);
 }
 
 [data-theme="dark"],
 .dark {
-  /* Core Surfaces (Dark) - Lighter surfaces for elevation */
-  --bg: oklch(0.15 0.004 270);
-  --surface-1: oklch(0.21 0.005 270);
-  --surface-2: oklch(0.26 0.006 270);
-  --surface-3: oklch(0.31 0.007 270);
-  --surface-toolbar: oklch(0.15 0.004 270 / 0.78);
+  /* Core Surfaces (Warm Studio Charcoal) */
+  --bg: #121110;
+  --surface-1: #1A1917;
+  --surface-2: #22201E;
+  --surface-3: #2A2825;
+  --surface-toolbar: rgba(18, 17, 16, 0.85);
 
-  /* Typography - Tuned for WCAG 2.2 AA (>= 4.5:1 body text in both modes) */
-  --text: oklch(0.97 0 0);                 /* 18.1:1 vs bg, 16.3:1 vs surface-1 */
-  --text-secondary: oklch(0.75 0.01 270);  /* 8.7:1 vs bg, 7.8:1 vs surface-1 */
-  --text-tertiary: oklch(0.64 0.01 270);   /* 5.9:1 vs bg, 5.3:1 vs surface-1, 4.6:1 vs surface-2 */
-  --text-accent: oklch(0.72 0.12 255);     /* >= 5.3:1 vs all dark surfaces (WCAG AA) */
+  /* Typography */
+  --text: #F4F1EA;
+  --text-secondary: #A8A29E;
+  --text-muted: #98928D;
+  --text-tertiary: #98928D;
+  --text-accent: #F0784D;
 
   /* Hairlines and Separators */
-  --separator: oklch(1 0 0 / 0.10);
-  --separator-subtle: oklch(1 0 0 / 0.05);
+  --separator: #2E2B28;
+  --separator-subtle: rgba(46, 43, 40, 0.6);
 
-  /* Unified System Accent (In-gamut sRGB, >= 4.5:1 vs #FFFFFF) */
-  --accent: oklch(0.55 0.15 255);
-  --accent-hover: oklch(0.50 0.15 255);
-  --accent-subtle: oklch(0.55 0.15 255 / 0.14);
+  /* Unified System Accent (Burnt Vermilion #E05A2B, tested in primitives.test.tsx) */
+  --accent: oklch(0.58 0.185 38);
+  --accent-hover: #EA6A3D;
+  --accent-subtle: rgba(224, 90, 43, 0.14);
   --accent-ring: var(--accent);
   --on-accent: #FFFFFF;
 
@@ -167,28 +177,28 @@
   --status-error-text: oklch(0.82 0.14 25);
   --status-danger: var(--status-error);
 
-  /* Dark Shadows: Subtle 1px inner top highlight instead of muddy dark drop shadows */
-  --shadow-subtle: inset 0 1px 0 oklch(1 0 0 / 0.06);
-  --shadow-card: inset 0 1px 0 oklch(1 0 0 / 0.06);
-  --shadow-elevated: inset 0 1px 0 oklch(1 0 0 / 0.06), 0 8px 24px 0 oklch(0 0 0 / 0.40);
-  --shadow-modal: inset 0 1px 0 oklch(1 0 0 / 0.08), 0 20px 40px 0 oklch(0 0 0 / 0.60);
+  /* Dark Shadows: Subtle 1px inner top highlight */
+  --shadow-subtle: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-card: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-elevated: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 8px 24px 0 rgba(0, 0, 0, 0.40);
+  --shadow-modal: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 20px 40px 0 rgba(0, 0, 0, 0.60);
 
-  /* 6 Equal Lightness/Chroma Data Viz Chunk Colors (L=0.74, C=0.13) */
-  --chunk-0: oklch(0.74 0.13 255);
-  --chunk-0-bg: oklch(0.74 0.13 255 / 0.14);
-  --chunk-1: oklch(0.74 0.13 190);
-  --chunk-1-bg: oklch(0.74 0.13 190 / 0.14);
-  --chunk-2: oklch(0.74 0.13 150);
-  --chunk-2-bg: oklch(0.74 0.13 150 / 0.14);
-  --chunk-3: oklch(0.74 0.13 85);
-  --chunk-3-bg: oklch(0.74 0.13 85 / 0.14);
-  --chunk-4: oklch(0.74 0.13 25);
-  --chunk-4-bg: oklch(0.74 0.13 25 / 0.14);
-  --chunk-5: oklch(0.74 0.13 330);
-  --chunk-5-bg: oklch(0.74 0.13 330 / 0.14);
+  /* Semantic Chunk Palette (Warm Studio Charcoal) */
+  --chunk-0: #D4A373;
+  --chunk-0-bg: rgba(212, 163, 115, 0.14);
+  --chunk-1: #5E8A75;
+  --chunk-1-bg: rgba(94, 138, 117, 0.14);
+  --chunk-2: #E05A2B;
+  --chunk-2-bg: rgba(224, 90, 43, 0.14);
+  --chunk-3: #94A3B8;
+  --chunk-3-bg: rgba(148, 163, 184, 0.12);
+  --chunk-4: #84CC16;
+  --chunk-4-bg: rgba(132, 204, 22, 0.12);
+  --chunk-5: #F59E0B;
+  --chunk-5-bg: rgba(245, 158, 11, 0.12);
 
   /* Compatibility Semantic Aliases */
-  --border-hover: oklch(1 0 0 / 0.18);
+  --border-hover: rgba(255, 255, 255, 0.16);
 }
 
 @layer base {
@@ -307,9 +317,6 @@ html.theme-transitioning * {
   }
   .title-tracking {
     letter-spacing: -0.01em;
-  }
-  .hero-glow {
-    background-image: radial-gradient(circle 700px at 50% 0%, var(--accent-subtle), transparent 75%);
   }
   .card-interactive {
     transition: transform 180ms cubic-bezier(0.23, 1, 0.32, 1),
