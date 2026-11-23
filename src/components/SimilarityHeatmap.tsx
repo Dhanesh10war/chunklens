@@ -114,7 +114,7 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
     : null;
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden bg-bg text-text">
+    <div className="flex-1 flex flex-col overflow-hidden min-h-0 min-w-0 bg-bg text-text">
       {/* Metric Highlights Bar */}
       <div className="px-4 sm:px-6 py-2.5 border-b border-separator bg-surface-1/40 surface-translucent flex flex-wrap items-center justify-between gap-4 text-xs select-none">
         <div className="flex items-center space-x-4 sm:space-x-6 flex-wrap gap-y-2">
@@ -334,46 +334,55 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
       )}
 
       {/* Main Workspace: Heatmap Grid & Inspector */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden min-h-0 min-w-0">
         {/* Heatmap Matrix Grid Container */}
         <div
           tabIndex={0}
           role="region"
           aria-label="Similarity matrix grid"
-          className="flex-1 overflow-auto p-4 sm:p-6 flex flex-col focus:outline-none"
+          className="flex-1 overflow-auto flex flex-col min-h-0 min-w-0 focus:outline-none"
         >
-          <div className="inline-block min-w-full">
-            {/* Top Column Index Header */}
-            <div className="flex items-center mb-1 pl-12 sticky top-0 z-10 bg-bg pb-1">
-              {displayChunks.map((_, colIdx) => (
-                <div
-                  key={`col-head-${colIdx}`}
-                  className="w-10 text-center font-mono text-xs text-text-tertiary shrink-0 select-none tabular-nums"
-                  title={`Chunk #${colIdx + 1}`}
-                >
-                  #{colIdx + 1}
-                </div>
-              ))}
+          <div className="w-max min-w-full">
+            {/* Top Column Index Header (Sticky in Y-axis) */}
+            <div className="flex items-center mb-1 sticky top-0 z-30 bg-bg pt-3 pb-1 border-b border-separator/40 w-max min-w-full">
+              {/* Top-Left Locked Corner Spacer (Sticks in both X & Y axes to prevent collision) */}
+              <div
+                data-testid="heatmap-corner-spacer"
+                className="w-14 shrink-0 sticky left-0 z-40 bg-bg border-r border-separator/40 self-stretch"
+                aria-hidden="true"
+              />
+              {/* Column Index Labels */}
+              <div className="flex items-center gap-1 shrink-0 pl-1 relative z-0">
+                {displayChunks.map((_, colIdx) => (
+                  <div
+                    key={`col-head-${colIdx}`}
+                    className="w-10 text-center font-mono text-xs text-text-tertiary shrink-0 select-none tabular-nums"
+                    title={`Chunk #${colIdx + 1}`}
+                  >
+                    #{colIdx + 1}
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Heatmap Rows */}
-            <div className="space-y-1">
+            <div className="space-y-1 w-max min-w-full">
               {matrix.map((rowScores, rowIdx) => (
                 <div
                   key={`row-${rowIdx}`}
-                  className="flex items-center"
-                  style={{ contentVisibility: 'auto', containIntrinsicSize: '0 36px' }}
+                  className="flex items-center w-max min-w-full"
+                  style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 36px' }}
                 >
-                  {/* Row Index Label */}
+                  {/* Row Index Label (Sticky in X-axis) */}
                   <div
-                    className="w-12 text-right pr-2 font-mono text-xs text-text-tertiary shrink-0 select-none tabular-nums sticky left-0 z-10 bg-bg"
+                    className="w-14 h-8 flex items-center justify-end pr-2.5 pl-2 font-mono text-xs text-text-tertiary shrink-0 select-none tabular-nums sticky left-0 z-20 bg-bg border-r border-separator/40"
                     title={`Chunk #${rowIdx + 1}`}
                   >
                     #{rowIdx + 1}
                   </div>
 
                   {/* Row Cells */}
-                  <div className="flex items-center space-x-1">
+                  <div className="flex items-center gap-1 shrink-0 pl-1 relative z-0">
                     {rowScores.map((score, colIdx) => {
                       const isSelf = rowIdx === colIdx;
                       const isSelected =
@@ -407,7 +416,7 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
                             isAdjacent ? ' (Adjacent boundary)' : ''
                           }`}
                           className={cn(
-                            'w-10 h-8 rounded-control text-xs font-mono border flex items-center justify-center select-none tabular-nums font-medium transition-all active-press focus-ring',
+                            'w-10 h-8 shrink-0 rounded-control text-xs font-mono border flex items-center justify-center select-none tabular-nums font-medium transition-all active-press focus-ring',
                             'border-separator/30 hover:-translate-y-[1px] hover:outline hover:outline-2 hover:outline-accent hover:outline-offset-1 hover:z-20',
                             isDimmed && 'opacity-30 hover:opacity-100',
                             isSelected && 'ring-2 ring-accent ring-offset-1 ring-offset-bg z-10',
@@ -426,7 +435,7 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
 
           {/* Adjacent Continuity Stepper Track */}
           {adjacentSimilarities.length > 0 && (
-            <div className="mt-8 pt-4 border-t border-separator">
+            <div className="mt-8 pt-4 border-t border-separator px-4 pb-2 max-w-4xl">
               <h4 className="text-xs font-semibold text-text mb-2 flex items-center gap-1.5 select-none">
                 <Info className="h-3.5 w-3.5 text-accent" />
                 Sequential Chunk Transition Continuity:
@@ -466,7 +475,7 @@ export const SimilarityHeatmap: React.FC<SimilarityHeatmapProps> = ({ chunks }) 
 
           {/* Redundancy Alerts Box */}
           {redundantPairs.length > 0 && (
-            <div className="mt-6 p-3.5 rounded-card bg-status-warn-subtle border border-status-warn/25 text-xs">
+            <div className="mt-6 mx-4 p-3.5 rounded-card bg-status-warn-subtle border border-status-warn/25 text-xs max-w-4xl mb-6">
               <div className="flex items-center space-x-2 text-status-warn-text font-semibold mb-2">
                 <AlertTriangle className="h-4 w-4 shrink-0 text-status-warn" />
                 <span>Detected {redundantPairs.length} High-Similarity Chunk Pair(s) (&gt;70%)</span>

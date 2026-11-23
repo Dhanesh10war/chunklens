@@ -99,4 +99,49 @@ describe('SimilarityHeatmap', () => {
     expect(html).toContain('Adjacent-Neighbor Boundary Continuity');
     expect(html).toContain('aria-label="Adjacent-neighbor continuity sparkline"');
   });
+
+  it('renders all columns and cells for 65 chunks with locked sticky corner and zero drift', () => {
+    const chunks65: ChunkMetadata[] = Array.from({ length: 65 }, (_, i) => ({
+      id: `chunk-${i}`,
+      index: i,
+      text: `Chunk index ${i} discussing technical embeddings and vector similarities in data pipelines.`,
+      startCharIndex: i * 80,
+      endCharIndex: i * 80 + 75,
+      charCount: 75,
+      tokenCount: 16,
+      overlapPrevChars: 0,
+      overlapNextChars: 0,
+      isOrphan: false,
+    }));
+
+    const html = renderToString(<SimilarityHeatmap chunks={chunks65} />);
+
+    // 1. Verify locked sticky corner spacer is rendered with z-40 and left-0
+    expect(html).toContain('w-14 shrink-0 sticky left-0 z-40 bg-bg border-r border-separator/40 self-stretch');
+
+    // 2. Verify top column header is sticky top-0 with z-30 and full max-content width
+    expect(html).toContain('sticky top-0 z-30 bg-bg pt-3 pb-1 border-b border-separator/40 w-max min-w-full');
+
+    // 3. Verify column header container uses identical gap-1 and pl-1 as rows
+    expect(html).toContain('flex items-center gap-1 shrink-0 pl-1 relative z-0');
+
+    // 4. Verify cell buttons have shrink-0 to prevent compression or cutoff
+    expect(html).toContain('w-10 h-8 shrink-0 rounded-control');
+
+    // 5. Verify row labels are sticky left-0 with border-r and z-20
+    expect(html).toContain('sticky left-0 z-20 bg-bg border-r border-separator/40');
+    expect(html).toContain('w-14 h-8 flex items-center justify-end');
+
+    // 6. Verify row container has w-max min-w-full
+    expect(html).toContain('w-max min-w-full');
+
+    // 7. Verify all 65 headers from #1 to #65 exist in HTML
+    expect(html).toContain('title="Chunk #1"');
+    expect(html).toContain('title="Chunk #30"');
+    expect(html).toContain('title="Chunk #49"');
+    expect(html).toContain('title="Chunk #65"');
+
+    // 8. Verify diagonal cell exists for chunk 65
+    expect(html).toContain('id="heatmap-cell-64-64"');
+  });
 });

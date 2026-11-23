@@ -574,7 +574,7 @@ export const WorkbenchView: React.FC<WorkbenchViewProps> = ({
         )}
 
         {/* Hero Content Canvas */}
-        <main className="flex-1 flex flex-col min-w-0 bg-bg-base overflow-hidden">
+        <main className="flex-1 flex flex-col min-w-0 min-h-0 bg-bg-base overflow-hidden">
           {!rawText.trim() ? (
             <EmptyState
               onSelectSample={handleSelectSample}
@@ -624,7 +624,7 @@ export const WorkbenchView: React.FC<WorkbenchViewProps> = ({
               </div>
 
               {/* Main View Area */}
-              <div className="flex-1 overflow-hidden flex">
+              <div className="flex-1 overflow-hidden flex min-h-0 min-w-0">
                 {activeTab === 'editor' ? (
                   <div className="flex-1 p-6 flex flex-col bg-bg-base">
                     <div className="flex items-center justify-between pb-2 text-xs">

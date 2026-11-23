@@ -1,8 +1,12 @@
 import { defineConfig } from '@playwright/test';
+import fs from 'node:fs';
 
 // Config portability: Optional environment variable PW_CHROME_PATH.
-// When omitted, Playwright defaults to its own browser binaries.
-const executablePath = process.env.PW_CHROME_PATH || undefined;
+// When omitted, check standard local cache fallback or default browser binaries.
+const localChromePath = '/home/drago/.cache/ms-playwright/chromium-1254/chrome-linux64/chrome';
+const executablePath =
+  process.env.PW_CHROME_PATH ||
+  (fs.existsSync(localChromePath) ? localChromePath : undefined);
 
 // Proxy detection: Apply loopback bypass only when a proxy is configured in the environment
 const hasProxy = Boolean(
