@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1920px;
+      height: 1080px;
+      background: #07090E;
+      color: #F8FAFC;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .ambient-glow {
+      position: absolute;
+      width: 1000px;
+      height: 1000px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, rgba(6, 78, 59, 0.06) 45%, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .grid-stats {
+      display: flex;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+    .stat-pill {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 16px 28px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+    }
+    .stat-num {
+      font-size: 28px;
+      font-weight: 700;
+      color: #34D399;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: #94A3B8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .title {
+      font-size: 72px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      margin-bottom: 16px;
+      background: linear-gradient(180deg, #FFFFFF 30%, #94A3B8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .url-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 24px;
+      padding: 16px 36px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: 100px;
+      color: #FFFFFF;
+      font-size: 26px;
+      font-weight: 600;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      box-shadow: 0 0 35px rgba(16, 185, 129, 0.25);
+    }
+    .subtitle {
+      font-size: 22px;
+      color: #94A3B8;
+      margin-top: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-glow"></div>
+  <div class="grid-stats">
+    <div class="stat-pill">
+      <div class="stat-num">0 Network Egress</div>
+      <div class="stat-label">100% Client-Side Privacy</div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-num">433 Invariants</div>
+      <div class="stat-label">Full Test Suite Passed</div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-num">29 Lessons</div>
+      <div class="stat-label">Interactive RAG Academy</div>
+    </div>
+  </div>
+  <h1 class="title">Deploy Reliable RAG with ChunkLens.</h1>
+  <div class="url-box">
+    chunklensdev.vercel.app
+  </div>
+  <p class="subtitle">Free & open client-side visualizer. No sign-up required.</p>
+</body>
+</html>

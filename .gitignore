@@ -36,3 +36,9 @@ playwright-report-compat/
 audit/
 docs/audit/
 *.bundle
+media/*.mp4
+media/*.png
+media/*.webm
+media/*.txt
+
+
