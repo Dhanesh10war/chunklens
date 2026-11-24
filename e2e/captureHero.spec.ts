@@ -38,13 +38,18 @@ test('captures current workbench hero screenshot in dark mode for README', async
   const targetDark = path.resolve('docs/design/v1.0/workbench_1440_dark.png');
   const targetV1 = path.resolve('docs/design/v1.0/workbench_1440.png');
   const targetLegacy = path.resolve('docs/design/after-v0.3/loaded_1440.png');
-  const artifactTarget = '/home/drago/.gemini/antigravity/brain/d82582c0-32d4-44c7-a92d-d5a92eacd7ec/workbench_1440_dark.png';
+  const outputDir = path.join(process.cwd(), 'test-results');
+
+  // Ensure directories exist
+  await fs.promises.mkdir(outputDir, { recursive: true });
+  await fs.promises.mkdir(path.dirname(targetDark), { recursive: true });
+  await fs.promises.mkdir(path.dirname(targetLegacy), { recursive: true });
 
   // Take screenshot
   await page.screenshot({ path: targetDark, fullPage: false });
   fs.copyFileSync(targetDark, targetV1);
   fs.copyFileSync(targetDark, targetLegacy);
-  fs.copyFileSync(targetDark, artifactTarget);
+  fs.copyFileSync(targetDark, path.join(outputDir, 'workbench_1440_dark.png'));
 
   console.log('Saved dark mode workbench screenshot successfully!');
 });

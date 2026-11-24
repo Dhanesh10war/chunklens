@@ -24,7 +24,7 @@ export const LandingSecurity: React.FC<LandingSecurityProps> = ({ onLaunchApp })
   const siteUrl =
     typeof window !== 'undefined' && window.location?.origin && window.location.origin !== 'null'
       ? window.location.origin
-      : 'https://chunklens.com';
+      : 'https://chunklensdev.vercel.app';
 
   const curlTest = `curl -sI ${siteUrl} | grep -i content-security-policy
 # Expected response header:

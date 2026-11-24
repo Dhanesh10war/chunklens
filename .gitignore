@@ -40,5 +40,8 @@ media/*.mp4
 media/*.png
 media/*.webm
 media/*.txt
+media/raw/
+media/frames/
+
 
 

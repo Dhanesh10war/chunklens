@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import fs from 'node:fs';
+import path from 'node:path';
 
 test.describe('Similarity Heatmap 2D Alignment & No Truncation', () => {
   test('aligns column headers with cell columns with 0px drift and renders all cells during 2D scroll', async ({ page }) => {
@@ -86,10 +88,9 @@ test.describe('Similarity Heatmap 2D Alignment & No Truncation', () => {
     await expect(gridRegion).toBeVisible();
     await page.waitForTimeout(500);
 
-    // 4. Verify matrix has at least 60+ chunks (e.g. 65 × 65)
+    // 4. Verify matrix has at least 60+ chunks (e.g. 65 × 65), waiting for Web Worker
     const headerCols = gridRegion.locator('.sticky.top-0 [title^="Chunk #"]');
-    const headerCount = await headerCols.count();
-    expect(headerCount).toBeGreaterThanOrEqual(60);
+    await expect.poll(async () => headerCols.count(), { timeout: 10000 }).toBeGreaterThanOrEqual(60);
 
     // 5. Scroll to column ~16 (scrollLeft = 700px)
     await gridRegion.evaluate((el) => {
@@ -144,9 +145,11 @@ test.describe('Similarity Heatmap 2D Alignment & No Truncation', () => {
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.waitForTimeout(200);
 
-    // 10. Save screenshot of the fixed 65-chunk heatmap to verify visually
+    // 10. Save screenshot of the fixed 65-chunk heatmap to test-results
+    const outputDir = path.join(process.cwd(), 'test-results');
+    await fs.promises.mkdir(outputDir, { recursive: true });
     await page.screenshot({
-      path: '/home/drago/.gemini/antigravity/brain/d82582c0-32d4-44c7-a92d-d5a92eacd7ec/heatmap_65_chunks_scrolled.png',
+      path: path.join(outputDir, 'heatmap_65_chunks_scrolled.png'),
       fullPage: false,
     });
   });
