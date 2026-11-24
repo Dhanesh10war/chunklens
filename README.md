@@ -13,7 +13,7 @@
 
 ---
 
-![ChunkLens Workbench](docs/design/after-v0.3/loaded_1440.png)
+![ChunkLens Workbench](docs/design/v1.0/workbench_1440.png)
 
 ---
 
