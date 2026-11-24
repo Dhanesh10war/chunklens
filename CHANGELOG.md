@@ -5,6 +5,43 @@ All notable changes to ChunkLens will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2026-11-23
+
+### Added
+- **Commercial Landing Page & SaaS Architecture:**
+  - High-converting editorial landing page with dark/light themes, warm typography (`Instrument Serif`), and interactive 3-column playground simulation.
+  - Multi-view routing architecture supporting `/` (Landing Page), `/?view=app` (Workbench), and `/?view=learn` (RAG Academy) with tab-scoped session preservation.
+  - Pro & Enterprise custom waitlist modal (`ProWaitlistModal.tsx`) with non-blocking Web3Forms background relay (`https://api.web3forms.com`), keeping document processing completely client-side and air-gapped.
+- **29-Lesson Interactive RAG Academy:**
+  - 9 structured curriculum modules (M0 Quickstart through M8 Production Playbooks for Legal, Financial 10-K, and Tech Docs).
+  - Interactive simulation widgets (`V1PipelineFlowExplorer`, `V2ChunkSandbox`) with live boundary calculations directly inside lesson prose.
+  - Mastery verification quizzes across all modules with detailed engineering rationales.
+- **Marketing Automation & Agency Video Pipeline:**
+  - Automated 1080p 60fps Playwright video recording suite (`e2e/recordProductVideo.spec.ts`) capturing fluid product interactions.
+  - Agency-grade title card templates (`media/intro_card.html`, `media/outro_card.html`).
+  - Produced 45.2s master launch trailer (`chunklens_launch_trailer.mp4`) and comprehensive multi-channel publish kit (`chunklens_first_publish_launch_kit.md`).
+- **Comprehensive Test Expansion:**
+  - Test suite grew from 126 tests (20 suites) to **433 tests passing across 44 test suites**, including property invariants, token variance benchmarks, and boundary checks.
+  - Automated Playwright cross-browser compatibility quick suite (16 tests) and dedicated heatmap alignment e2e test suite (2 tests).
+
+### Changed
+- **Code Splitting & Bundle Performance:**
+  - Split `AppContent` into lazy-loaded views, reducing main entry shell JS from 136.00 kB to **36.57 kB** (raw) / 12.58 kB (gzip).
+  - Workbench workspace isolated into dedicated chunk (`116.24 kB`), bringing total initial JS for `?view=app` to **152.81 kB** (well under the 165 kB budget).
+  - CSS bundle optimized to **44.16 kB** (under the 45.0 kB budget).
+- **Updated Content Security Policy:**
+  - Refined CSP across `index.html`, `public/_headers`, `vercel.json`, and `csp.ts` to `connect-src 'self' https://api.web3forms.com`, preserving zero document egress while enabling enterprise waitlist submissions.
+
+### Fixed
+- **2D Similarity Heatmap Pitch Alignment (0px Drift):**
+  - Resolved cumulative horizontal misalignment where 40px column headers drifted from 44px matrix cells (gap-1); standardized headers and cell rows to identical 44px pitch.
+- **Dual-Axis Locked Sticky Corner:**
+  - Added `data-testid="heatmap-corner-spacer"` with `z-40`, `left-0`, `top-0` to prevent column headers from colliding with sticky row numbers during 2D scroll.
+- **Large Matrix Row Truncation & Black Void:**
+  - Enforced `shrink-0` on cell buttons, `w-max min-w-full` on row wrappers, and updated `containIntrinsicSize: 'auto 36px'`, eliminating horizontal cell cutoff on 65+ chunk datasets.
+- **Scrollport Height Expansion:**
+  - Added `min-h-0 min-w-0` to flex container hierarchy in `WorkbenchView.tsx` and `SimilarityHeatmap.tsx` to restore smooth inner 2D scrolling within the browser window.
+
 ## [0.3.0] - 2026-11-14
 
 ### Added

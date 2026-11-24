@@ -3,17 +3,29 @@
 ## Golden Commands
 - **Install:** `npm ci` (or `npm install`)
 - **Lint / Type-Check:** `npm run lint` / `npm run typecheck` (`tsc -b`)
-- **Unit Tests:** `npm run test` (`vitest run`)
-- **Verbose Tests:** `npm run test:verbose` (`vitest run --reporter=verbose`)
+- **Unit & Invariant Tests:** `npm test` (`vitest run` — 433 tests across 44 test suites)
+- **Compatibility Quick Suite:** `npm run test:compat:quick` (Playwright cross-browser tests)
+- **Heatmap Alignment E2E:** `npx playwright test e2e/heatmapAlignment.spec.ts`
+- **Video Recording E2E:** `npx playwright test e2e/recordProductVideo.spec.ts`
+- **Bundle Budget Check:** `npm run check:bundle` (Main JS $\le 185$ kB, Workbench $\le 120$ kB, Total $\le 165$ kB, CSS $\le 45$ kB)
 - **Production Build:** `npm run build` (`tsc -b && vite build`)
 - **Local Dev Server:** `npm run dev` (`vite`)
-- **Visual Capture & Audit:** `node --experimental-websocket scripts/capture-baseline.cjs after`
+- **Local Preview Server:** `npm run preview` (`vite preview`)
 
 ## Architecture Pointers
+- **Application Views (`src/components/` & `src/App.tsx`):**
+  - `LandingPage.tsx`: Root commercial SaaS landing page (`/`) with interactive strategy matrix and Pro waitlist.
+  - `WorkbenchView.tsx`: Interactive chunking workbench (`/?view=app`) with continuous canvas, metrics, and inspector.
+  - `LearnView.tsx`: 29-lesson interactive RAG Academy (`/?view=learn`) with curriculum map, quizzes, and sandboxes.
 - **Engine Core (`src/engine/`):**
   - `chunkers/`: Algorithm implementations (`markdownChunker`, `sentenceChunker`, `recursiveChunker`, `fixedChunker`, `tabularChunker`, `utils.ts`).
   - `tokenizers/`: BPE tokenizer wrapper (`tokenizer.ts`, `multiModelTokenizer.ts` using `js-tiktoken`).
+  - `embeddings/`: `vectorizer.ts` (TF-IDF and cosine similarity matrix calculation).
   - `types.ts`: Universal schemas (`ChunkingConfig`, `ChunkMetadata`, `ChunkingResult`).
+- **Interactive Widgets (`src/components/learning/widgets/`):**
+  - `V1PipelineFlowExplorer.tsx`: Interactive RAG architecture pipeline visualizer.
+  - `V2ChunkSandbox.tsx`: Live inline chunk boundary sandbox.
+  - `DecisionWizard.tsx`: Strategy selection diagnostic wizard.
 - **Exporters (`src/exporters/`):**
   - `codeExporters.ts`: Strategy-aware Python/TS code generator.
   - `dataExporters.ts`: RFC 4180 CSV & JSON dataset generator.
@@ -30,8 +42,10 @@
   - `Sidebar.tsx`: 300px collapsible configuration drawer (<1024px responsive overlay).
   - `MetricsBar.tsx`: Slim hairline summary strip with inline metric pairs and tabular numerals.
   - `VisualCanvas.tsx`: Hero continuous reading column with OKLCH chunk color bands and diagonal-hatch overlap ribbons.
+  - `SimilarityHeatmap.tsx`: 2D pairwise cosine similarity matrix with dual-axis locked sticky corner (`data-testid="heatmap-corner-spacer"`) and neighbor boundary continuity sparkline.
   - `ChunkInspector.tsx`: 320px pro inspector (<768px responsive bottom sheet) detailing boundary split reasons and neighbor context.
   - `CommandPalette.tsx`: ⌘K floating quick actions launcher.
+  - `ProWaitlistModal.tsx`: Enterprise & Pro waitlist modal with Web3Forms relay.
 
 ## Do-Not-Modify List
 - `package-lock.json` (do not hand-edit).

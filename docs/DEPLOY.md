@@ -34,9 +34,10 @@ Cloudflare Pages provides global edge hosting with native support for Vite singl
 
 ---
 
-## Target 2: Vercel
+## Target 2: Vercel (Production)
 
-Vercel provides edge deployment configured via `vercel.json`.
+ChunkLens is deployed to production on Vercel at:  
+👉 **`https://chunklensdev.vercel.app`**
 
 ### Build Configuration
 
@@ -44,23 +45,21 @@ Vercel provides edge deployment configured via `vercel.json`.
 - **Build command**: `npm run build`
 - **Output directory**: `dist`
 - **Node.js version**: `22.x`
+- **Production Branch**: `main`
 
-### Vercel Dashboard Setup (as of November 2026, verify in the dashboard)
+### Routing & View Architecture
 
-1. Sign in to the Vercel dashboard.
-2. Select **Add New...** > **Project**.
-3. Import the `chunklens` repository.
-4. Under **Build and Output Settings**, Vercel detects Vite automatically:
-   - Framework Preset: `Vite`
-   - Build Command: `npm run build`
-   - Output Directory: `dist`
-5. Select **Deploy**.
+The application operates as a client-side routed SPA with three primary views:
+- **`https://chunklensdev.vercel.app/`**: Commercial landing page with interactive strategy matrix, product overview, and Pro waitlist.
+- **`https://chunklensdev.vercel.app/?view=app`**: Full interactive chunking workbench with multi-model tokenization and 2D similarity heatmap.
+- **`https://chunklensdev.vercel.app/?view=learn`**: 29-lesson interactive RAG Academy with curriculum map, sandbox widgets, and quizzes.
 
 ### Headers & Configuration
 
 - `vercel.json` in the root repository defines the security headers for all routes, matching `public/_headers`.
 - `index.html` receives `Cache-Control: no-cache` to ensure instant updates upon new deployments.
 - Static bundles in `/assets/*` receive `Cache-Control: public, max-age=31536000, immutable`, while non-content-hashed self-hosted fonts in `/fonts/*` receive `Cache-Control: public, max-age=604800`.
+- **Content Security Policy**: `connect-src 'self' https://api.web3forms.com`, ensuring all document ingestion and processing remains strictly client-side with zero egress, while permitting background submission of the optional Pro waitlist form.
 
 ---
 
@@ -78,7 +77,7 @@ Verify that the production deployment never leaks document data over the network
 6. Change chunking strategies and tokenizers.
 7. Confirm that **zero** requests appear in the Network tab.
 8. Select the initial HTML document request in the Doc filter and inspect **Response Headers** to verify:
-   - `Content-Security-Policy`: includes `connect-src 'none'` and `frame-ancestors 'none'`
+   - `Content-Security-Policy`: includes `connect-src 'self' https://api.web3forms.com` and `frame-ancestors 'none'`
    - `X-Content-Type-Options`: `nosniff`
    - `X-Frame-Options`: `DENY`
    - `Permissions-Policy`: `camera=(), microphone=(), geolocation=()`

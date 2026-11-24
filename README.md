@@ -1,12 +1,14 @@
 # 🔍 ChunkLens
 
-> **Client-side document chunking and token cost workbench for RAG**  
-> *100% Client-Side • Zero Server Egress • Multi-Model BPE Analysis • Open Source (MIT) • Live demo: coming soon*
+> **Client-side document chunking, token cost workbench, and interactive RAG academy**  
+> *100% Client-Side • Zero Document Egress • 29 Interactive Lessons • 433 Verified Invariants • [Live Demo](https://chunklensdev.vercel.app)*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18-cyan.svg)](https://react.dev/)
-[![Zero Backend](https://img.shields.io/badge/Backend-$0%20(Client--Side)-emerald.svg)](#-100-client-side-privacy-guarantee)
+[![Live Demo](https://img.shields.io/badge/Demo-chunklensdev.vercel.app-emerald.svg)](https://chunklensdev.vercel.app)
+[![Zero Document Egress](https://img.shields.io/badge/Privacy-100%25%20Client--Side-emerald.svg)](#-100-client-side-privacy-guarantee)
+[![Tests Passing](https://img.shields.io/badge/Tests-433%20Passed-blue.svg)](#-verification--build)
 [![WCAG 2.2 AA](https://img.shields.io/badge/Accessibility-WCAG%202.2%20AA-blue.svg)](#-architecture--design-standards)
 
 ---
@@ -53,15 +55,22 @@ Compare token counts, density ratios, and variance across model families. Only t
 
 ### 4. Semantic Similarity Heatmap & Continuity Matrix
 - **$N \times N$ Pairwise Matrix:** Computes an interactive cosine similarity matrix directly in-browser using L2-normalized TF-IDF vectorization.
-- **Boundary Continuity Scoring:** Assesses semantic transition smoothness between neighboring chunks.
-- **Redundancy Detection:** Flags duplicate or highly redundant chunk pairs (>70% overlap) with shared key term extraction.
+- **Pixel-Perfect 2D Grid with 0px Drift:** Locked dual-axis sticky corner anchor (`data-testid="heatmap-corner-spacer"`) and uniform 44px column pitch ensure column headers never drift out of sync with matrix cells, even across 100+ chunks.
+- **Boundary Continuity Scoring:** Assesses semantic transition smoothness between neighboring chunks with a real-time adjacent continuity sparkline.
+- **Redundancy & Orphan Detection:** Flags duplicate or highly redundant chunk pairs (>70% overlap) with shared key term extraction, and isolates semantically disconnected orphan chunks.
 
-### 5. Document Sniffing & Local Parsing
+### 5. Interactive 29-Lesson RAG Academy
+- **Zero-to-Production Curriculum:** 9 structured modules (M0 to M8) covering mental models, document ingestion, tokenization physics, parent-child retrieval, hybrid search (RRF), cross-encoders, and production playbooks (legal contracts, 10-K financial filings, technical documentation).
+- **Embedded Simulation Sandboxes:** Hands-on interactive widgets (`V1PipelineFlowExplorer`, `V2ChunkSandbox`) allowing learners to simulate chunking boundaries directly inside the lesson text.
+- **Mastery Verification Quizzes:** Comprehensive multi-question quizzes with instant answer feedback and deep engineering rationale explanations.
+- **Progress Tracking:** Local, private progress persistence across modules without requiring any user account or cloud storage.
+
+### 6. Document Sniffing & Local Parsing
 - **Intelligent Ingestion:** Combines binary magic bytes (`%PDF-`), file extensions, and deep content heuristics to automatically identify uploaded documents.
 - **Supported Formats:** PDF (`.pdf`), Markdown (`.md`), Tabular CSV (`.csv`), TSV (`.tsv`), JSON Datasets (`.json`), JSON Lines (`.jsonl`), Source Code (`.py`, `.ts`, `.js`, `.go`, `.sql`), and Plain Text.
 - **Auto Strategy Alignment:** Uploading a CSV or JSON file automatically switches the workbench to **Tabular Record Chunking**; uploading Markdown aligns to **Markdown Header Splitting**.
 
-### 6. One-Click Production Code & Dataset Exporter
+### 7. One-Click Production Code & Dataset Exporter
 Generates copy-pasteable, production-ready code mirroring your exact in-browser parameters:
 - **Python (LangChain):** `RecursiveCharacterTextSplitter`, `MarkdownHeaderTextSplitter`
 - **Python (LlamaIndex):** `SentenceSplitter`, `TokenTextSplitter`
@@ -69,16 +78,20 @@ Generates copy-pasteable, production-ready code mirroring your exact in-browser 
 - **Native Python:** Zero external dependencies
 - **Dataset Export:** Download chunks as JSON or RFC 4180 CSV with token counts, character offsets, and metadata.
 
+### 8. Pro & Enterprise Ingestion Funnel
+- Dedicated waitlist and custom inquiry modal for high-volume batch processing, CI/CD pipeline linters, and air-gapped enterprise self-hosting.
+- Secure, non-intrusive background inquiry relay via Web3Forms, completely isolated from document processing.
+
 ---
 
 ## 🔒 100% Client-Side Privacy Guarantee
 
 ChunkLens operates entirely within your browser runtime:
-- **Zero Network Egress:** All text parsing, BPE tokenization, and vector similarity calculations execute locally.
-- **Strict Content Security Policy:** Production builds enforce `connect-src 'none'`, preventing any outbound network requests.
+- **Zero Document Egress:** All text parsing, BPE tokenization, and vector similarity calculations execute locally in WebAssembly and Web Workers. Your documents never touch our servers.
+- **Strict Content Security Policy:** Production builds enforce a strict CSP (`connect-src 'self' https://api.web3forms.com`), ensuring that document processing is completely air-gapped from network transmission (with network access restricted exclusively to the optional Pro waitlist inquiry form).
 - **Isolated PDF Parsing:** Client-side Web Worker parses PDF documents locally via `pdfjs-dist` with script evaluation disabled (`isEvalSupported: false`).
 - **Memory Safety:** Cloned buffer protection prevents memory leaks and detached buffer errors during binary file processing.
-- **Zero Cookies / Zero Telemetry:** No tracking, no analytics, no external CDN font calls, and no local storage persistence of your document text.
+- **Zero Tracking:** No tracking cookies, no third-party telemetry, no external CDN font calls, and no local storage persistence of your sensitive document text.
 
 ### DevTools Privacy Verification Guide
 You can independently verify the zero-egress guarantee at any time:
@@ -86,7 +99,7 @@ You can independently verify the zero-egress guarantee at any time:
 2. Switch to the **Network** tab.
 3. Upload any sensitive document, change chunking strategies, or inspect token counts.
 4. Verify that **zero network requests** are dispatched during parsing, chunking, or analysis.
-5. In the **Console** or **Security** tab, inspect the document headers or meta tags to verify the active Content Security Policy: `connect-src 'none'`.
+5. In the **Console** or **Security** tab, inspect the document headers or meta tags to verify the active Content Security Policy.
 
 ---
 
@@ -157,8 +170,12 @@ npm run build
 ┌──────────────────────────────────────────────────────────────┐
 │                    Client Browser Runtime                    │
 ├──────────────────────────────┬───────────────────────────────┤
+│ Core Views                   │ Landing (/)                   │
+│                              │ Workbench (/?view=app)        │
+│                              │ Learn Academy (/?view=learn)  │
+├──────────────────────────────┼───────────────────────────────┤
 │ UI Framework                 │ React 18 + TypeScript + Vite  │
-│ Design Tokens                │ Tailwind CSS + OKLCH Theme    │
+│ Design Tokens                │ Tailwind CSS + OKLCH + Serif  │
 │ Icons & Feedback             │ Lucide Icons + Native Toasts  │
 ├──────────────────────────────┼───────────────────────────────┤
 │ Off-Thread Processing        │ Background Web Worker         │
@@ -166,7 +183,30 @@ npm run build
 │ Similarity & Vectorizer      │ In-Memory TF-IDF + Cosine Sim │
 │ PDF Extraction               │ pdfjs-dist (Isolated Worker)  │
 │ Format Sniffer               │ Magic Bytes & Content Parser  │
+├──────────────────────────────┼───────────────────────────────┤
+│ Performance & Budget         │ Main Shell: 36.57 kB (<=185kB)│
+│                              │ Workbench: 116.24 kB (<=120kB)│
+│                              │ Total Initial: 152.8 kB(<=165)│
+│                              │ CSS Bundle: 44.16 kB (<=45kB) │
 └──────────────────────────────┴───────────────────────────────┘
+```
+
+### Verification & Test Suite
+```bash
+# Run strict TypeScript type check (0 errors)
+npm run typecheck
+
+# Run full Vitest unit & invariant suite (433 tests passing)
+npm test
+
+# Run cross-browser Playwright compatibility quick suite (16 tests)
+npm run test:compat:quick
+
+# Run production bundle budget validation gate
+npm run check:bundle
+
+# Production build
+npm run build
 ```
 
 ---

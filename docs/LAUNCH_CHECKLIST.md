@@ -1,31 +1,94 @@
-# 🚀 Release Pre-Flight Verification Checklist (v0.3.0)
+# 🚀 Release Pre-Flight Verification Checklist (v1.0.0)
 
 This checklist defines the rigorous pre-flight verification requirements for ChunkLens releases. Every item must be validated before production deployment.
 
 ---
 
-## 1. Zero Network Egress & CSP Audit
+## 1. Zero Document Egress & CSP Audit
 
-ChunkLens is designed with a strict zero-backend, client-side execution model. No user documents, tokens, or telemetry must ever leave the browser.
+ChunkLens is designed with a strict zero-backend, client-side execution model. No user documents, tokens, or document telemetry must ever leave the browser.
 
 - [ ] **Content Security Policy Enforcement:**
   - Build the production bundle: `npm run build`.
   - Preview production build: `npm run preview`.
   - In DevTools (`F12`), open the **Network** tab and inspect initial document response headers or meta tags.
-  - Verify CSP contains `connect-src 'none'`.
+  - Verify CSP contains `connect-src 'self' https://api.web3forms.com`.
 - [ ] **Runtime Egress Test:**
   - Clear the Network log.
-  - Load sample corpora (Constitution, Tech Spec, State of the Union).
+  - Load sample corpora (API Reference, SaaS Agreement, Financial 10-Q, CSV Catalog).
   - Upload a local plain text file, a markdown file, and a CSV file.
   - Switch chunking algorithms across all 5 strategies.
   - Change tokenizer profiles across all 6 models.
   - Toggle between Stream and Cards views; open Heatmap and Comparison modals.
   - Trigger JSON and CSV data exports.
-  - **Pass Criteria:** The Network tab must show **exactly 0** outbound HTTP/HTTPS/WebSocket requests after initial static asset load.
+  - **Pass Criteria:** The Network tab must show **exactly 0** outbound HTTP/HTTPS/WebSocket requests after initial static asset load (excluding optional Pro waitlist form submission).
 - [ ] **Offline Capability:**
   - In DevTools Network tab, toggle **Offline** mode.
   - Switch chunking parameters, change algorithms, and navigate chunks.
   - **Pass Criteria:** Application functions completely without interruption.
+
+---
+
+## 2. Multi-Route SPA & View State Preservation
+
+- [ ] **Root Landing Page (`/`):**
+  - Verify hero headline, strategy matrix, interactive simulation, and navigation CTA.
+  - Verify "Launch Visualizer" transitions instantly to the Workbench (`/?view=app`).
+  - Verify "RAG Academy" transitions to the curriculum map (`/?view=learn`).
+- [ ] **Session Document Preservation:**
+  - In the Workbench, load an in-progress document.
+  - Click the logo to return to the Landing page or visit the Learn Track.
+  - Click back to the Workbench: verify the document text, chunk configuration, and active tab are preserved.
+
+---
+
+## 3. 2D Similarity Heatmap & Matrix Continuity
+
+- [ ] **Locked Sticky Corner & Pitch Alignment:**
+  - Load a document with $\ge 65$ chunks.
+  - Switch to the Similarity Heatmap tab.
+  - Scroll horizontally: verify top-left corner spacer (`data-testid="heatmap-corner-spacer"`) stays pinned at `z-40`, preventing column headers from obscuring row numbers.
+  - Verify column headers (`#16`, `#17`, `#35`...) align exactly with cell buttons below with 0px drift.
+  - Verify cells render all the way through column #65 without truncation or empty black void.
+  - Verify self-similarity diagonal (100% / accent) is visible along cell `(i, i)`.
+- [ ] **Boundary Continuity Sparkline:**
+  - Verify adjacent-neighbor continuity score and sparkline bars reflect sequential transitions.
+
+---
+
+## 4. 29-Lesson RAG Academy & Interactive Widgets
+
+- [ ] **Curriculum Map:**
+  - Navigate to `/?view=learn`.
+  - Verify all 9 modules (M0 through M8) render with accurate lesson titles and duration estimates.
+- [ ] **Interactive Widgets:**
+  - Open Lesson 0.1: verify `V1PipelineFlowExplorer` renders interactive flow nodes.
+  - Open Lesson 3.2: verify `V2ChunkSandbox` allows real-time slider adjustments without lag.
+- [ ] **Quizzes & Progress:**
+  - Select quiz answers: verify instant feedback and detailed engineering rationales.
+  - Reload page: verify module completion checkmarks persist locally in `localStorage`.
+
+---
+
+## 5. Automated Verification Gates
+
+Run the automated verification suite before merging to `main`:
+```bash
+# 1. Typecheck
+npm run typecheck
+
+# 2. Vitest Suite (433 tests)
+npm test
+
+# 3. Bundle Budgets
+npm run check:bundle
+
+# 4. Compatibility Quick Suite (16 tests)
+npm run test:compat:quick
+
+# 5. Heatmap Alignment E2E (2 tests)
+npx playwright test e2e/heatmapAlignment.spec.ts
+```
 
 ---
 
